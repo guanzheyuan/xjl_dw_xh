@@ -25,9 +25,6 @@ public class WxServer extends GenericModel{
 	@Column(name = "WX_SERVER_ID")
 	public Long wxServerId;
 
-	@Column(name = "SCHOOL_ID")
-	public Long schoolId;
-
 	@Column(name = "WX_CODE")
 	public String wxCode;
 

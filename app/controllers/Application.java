@@ -16,7 +16,10 @@ public class Application extends Controller {
     
  // 根目录下的访问txt文件自动匹配到/public/txt/目录下对应的文件上
  	public static void txt() {
- 		render("/public/txt" + request.url);
+ 		Logger.info("request.url1:"+request.url.split("xh")[0]);
+ 		Logger.info("request.url2:"+request.url.split("xh")[1]);
+ 		render("/public/txt" + request.url.split("xh")[1]);
+ 		//render("/public/txt" + request.url);
  	}
 
  	public static void timeout() {

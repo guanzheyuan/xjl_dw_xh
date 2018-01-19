@@ -76,6 +76,7 @@ public class MobileFilter extends BaseController{
 					}
 				}else{
 					//跳转到登录口 后续增加
+					LoginService.index();
 				}
 			}else{
 				sessionInfo=new SessionInfo();
@@ -89,7 +90,7 @@ public class MobileFilter extends BaseController{
 			if(Cache.get(Key)==null){
 				String doMain = request.domain;
 				if("localhost".equals(doMain)){
-					doMain="dw201709.com/zz";
+					doMain="dw201709.com/xh";
 				}
 				Map<String, String> condition = new HashMap<>();
 				condition.put("doMain", doMain);
@@ -263,7 +264,19 @@ public class MobileFilter extends BaseController{
 		}
 		return sessionInfo;
 	}
-
+	public static WxUser getWXUser() {
+		SessionInfo sessionInfo = getSessionInfo();
+		if (sessionInfo!=null) {
+			WxUser wxUser=sessionInfo.getWxUser();
+			log.debug("wxUser信息 openId:"+wxUser.wxOpenId + " nickName:"+wxUser.nickName);
+			return wxUser;
+		}
+		else{
+			log.debug("session为空");
+        	nok(Messages.get("appletSessionBeOverdue"));
+		}
+		return null;
+	}
 	private static void setSessionInfo(SessionInfo sessionInfo){
 		Cache.set(getSessionKey(), sessionInfo);
 	}
