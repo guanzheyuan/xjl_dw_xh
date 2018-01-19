@@ -40,6 +40,10 @@ angular.module('app', ['ngTouch'])
 					    if(obj.iphone == ""){
 					    	return {flag:false, msg: '手机号不能为空！'};
 					    }
+					    var lenObj = obj.iphone;
+					    if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(lenObj))){
+					    	return {flag:false, msg: '手机号格式错误！'};
+					    }
 					    return {flag: true, msg: '验证通过'};
 					},
 					provinceInfo:function(){
@@ -48,14 +52,25 @@ angular.module('app', ['ngTouch'])
                               url: '/xh/mobile/Execute/queryProvinces'
 						 });
 					},
-					cityInfo:function(provinceid){
+					save:function(obj){
 						return $http({
 							method: 'GET',
-                            url: '/xh/mobile/Execute/queryCity',
+                            url: '/xh/mobile/Execute/saveSign',
                             params:{
-                            	provinceid:provinceid
+                            	companyName:obj.companyName,
+                            	companyProvinces:obj.companyProvinces.provinceId,
+                            	companyCity:obj.companyCity.cityId,
+                            	companyAddress:obj.companyAddress,
+                            	name:obj.name,
+                            	iphone:obj.iphone
             				}
 						 });
+					},
+					vaildSave:function(obj){
+						return $http({
+							method: 'GET',
+                            url: '/xh/mobile/Execute/doVaildUserInfo'
+						});
 					}
 				}
 			}])
@@ -71,16 +86,46 @@ angular.module('app', ['ngTouch'])
 						iphone:''
 				}
 				$scope.submit = function(me){
-					console.log($scope.register);
-					var vaildRes = 	agentRemote.valid($scope.register);
-				    if(vaildRes.flag){
-					  
-				    }else{
-				    	layer.open({
-	                       content: vaildRes.msg,
-	                       btn: ['知道了']
-		                   });
-				    }
+					agentRemote.vaildSave().then(function(res){
+						console.log(res);
+						if (res.data.ret == '-1') {
+							layer.open({
+	                               content: res.data.desc,
+	                               btn: ['知道了']
+	                           });
+						}else{
+							if(!res.data.data){
+								layer.open({
+	                               content:"您已经注册！",
+	                               btn: ['知道了']
+	                            });
+								return;
+							}
+							var vaildRes = 	agentRemote.valid($scope.register);
+						    if(vaildRes.flag){
+						    	agentRemote.save($scope.register).then(function(res){
+						    		  if (res.data.ret == '-1') {
+						    			  layer.open({
+				                               content: res.data.desc,
+				                               btn: ['知道了']
+				                           });
+						    		  }else{
+						    			  layer.open({
+				                               content: '发布成功',
+				                               btn: ['确定'],
+				                               end: function () {
+				                               }
+				                           });
+						    		  }
+						    	})
+						    }else{
+						    	layer.open({
+			                       content: vaildRes.msg,
+			                       btn: ['知道了']
+				                   });
+						    }
+						}
+					});
 				}
 				//初始化
 				$scope.initPage = function (me) {

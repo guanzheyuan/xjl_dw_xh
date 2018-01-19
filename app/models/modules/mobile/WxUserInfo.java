@@ -97,8 +97,25 @@ public class WxUserInfo  extends GenericModel{
 			sql += "and a.wx_open_id='"+searchKeyWord+"' ";
 	    }
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
-		List<WxUser> data = ModelUtils.queryData(pageIndex, pageSize, ret, WxUser.class);
+		List<WxUserInfo> data = ModelUtils.queryData(pageIndex, pageSize, ret, WxUserInfo.class);
 		return ModelUtils.createResultMap(ret, data);
+	}
+	
+	/**
+	 * 通过微信id验证是否注册
+	 * @param wxOpenId
+	 * @return
+	 */
+	public static boolean queryUserInfoByWxOpenId(String wxOpenId){
+		String sql = "select * from xjl_dw_userinfo where status='0AA' and  wx_open_id='"+wxOpenId+"'";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
+		if(data.isEmpty()){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 }
