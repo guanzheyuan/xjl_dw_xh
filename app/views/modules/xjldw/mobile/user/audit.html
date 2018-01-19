@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>注册审核</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+ 		  .factory('agentRemote', ['$http', function ($http, appValue) {
+ 			  return {
+ 				  auditInfo:function(){
+ 					  return $http({
+ 						 method: 'GET',
+ 						 url:'/xh/mobile/Execute/doQueryUserInfoForStay'
+ 					  })
+ 				  },
+ 				  isPass:function(id,status){
+ 					  return $http({
+ 						 method: 'GET',
+ 						 url:'/xh/mobile/Execute/doModifyUserInfoIsPass',
+ 						 params:{
+ 							id:id,
+ 							status:status
+ 						 }
+ 					  })
+ 				  }
+ 			  }
+ 		  }])
+ 		  .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+ 			  $scope.auditList = [];
+ 			  $scope.passClick = function(id,status){
+ 				 agentRemote.isPass(id,status).then(function(res){
+ 					layer.open({
+                        content: '操作成功',
+                        btn: ['确定'],
+                        end: function () {
+                        	$scope.initPage();
+                        }
+                    });
+ 				 })
+ 			  }
+ 			  //初始化
+ 			  $scope.initPage = function (me) {
+ 				agentRemote.auditInfo().then(function(res){
+ 					$scope.auditList = res.data.data.data;
+ 					  console.log(res.data.data.data);
+ 				},function(response){
+ 					
+ 				})
+ 			 }
+ 			$scope.initPage();
+ 		  }]);
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<div class="weui_panel weui_panel_access">
+       <div class="weui_panel_hd">注册待审核</div>
+       <div class="weui_panel_bd" >
+          <div class="weui_media_box weui_media_text" ng-show="auditList.length==0">
+          	 <h6 class="weui_media_title">暂无待审核数据....</h6>
+          </div>
+           <div class="weui_media_box weui_media_text" ng-repeat="audit in auditList" >
+	           <div  ng-if="audit.userinfoType == ''">
+	           	   <h6 class="weui_media_title">{{audit.companyName}}</h6>
+	               <h6 class="weui_media_title">{{audit.conpanyAddress}}</h6>
+	               <h6 class="weui_media_title">{{audit.userinfoName}}</h6>
+	               <h6 class="weui_media_title">{{audit.iphone}}</h6>
+	               <div class="button_sp_area">
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="passClick({{audit.userInfoId}},'0AA')">通过</a>
+	               </div>
+	           </div>
+	           <div ng-if="audit.userinfoType != ''">
+		           <h6 class="weui_media_title">{{audit.userinfoName}}</h6>
+	               <h6 class="weui_media_title">{{audit.iphone}}</h6>
+	               <h6 class="weui_media_title">{{audit.userinfoTypeName}}</h6>
+	               <div class="button_sp_area">
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="passClick({{audit.userInfoId}},'0AA')">通过</a>
+	               </div>
+	           </div>
+           </div>
+       </div>
+</div>       
+</body>
+</html>

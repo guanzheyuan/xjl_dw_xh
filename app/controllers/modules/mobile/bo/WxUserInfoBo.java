@@ -10,7 +10,7 @@ public class WxUserInfoBo {
 	
 	public static WxUserInfo save(WxUserInfo wxUserInfo){
 		wxUserInfo.userInfoId = SeqUtil.maxValue("xjl_dw_userinfo", "USERINFO_ID");
-		wxUserInfo.status="0AA";
+		wxUserInfo.status="0AB";
 		wxUserInfo.createTime = DateUtil.getNowDate();
 		wxUserInfo = wxUserInfo.save();
 		return wxUserInfo;

@@ -58,4 +58,24 @@ public class Execute  extends MobileFilter {
 		boolean flag = WxUserInfo.queryUserInfoByWxOpenId(wxuser.wxOpenId);
 		ok(flag);
 	}
+	
+	/**
+	 * 查询待审核的注册信息
+	 */
+	public static void doQueryUserInfoForStay(){
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		Map ret = WxUserInfo.queryUserInfoByList(condition, pageIndex, pageSize);
+		ok(ret);
+	}
+	/**
+	 * 是否通过审核
+	 */
+	public static void doModifyUserInfoIsPass(){
+		String status = params.get("status");
+		String id = params.get("id");
+		int ret = WxUserInfo.modifyUserInfoIsPass(id, status);
+		ok(ret);
+	}
 }

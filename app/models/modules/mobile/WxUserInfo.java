@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,15 @@ public class WxUserInfo  extends GenericModel{
 	@Column(name = "CREATE_TIME")
 	public Date createTime;
 	
+	@Column(name = "ISADMIN")
+	public String isadmin;
+	
+	@Transient
+	public String address;
+	
+	@Transient
+	public String userinfoTypeName;
+	
 	
 	/**
 	 * 根据微信Id得到用户基本信息
@@ -102,6 +112,24 @@ public class WxUserInfo  extends GenericModel{
 	}
 	
 	/**
+	 * 查询申请未审核的注册信息
+	 * @param condition
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	public static Map queryUserInfoByList(Map<String, String> condition,int pageIndex, int pageSize){
+		String sql="select * from xjl_dw_userinfo where status='0AB' order by CREATE_TIME desc";
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
+		for (WxUserInfo wxUserInfo : data) {
+			if(StringUtil.isNotEmpty(wxUserInfo.userinfoType)){
+				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
+			}
+		}
+		return ModelUtils.createResultMap(ret, data);
+	}
+	/**
 	 * 通过微信id验证是否注册
 	 * @param wxOpenId
 	 * @return
@@ -116,6 +144,35 @@ public class WxUserInfo  extends GenericModel{
 		}else{
 			return false;
 		}
+	}
+	
+	/**
+	 * 根据管理员标记和微信ID判断登录人是否是管理员
+	 * @param wxOpenId
+	 * @return
+	 */
+	public static boolean queryAdminInfoByFlag(String wxOpenId){
+		String sql="select * from xjl_dw_userinfo where status='0AA' and isadmin='0AA' and  wx_open_id='"+wxOpenId+"' ";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
+		if(data.isEmpty()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * 修改状态
+	 * @param id
+	 * @param status
+	 * @return
+	 */
+	public static int modifyUserInfoIsPass(String id,String status){
+		String sql="update xjl_dw_userinfo set status='"+status+"' where USERINFO_ID='"+id+"'";
+		Map<String, String> condition = new HashMap<String, String>();
+		return ModelUtils.executeDelete(condition, sql);
 	}
 	
 }

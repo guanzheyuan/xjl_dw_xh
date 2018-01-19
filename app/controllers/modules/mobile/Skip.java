@@ -2,6 +2,7 @@ package controllers.modules.mobile;
 import controllers.comm.SessionInfo;
 import controllers.modules.mobile.filter.MobileFilter;
 import models.modules.mobile.WxUser;
+import models.modules.mobile.WxUserInfo;
 import play.Logger;
 import play.i18n.Messages;
 public class Skip extends MobileFilter {
@@ -9,8 +10,14 @@ public class Skip extends MobileFilter {
 	/**
 	 * 跳转到注册认证
 	 */
-	public static void toRegister() {
-        render("modules/xjldw/mobile/user/register.html");
+	public static void toRegisterOrAudit() {
+		WxUser wxuser = getWXUser();
+		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
+		if(!flag){
+			render("modules/xjldw/mobile/user/audit.html");
+		}else{
+			render("modules/xjldw/mobile/user/register.html");
+		}
     }
 	
 	/**
