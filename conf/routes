@@ -3,33 +3,33 @@
 # ~~~~
 
 # Home page
-GET     /                                   Application.mIndex
+GET     /xh                                  Application.mIndex
 
 # Home page
-GET     /pc                                 LoginService.index
-GET     /mobile                             LoginService.mIndex
+GET     /xh/pc                                 LoginService.index
+GET     /xh/mobile                             LoginService.mIndex
 
 # Ignore favicon requests
-GET     /favicon.ico                            404
+GET     /xh/favicon.ico                            404
 
 #weixin config
-GET    /auth                   modules.weixin.Auth.get
-POST   /auth                   modules.weixin.Auth.post
+GET    /xh/auth                   modules.weixin.Auth.get
+POST   /xh/auth                   modules.weixin.Auth.post
 
 # Map static resources from the /app/public folder to the /public path
-GET     /public/                                staticDir:public
+GET     /xh/public/                                staticDir:public
 
 # web images static resources from the /app/web folder to the /web path
-GET     /_web_/                                staticDir:_web_
+GET     /xh/_web_/                                staticDir:_web_
 
 # Map static resources from the /app/websit folder to the /websit path
-GET     /websit/                                staticDir:websit
-GET     /doc/                                   staticDir:doc
+GET     /xh/websit/                                staticDir:websit
+GET     /xh/doc/                                   staticDir:doc
 
 # common config
-*      /{module}/{service}/{action}               modules.{module}.{service}.{action}
-*      /{txtfilename}.txt               Application.txt
+*      /xh/{module}/{service}/{action}               modules.{module}.{service}.{action}
+*      /xh/{txtfilename}.txt               Application.txt
 
 
 # Catch all
-*       /{controller}/{action}                  {controller}.{action}
+*       /xh/{controller}/{action}                  {controller}.{action}
