@@ -69,6 +69,17 @@ public class Execute  extends MobileFilter {
 		Map ret = WxUserInfo.queryUserInfoByList(condition, pageIndex, pageSize);
 		ok(ret);
 	}
+	
+	/**
+	 * 查询审核记录
+	 */
+	public static void doQueryUserInfoStayLog(){
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		Map ret = WxUserInfo.queryUserInfoLog(condition, pageIndex, pageSize);
+		ok(ret);
+	}
 	/**
 	 * 是否通过审核
 	 */

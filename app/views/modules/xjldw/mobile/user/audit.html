@@ -37,6 +37,12 @@ angular.module('app', ['ngTouch'])
  							status:status
  						 }
  					  })
+ 				  },
+ 				  auditLog:function(){
+ 					  return $http({
+ 						 method: 'GET',
+ 						 url:'/xh/mobile/Execute/doQueryUserInfoStayLog'
+ 					  });
  				  }
  			  }
  		  }])
@@ -44,20 +50,37 @@ angular.module('app', ['ngTouch'])
  			  $scope.auditList = [];
  			  $scope.passClick = function(id,status){
  				 agentRemote.isPass(id,status).then(function(res){
- 					layer.open({
-                        content: '操作成功',
-                        btn: ['确定'],
-                        end: function () {
-                        	$scope.initPage();
-                        }
-                    });
+ 					  $.toast("操作成功");
  				 })
+ 			  }
+ 			  $scope.changeAudit = function(flag){
+ 				  console.log(flag);
+ 				    if("0" == flag){
+ 				    	 $("#audit").addClass("weui_btn_primary");
+ 						 $("#audit").removeClass("weui_btn_default");
+ 						 $("#auditLog").removeClass("weui_btn_primary");
+ 				    	 $("#auditLog").addClass("weui_btn_default");
+ 				    	 agentRemote.auditInfo().then(function(res){
+ 		 					$scope.auditList = res.data.data.data;
+ 		 				},function(response){
+ 		 				})
+ 				    }else{
+ 				    	$("#auditLog").removeClass("weui_btn_default");
+ 				    	$("#auditLog").addClass("weui_btn_primary");
+ 				    	$("#audit").removeClass("weui_btn_primary");
+ 				    	$("#audit").addClass("weui_btn_default");
+ 				    	agentRemote.auditLog().then(function(res){
+ 				    		console.log(res.data.data.data);
+ 				    		$scope.auditList = res.data.data.data;
+ 				    	},function(response){
+ 		 				})
+ 				    }
+ 				   
  			  }
  			  //初始化
  			  $scope.initPage = function (me) {
  				agentRemote.auditInfo().then(function(res){
  					$scope.auditList = res.data.data.data;
- 					  console.log(res.data.data.data);
  				},function(response){
  					
  				})
@@ -68,7 +91,10 @@ angular.module('app', ['ngTouch'])
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
 <div class="weui_panel weui_panel_access">
-       <div class="weui_panel_hd">注册待审核</div>
+       <div class="weui_panel_hd" style="padding-left:55%">
+            <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" id="auditLog" ng-click="changeAudit(1)">审核记录</a>
+            <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" id="audit"    ng-click="changeAudit(0)">待审核</a>
+       </div>
        <div class="weui_panel_bd" >
           <div class="weui_media_box weui_media_text" ng-show="auditList.length==0">
           	 <h6 class="weui_media_title">暂无待审核数据....</h6>
@@ -79,18 +105,31 @@ angular.module('app', ['ngTouch'])
 	               <h6 class="weui_media_title">{{audit.conpanyAddress}}</h6>
 	               <h6 class="weui_media_title">{{audit.userinfoName}}</h6>
 	               <h6 class="weui_media_title">{{audit.iphone}}</h6>
-	               <div class="button_sp_area">
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="passClick({{audit.userInfoId}},'0AA')">通过</a>
+	               <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0AB'">
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default"  style="margin-left:40%" ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary"  style="width:60px;"ng-click="passClick({{audit.userInfoId}},'0AA')">通  过</a>
+	               </div>
+	               <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0XX'">
+	               	 <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_default">不通过</a>
+	               </div>
+	                <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0AA'">
+	               	 <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_primary">通过</a>
 	               </div>
 	           </div>
 	           <div ng-if="audit.userinfoType != ''">
 		           <h6 class="weui_media_title">{{audit.userinfoName}}</h6>
 	               <h6 class="weui_media_title">{{audit.iphone}}</h6>
 	               <h6 class="weui_media_title">{{audit.userinfoTypeName}}</h6>
-	               <div class="button_sp_area">
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="passClick({{audit.userInfoId}},'0AA')">通过</a>
+	               <h6 class="weui_media_title">{{audit.area}}</h6>
+	               <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0AB'">
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" style="margin-left:40%"ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" style="width:60px;" ng-click="passClick({{audit.userInfoId}},'0AA')">通  过</a>
+	               </div>
+	               <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0XX'">
+	               	 <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_default">不通过</a>
+	               </div>
+	                <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0AA'">
+	               	 <a href="javascript:;" class="weui_btn weui_btn_disabled weui_btn_primary">通过</a>
 	               </div>
 	           </div>
            </div>

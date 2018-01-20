@@ -68,6 +68,9 @@ public class WxUserInfo  extends GenericModel{
 	@Transient
 	public String userinfoTypeName;
 	
+	@Transient
+	public String statusName;
+	
 	
 	/**
 	 * 根据微信Id得到用户基本信息
@@ -126,6 +129,23 @@ public class WxUserInfo  extends GenericModel{
 			if(StringUtil.isNotEmpty(wxUserInfo.userinfoType)){
 				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
 			}
+		}
+		return ModelUtils.createResultMap(ret, data);
+	}
+	
+	/**
+	 * 审核记录
+	 * @param condition
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 */
+	public static Map queryUserInfoLog(Map<String, String> condition,int pageIndex, int pageSize){
+		String sql="select * from xjl_dw_userinfo where status in ('0AA','0XX') and isadmin is null order by CREATE_TIME desc";
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
+		for (WxUserInfo wxUserInfo : data) {
+			wxUserInfo.statusName = "0AA".equals(wxUserInfo.status)?"通过":"0XX".equals(wxUserInfo.status)?"不通过":"";
 		}
 		return ModelUtils.createResultMap(ret, data);
 	}
