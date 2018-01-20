@@ -1,4 +1,5 @@
 package models.modules.mobile;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Column;
@@ -47,4 +48,17 @@ public class XjlDwProvinces extends GenericModel{
 		}
 		return ModelUtils.createResultMap(ret,data);
 	}
+	
+	public static XjlDwProvinces queryProvinceByProvinceId(String provinceId){
+		String sql="select * from xjl_dw_provinces where status='0AA' and PROVINCEID='"+provinceId+"'";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwProvinces> data = ModelUtils.queryData(1, 10, ret, XjlDwProvinces.class);
+		if(!data.isEmpty()){
+			return data.get(0);
+		}else{
+			return new XjlDwProvinces();
+		}
+	}
+	
 }

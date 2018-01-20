@@ -1,5 +1,6 @@
 package models.modules.mobile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,5 +45,17 @@ public class XjlDwCities extends GenericModel {
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwCities> data = ModelUtils.queryData(pageIndex, pageSize, ret, XjlDwCities.class);
 		return ModelUtils.createResultMap(ret,data);
+	}
+	
+	public static XjlDwCities queryCitiesByProvinceId(String cityId,String provinceid){
+		String sql="select * from xjl_dw_cities where status='0AA' and cityId='"+cityId+"' and PROVINCEID='"+provinceid+"'";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwCities> data = ModelUtils.queryData(1, 10, ret, XjlDwCities.class);
+		if(!data.isEmpty()){
+			return data.get(0);
+		}else{
+			return new XjlDwCities();
+		}
 	}
 }

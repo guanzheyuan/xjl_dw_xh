@@ -13,6 +13,7 @@ import javax.persistence.Transient;
 
 import org.slf4j.LoggerFactory;
 
+import play.Logger;
 import play.db.jpa.GenericModel;
 import utils.StringUtil;
 import utils.jpa.SQLResult;
@@ -129,6 +130,20 @@ public class WxUserInfo  extends GenericModel{
 			if(StringUtil.isNotEmpty(wxUserInfo.userinfoType)){
 				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
 			}
+			if(StringUtil.isNotEmpty(wxUserInfo.conpanyProvince)){
+				XjlDwProvinces pro = XjlDwProvinces.queryProvinceByProvinceId(wxUserInfo.conpanyProvince);
+				if(null != pro){
+					wxUserInfo.address = pro.provinceName;
+				}
+				if(StringUtil.isNotEmpty(wxUserInfo.conpanyCity)){
+					XjlDwCities city = XjlDwCities.queryCitiesByProvinceId(wxUserInfo.conpanyCity, wxUserInfo.conpanyProvince);
+					if(null != city){
+						wxUserInfo.address += city.city;
+					}
+				}
+				wxUserInfo.address += wxUserInfo.conpanyAddress;
+			}
+			
 		}
 		return ModelUtils.createResultMap(ret, data);
 	}
@@ -146,6 +161,21 @@ public class WxUserInfo  extends GenericModel{
 		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
 		for (WxUserInfo wxUserInfo : data) {
 			wxUserInfo.statusName = "0AA".equals(wxUserInfo.status)?"通过":"0XX".equals(wxUserInfo.status)?"不通过":"";
+			if(StringUtil.isNotEmpty(wxUserInfo.conpanyProvince)){
+				XjlDwProvinces pro = XjlDwProvinces.queryProvinceByProvinceId(wxUserInfo.conpanyProvince);
+				if(null != pro){
+					wxUserInfo.address = pro.provinceName;
+				}
+				if(StringUtil.isNotEmpty(wxUserInfo.conpanyCity)){
+					Logger.info("进入城市查询");
+					XjlDwCities city = XjlDwCities.queryCitiesByProvinceId(wxUserInfo.conpanyCity, wxUserInfo.conpanyProvince);
+					Logger.info("城市结果"+city);
+					if(null != city){
+						wxUserInfo.address += city.city;
+					}
+				}
+				wxUserInfo.address += wxUserInfo.conpanyAddress;
+			}
 		}
 		return ModelUtils.createResultMap(ret, data);
 	}

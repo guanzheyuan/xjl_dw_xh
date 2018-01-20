@@ -39,8 +39,10 @@ angular.module('app', ['ngTouch'])
 					    if(obj.userType == ""){
 					    	return {flag:false, msg: '员工类型不能为空'};
 					    }
-					    if(obj.arer == ""){
-					    	return {flag:false, msg: '负责片区不能为空'};
+					    if("1" != obj.userType){
+					    	if(obj.arer == ""){
+						    	return {flag:false, msg: '负责片区不能为空'};
+						    }
 					    }
 					    return {flag: true, msg: '验证通过'};
 					},
@@ -75,8 +77,10 @@ angular.module('app', ['ngTouch'])
 				$scope.selectChange = function(me){
 					if("1" == $scope.staffRegister.userType){
 						$("#arer").attr("disabled","disabled");
+						$("#cell_arer").hide();
 					}else{
 						$("#arer").removeAttr("disabled");
+						$("#cell_arer").show();
 					}
 				}
 				//提交
@@ -112,13 +116,13 @@ angular.module('app', ['ngTouch'])
 	 	<div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">姓名</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="text"  placeholder="姓名" ng-model="staffRegister.name"/>
+	             <input class="weui_input" type="text"  placeholder="请输入姓名" ng-model="staffRegister.name"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">手机号</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*"  placeholder="手机号" ng-model="staffRegister.iphone"/>
+	             <input class="weui_input" type="number" pattern="[0-9]*"  placeholder="请输入手机号" ng-model="staffRegister.iphone"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell weui_cell_select weui_select_after">
@@ -133,10 +137,10 @@ angular.module('app', ['ngTouch'])
                 </select>
             </div>
         </div>
-        <div class="weui_cell">
+        <div class="weui_cell" id="cell_arer">
 	         <div class="weui_cell_hd"><label class="weui_label">负责片区</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" id="arer" type="text"  placeholder="负责片区" ng-model="staffRegister.arer" />
+	             <input class="weui_input" id="arer" type="text"  placeholder="请输入片区" ng-model="staffRegister.arer" />
 	         </div>
 	    </div>
 	 </div>

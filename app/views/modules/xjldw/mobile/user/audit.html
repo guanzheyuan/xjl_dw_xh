@@ -51,14 +51,15 @@ angular.module('app', ['ngTouch'])
  			  $scope.passClick = function(id,status){
  				 agentRemote.isPass(id,status).then(function(res){
  					  $.toast("操作成功");
+ 					 $scope.initPage();
  				 })
  			  }
  			  $scope.changeAudit = function(flag){
  				  console.log(flag);
  				    if("0" == flag){
- 				    	 $("#audit").addClass("weui_btn_primary");
+ 				    	 $("#audit").addClass("bg-blue");
  						 $("#audit").removeClass("weui_btn_default");
- 						 $("#auditLog").removeClass("weui_btn_primary");
+ 						 $("#auditLog").removeClass("bg-blue");
  				    	 $("#auditLog").addClass("weui_btn_default");
  				    	 agentRemote.auditInfo().then(function(res){
  		 					$scope.auditList = res.data.data.data;
@@ -66,8 +67,8 @@ angular.module('app', ['ngTouch'])
  		 				})
  				    }else{
  				    	$("#auditLog").removeClass("weui_btn_default");
- 				    	$("#auditLog").addClass("weui_btn_primary");
- 				    	$("#audit").removeClass("weui_btn_primary");
+ 				    	$("#auditLog").addClass("bg-blue");
+ 				    	$("#audit").removeClass("bg-blue");
  				    	$("#audit").addClass("weui_btn_default");
  				    	agentRemote.auditLog().then(function(res){
  				    		console.log(res.data.data.data);
@@ -91,9 +92,9 @@ angular.module('app', ['ngTouch'])
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
 <div class="weui_panel weui_panel_access">
-       <div class="weui_panel_hd" style="padding-left:55%">
-            <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" id="auditLog" ng-click="changeAudit(1)">审核记录</a>
-            <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" id="audit"    ng-click="changeAudit(0)">待审核</a>
+       <div class="weui_panel_hd" style="padding-left:58%">
+            <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default " id="auditLog" ng-click="changeAudit(1)">已审核</a>
+            <a href="javascript:;" class="weui_btn weui_btn_mini bg-blue" id="audit"    ng-click="changeAudit(0)">待审核</a>
        </div>
        <div class="weui_panel_bd" >
           <div class="weui_media_box weui_media_text" ng-show="auditList.length==0">
@@ -102,18 +103,18 @@ angular.module('app', ['ngTouch'])
            <div class="weui_media_box weui_media_text" ng-repeat="audit in auditList" >
 	           <div  ng-if="audit.userinfoType == ''">
 	           	   <h6 class="weui_media_title">{{audit.companyName}}</h6>
-	               <h6 class="weui_media_title">{{audit.conpanyAddress}}</h6>
+	               <h6 class="weui_media_title">{{audit.address}}</h6>
 	               <h6 class="weui_media_title">{{audit.userinfoName}}</h6>
 	               <h6 class="weui_media_title">{{audit.iphone}}</h6>
-	               <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0AB'">
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default"  style="margin-left:40%" ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary"  style="width:60px;"ng-click="passClick({{audit.userInfoId}},'0AA')">通  过</a>
+	               <div class="button_sp_area"  style="padding-left:40%" ng-show="audit.status == '0AB'">
+	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default"  style="margin-left:40%"  ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
+	                <a href="javascript:;" class="weui_btn weui_btn_mini  bg-blue" ng-click="passClick({{audit.userInfoId}},'0AA')">通  过</a>
 	               </div>
 	               <div class="button_sp_area" style="padding-left:50%" ng-show="audit.status == '0XX'">
-	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_default" style="margin-left:40%" >不通过</a>
+	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_default" style="margin-left:40%" >未通过</a>
 	               </div>
 	                <div class="button_sp_area" style="padding-left:50%" ng-show="audit.status == '0AA'">
-	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_primary" style="margin-left:40%;width:70px;" >通过</a>
+	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_default" style="margin-left:40%;width:70px;" >已通过</a>
 	               </div>
 	           </div>
 	           <div ng-if="audit.userinfoType != ''">
@@ -123,13 +124,13 @@ angular.module('app', ['ngTouch'])
 	               <h6 class="weui_media_title">{{audit.area}}</h6>
 	               <div class="button_sp_area" style="padding-left:40%" ng-show="audit.status == '0AB'">
 	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" style="margin-left:40%"ng-click="passClick({{audit.userInfoId}},'0XX')">不通过</a>
-	                <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" style="width:60px;" ng-click="passClick({{audit.userInfoId}},'0AA')">通  过</a>
+	                <a href="javascript:;" class="weui_btn weui_btn_mini  bg-blue"  ng-click="passClick({{audit.userInfoId}},'0AA')">通  过</a>
 	               </div>
 	               <div class="button_sp_area" style="padding-left:50%" ng-show="audit.status == '0XX'">
-	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_default" style="margin-left:40%">不通过</a>
+	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_default" style="margin-left:40%">未通过</a>
 	               </div>
-	                <div class="button_sp_area" style="padding-left:5 0%" ng-show="audit.status == '0AA'">
-	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_primary" style="margin-left:40%;width:70px;">通过</a>
+	                <div class="button_sp_area" style="padding-left:50%" ng-show="audit.status == '0AA'">
+	               	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_disabled weui_btn_default" style="margin-left:40%;width:70px;">已通过</a>
 	               </div>
 	           </div>
            </div>

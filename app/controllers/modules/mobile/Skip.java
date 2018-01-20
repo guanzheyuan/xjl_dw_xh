@@ -27,4 +27,18 @@ public class Skip extends MobileFilter {
 		render("modules/xjldw/mobile/user/staff_register.html");
 	}
 	
+	/**
+	 * 跳转到产品展示页面
+	 */
+	public static void toProduct(){
+		render("modules/xjldw/mobile/product/product.html");
+	}
+	
+	/**
+	 * 跳转销售风采
+	 */
+	public static void toMarket(){
+		render("modules/xjldw/mobile/product/market.html");
+	}
+	
 }
