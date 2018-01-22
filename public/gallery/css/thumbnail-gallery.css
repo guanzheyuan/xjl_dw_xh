@@ -27,7 +27,7 @@ body {
     padding: 0;
     margin-bottom: 30px;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius:8px;
     border: none;
     transition: 0.15s ease-in-out;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.06);
@@ -42,7 +42,7 @@ body {
 }
 
 .tz-gallery .caption{
-    padding: 26px 30px;
+   
     text-align: center;
 }
 

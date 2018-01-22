@@ -45,4 +45,10 @@ public class Skip extends MobileFilter {
 		render("modules/xjldw/mobile/product/market.html");
 	}
 	
+	public static void toNavigation(){
+		WxUser wxuser = getWXUser();
+		renderArgs.put("wxUser",wxuser);
+		render("modules/xjldw/mobile/map/navigation.html");
+	}
+	
 }
