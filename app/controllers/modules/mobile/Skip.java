@@ -3,8 +3,10 @@ import controllers.comm.SessionInfo;
 import controllers.modules.mobile.filter.MobileFilter;
 import models.modules.mobile.WxUser;
 import models.modules.mobile.WxUserInfo;
+import models.modules.mobile.XjlDwChecking;
 import play.Logger;
 import play.i18n.Messages;
+import utils.StringUtil;
 public class Skip extends MobileFilter {
 	
 	/**
@@ -45,10 +47,31 @@ public class Skip extends MobileFilter {
 		render("modules/xjldw/mobile/product/market.html");
 	}
 	
+	/**
+	 * 跳转到一键导航
+	 */
 	public static void toNavigation(){
 		WxUser wxuser = getWXUser();
 		renderArgs.put("wxUser",wxuser);
 		render("modules/xjldw/mobile/map/navigation.html");
+	}
+	
+	/**
+	 * 跳转到企业管理
+	 */
+	public static void toBusiness(){
+		WxUser wxuser = getWXUser();
+		WxUserInfo userInfo = WxUserInfo.getFindByOpenId(wxuser.wxOpenId);
+		renderArgs.put("wxUser",wxuser);
+		renderArgs.put("userInfo",userInfo);
+		render("modules/xjldw/mobile/business/business_manage.html");
+	}
+	
+	/**
+	 * 跳转到考勤管理
+	 */
+	public static void toChecking(){
+		render("modules/xjldw/mobile/business/checking.html");
 	}
 	
 }

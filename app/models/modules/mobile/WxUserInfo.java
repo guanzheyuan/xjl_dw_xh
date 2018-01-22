@@ -73,6 +73,8 @@ public class WxUserInfo  extends GenericModel{
 	public String statusName;
 	
 	
+	
+	
 	/**
 	 * 根据微信Id得到用户基本信息
 	 * @param openid
@@ -112,6 +114,11 @@ public class WxUserInfo  extends GenericModel{
 	    }
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<WxUserInfo> data = ModelUtils.queryData(pageIndex, pageSize, ret, WxUserInfo.class);
+		for (WxUserInfo wxUserInfo : data) {
+			if(StringUtil.isNotEmpty(wxUserInfo.userinfoType)){
+				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
+			}
+		}
 		return ModelUtils.createResultMap(ret, data);
 	}
 	

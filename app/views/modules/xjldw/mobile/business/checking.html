@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>考勤管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<style type="text/css">
+.radiu{
+	width: 100px;
+	height: 100px;
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	border-radius: 50%; 
+	background-color:#73CBF5;
+ }
+</style>
+<script type="text/javascript">
+$(function(){
+	currerDay();
+	timeClock();
+})
+function currerDay(){
+	var date = new Date();
+	this.year = date.getFullYear();
+	this.month = date.getMonth() + 1;
+	this.date = date.getDate();
+	this.day = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六")[date.getDay()];
+	this.hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+	this.minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	this.second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+	var currentTime = this.year + "年" + this.month + "月" + this.date + "日 " + this.day;
+	$("#weuiTime").html(currentTime);
+}
+function timeClock(){
+	var date = new Date();
+	var intHours = date.getHours();//获得小时
+	var intMinutes = date.getMinutes();//获得分钟
+     if(intHours == 0){
+         hours = '00:';
+     }else if(intHours < 10){
+         hours = '0' + intHours + ':';
+     }else{
+         hours = intHours + ":";
+     }
+     
+     if(intMinutes == 0){
+         minutes = '00';
+     }else if(intMinutes < 10){
+         minutes = '0' + intMinutes ;
+     }else{
+         minutes = intMinutes;
+     }
+     var timeClock = hours+minutes;
+     $("#timeClock").html(timeClock);
+     window.setInterval('timeClock()',9000);
+}
+angular.module('app', ['ngTouch'])
+      .factory('agentRemote', ['$http', function ($http, appValue) {
+    	  return {
+    		  checkingInfo:function(){
+				  return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQueryCheckingLog'
+				  })
+			  },
+			  save:function(checkFlag){
+				  return $http({
+						 method: 'GET',
+						 url:'/xh/mobile/Execute/doChecking',
+						 params:{
+							 checkFlag:checkFlag
+ 						 }
+					  }) 
+			  },
+			  saveDuty:function(checkId){
+				  return $http({
+						 method: 'GET',
+						 url:'/xh/mobile/Execute/doCheckingOver',
+						 params:{
+							 checkId:checkId
+						 }
+					  })  
+			  },
+			  query:function(month){
+				  return $http({
+						 method: 'GET',
+						 url:'/xh/mobile/Execute/doQueryCheckingByMonth',
+						 params:{
+							 month:month
+						 }
+					  })  
+			  },
+			  statisChecking:function(month){
+				  return $http({
+						 method: 'GET',
+						 url:'/xh/mobile/Execute/doQueryCheckingAStatistics',
+						 params:{
+							 month:month
+						 }
+					  })  
+			  }
+    	  }
+      }])
+      .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+    	  $scope.checkFlag = "";
+    	  $scope.check = [];
+    	  $scope.checkList = [];
+    	  $scope.checkShow = true;
+    	  $scope.quanqin = 0;
+    	  $scope.chidao = 0;
+    	  $scope.zaotui = 0;
+    	  $scope.queqin = 0;
+    	  $scope.query = function(me){
+    		  var date = new Date();
+    		  agentRemote.query(date.getMonth() + 1).then(function(res){
+    			  $scope.checkList = res.data.data;
+    			  console.log(res.data.data);
+    		  });
+    	  }
+    	  
+    	 $scope.selectDate = function(me){
+    		  var month = $("#monthDate").val();
+    		  if(month != ""){
+    			  agentRemote.statisChecking(month).then(function(res){
+        			  console.log(res);
+        			  $scope.quanqin = res.data.data.quanqin;
+        			  $scope.chidao = res.data.data.chidao;
+        			  $scope.zaotui =  res.data.data.zaotui;
+        			  $scope.queqin = res.data.data.queqing;
+        		  })
+    		  }
+    	 }
+    	 $scope.changeCheck = function(flag){
+    		 if("0" == flag){
+    			 $("#detail").addClass("bg-blue");
+			     $("#detail").removeClass("weui_btn_default");
+			     $("#statistics").removeClass("bg-blue");
+		    	 $("#statistics").addClass("weui_btn_default");
+		    	 $scope.checkShow = true;
+    		 }else{
+    			 $("#statistics").removeClass("weui_btn_default");
+			     $("#statistics").addClass("bg-blue");
+			     $("#detail").removeClass("bg-blue");
+		    	 $("#detail").addClass("weui_btn_default"); 
+		    	 $scope.checkShow = false;
+    		 }
+    	 }
+    	  //下班打卡
+ 		 $scope.saveDuty = function(id){
+ 			 agentRemote.saveDuty(id).then(function(res){
+ 				 $.toast("操作成功");
+ 				 $scope.initChecking();
+ 			 })
+ 		 }
+ 		 //第一次打卡
+ 		 $scope.save = function(flag){
+ 			 agentRemote.save(flag).then(function(res){
+ 				 $scope.check = res.data.data;
+ 				 $.toast("操作成功");
+ 				 $scope.initChecking();
+ 			 });
+ 		 }
+    	 //初始化展示打开状态
+ 		  $scope.initChecking = function(me){
+ 			 agentRemote.checkingInfo().then(function(res){
+ 				 $scope.checkFlag = res.data.data.checkFlag;
+ 				 console.log(res);
+ 			 });
+ 		 };
+ 		 $scope.initChecking();
+ 		 $scope.query();
+      }])
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<div class="page-bd">
+	 <div class="weui-flex">
+            <div id="weuiTime" class="weui-flex-item" style="text-align:center;">
+            </div>
+      </div>
+      <div class="weui-flex">
+            <div class="weui-flex-item" style="text-align:center;">
+            	<div class="radiu" style="margin-left:35%;">
+            	   <p style="font-weight: bold;color:white;padding-top:20%;" ng-if="checkFlag == 'X'"   ng-click="save(checkFlag)">上班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:20%;" ng-if="checkFlag == 'B'"   ng-click="saveDuty(check.checkId)">下班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:20%;" ng-if="checkFlag == 'A'" >今日已打卡</p>
+            	   <p id="timeClock" style="font-weight: bold;color:white;"></p>
+            	</div>
+            </div>
+        </div>
+        <div class="weui-flex">
+            <div class="weui-flex-item" style="float:right;" >
+            	<a href="javascript:;" id="detail" class="weui_btn weui_btn_mini bg-blue" style="margin-left:70%" ng-click="changeCheck(0)">明细</a>
+            	<a href="javascript:;" id="statistics" class="weui_btn weui_btn_mini weui_btn_default" ng-click="changeCheck(1)">统计</a>
+            </div>
+      </div>
+      <div class="weui-flex">
+            <div class="weui-flex-item">
+            	<hr>
+            	<table class="weui-table weui-border-tb" ng-if="checkShow == true">
+	                <thead>
+	                <tr><th>日期</th><th>上班</th><th>下班</th></tr>
+	                </thead>
+	                <tbody >
+	                <tr ng-repeat="check in checkList">
+		                <td>{{check.workday}}</td>
+		                <td ng-if="check.am !='' && check.amval">{{check.am}}</td>
+		                <td ng-if="check.am !='' && !check.amval" style="color:red;">{{check.am}}</td>
+		                <td ng-if="check.am =='' && !check.isNow" style="color:red;">暂无数据</td>
+		                 <td ng-if="check.am =='' && check.isNow">{{check.am}}</td>
+		                
+		                
+		                <td ng-if="check.pm !=''&& check.pmval">{{check.pm}}</td>
+		                <td ng-if="check.pm !=''&& !check.pmval" style="color:red;">{{check.pm}}</td>
+		                <td ng-if="check.pm =='' && !check.isNow" style="color:red;">暂无数据</td>
+		                <td ng-if="check.pm =='' && check.isNow" >{{check.pm}}</td>
+		                
+	                </tr>
+	                </tbody>
+            	</table>
+            	  <div class="weui_cells" style="margin-top:0%;" ng-if="checkShow == false" >
+            	    <div class="weui_cell">
+		                <div class="weui_cell_hd"><label for="" class="weui_label">日期:</label></div>
+		                <div class="weui_cell_bd weui_cell_primary">
+		                    <input class="weui_input" id="monthDate" type="month"   ng-model="checkDate"/>
+		                </div>
+		                <div class="weui_cell_bd weui_cell_primary">
+		                		<a href="javascript:;" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-click="selectDate()">查询</a>
+		                </div>
+		            </div>
+		            <div class="weui_cell" >
+		                <div class="weui_cell_bd weui_cell_primary">
+		                    <p>全勤</p>
+		                </div>
+		                 <div class="weui_cell_ft">{{quanqin}}次</div>
+		            </div>
+		             <div class="weui_cell" >
+		                <div class="weui_cell_bd weui_cell_primary">
+		                    <p>迟到</p>
+		                </div>
+		                <div class="weui_cell_ft">{{chidao}}次</div>
+		            </div>
+		            <div class="weui_cell" >
+		                <div class="weui_cell_bd weui_cell_primary">
+		                    <p>早退</p>
+		                </div>
+		                <div class="weui_cell_ft">{{zaotui}}次</div>
+		            </div>
+		            <div class="weui_cell" >
+		                <div class="weui_cell_bd weui_cell_primary">
+		                    <p>缺勤</p>
+		                </div>
+		                <div class="weui_cell_ft">{{queqin}}次</div>
+		            </div>
+            	</div>
+      		 </div>
+      </div>
+</div>
+</body>
+</html>

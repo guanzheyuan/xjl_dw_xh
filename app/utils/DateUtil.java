@@ -5,8 +5,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import play.utils.Java;
@@ -866,27 +868,112 @@ public class DateUtil {
 
 	       return isSameDate;
 	   }
-
-	public static void main(String[] args) throws ParseException {
-
-		String a = "2017-01-13 15:14:00";
-		SimpleDateFormat dateFm = new SimpleDateFormat("EEEE");
-		System.out.println(dateFm.format(strToDate(a)));
-		
-		String b = DateUtil.date2String(new Date(), "yyyy-MM-dd H:mm:ss");
-//		System.out.println("b= " + b);
-
-		Date dd = DateUtil.string2SQLDate(a);
-		System.out.println("dd= " + dd);
-		System.out.println("new Date()= " + new Date());
-		System.out.println(isSameDate(dd, new Date()));
-		
-		System.out.println(diffMins(new Date(),dd));
-		
-		
-		String ssss = "01";
-		System.out.println(Integer.valueOf(ssss));
-		
+	
+	 public static List<Date> getDateWeek(Date begin,Date end){
+		 if(null == begin){
+		     begin = new Date();
+		 }
+		 if(null == end){
+		     end = new Date();
+		 }
+		 List<Date> list = getDate(begin, end);
+		 List<Date> result = new ArrayList<Date>();
+		 Calendar calendar = Calendar.getInstance();
+		 for(int i=0;i<list.size();i++){
+		     calendar.setTime(list.get(i));
+		     if (calendar.get(Calendar.DAY_OF_WEEK) == 1
+		      || calendar.get(Calendar.DAY_OF_WEEK) == 7) {
+		  continue;
+		     }else{
+		  result.add(list.get(i));
+		     }
+		 }
+		 return result;
+		    }
+	 /**
+	     * 返回两个日期之间的所有天数的日期
+	     * @param begin
+	     * @param end
+	     * @return
+	     */
+	    @SuppressWarnings("deprecation")
+	    public static List<Date> getDate(Date begin , Date end){
+	 List<Date> result = new ArrayList<Date>();
+	 while(begin.before(end)){
+	     result.add(new Date(begin.getYear(),begin.getMonth(),begin.getDate()));
+	     begin.setDate(begin.getDate()+1);
+	 }
+	 result.add(end);
+	 return result;
+	    }
+	    
+	    /** 
+	    * 获得该月第一天 
+	    * @param year 
+	    * @param month 
+	    * @return 
+	    */  
+	    public static String getFirstDayOfMonth(int year,int month){  
+	            Calendar cal = Calendar.getInstance();  
+	            //设置年份  
+	            cal.set(Calendar.YEAR,year);  
+	            //设置月份  
+	            cal.set(Calendar.MONTH, month-1);  
+	            //获取某月最小天数  
+	            int firstDay = cal.getActualMinimum(Calendar.DAY_OF_MONTH);  
+	            //设置日历中月份的最小天数  
+	            cal.set(Calendar.DAY_OF_MONTH, firstDay);  
+	            //格式化日期  
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
+	            String firstDayOfMonth = sdf.format(cal.getTime());  
+	            return firstDayOfMonth;  
+	        }  
+	      
+	    /** 
+	    * 获得该月最后一天 
+	    * @param year 
+	    * @param month 
+	    * @return 
+	    */  
+	    public static String getLastDayOfMonth(int year,int month){  
+	            Calendar cal = Calendar.getInstance();  
+	            //设置年份  
+	            cal.set(Calendar.YEAR,year);  
+	            //设置月份  
+	            cal.set(Calendar.MONTH, month-1);  
+	            //获取某月最大天数  
+	            int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);  
+	            //设置日历中月份的最大天数  
+	            cal.set(Calendar.DAY_OF_MONTH, lastDay);  
+	            //格式化日期  
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
+	            String lastDayOfMonth = sdf.format(cal.getTime());  
+	            return lastDayOfMonth;  
+	        }  
+	    public static List<Date> getDates(int year,int month){    
+	        List<Date> dates = new ArrayList<Date>();    
+	            
+	        Calendar cal = Calendar.getInstance();    
+	        cal.set(Calendar.YEAR, year);    
+	        cal.set(Calendar.MONTH,  month - 1);    
+	        cal.set(Calendar.DATE, 1);    
+	            
+	            
+	        while(cal.get(Calendar.YEAR) == year &&     
+	                cal.get(Calendar.MONTH) < month){    
+	            int day = cal.get(Calendar.DAY_OF_WEEK);    
+	                
+	            if(!(day == Calendar.SUNDAY || day == Calendar.SATURDAY)){    
+	                dates.add((Date)cal.getTime().clone());    
+	            }    
+	            cal.add(Calendar.DATE, 1);    
+	        }    
+	        return dates;    
+	    
+	    }    
+	public static void main(String[] args)  {
+		List<Date> dates  =  DateUtil.getDates(2028,1);
+		  System.out.println(dates.size());
 	}
 
 }
