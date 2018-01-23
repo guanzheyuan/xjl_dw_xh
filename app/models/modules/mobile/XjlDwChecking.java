@@ -105,8 +105,8 @@ public class XjlDwChecking extends GenericModel {
         	return null;
         }
 	}
-	public static int modifyAmOrPm(String checkId,String pm){
-		String sql="update xjl_dw_checking set  pm='"+pm+"' where CHECK_ID='"+checkId+"'";
+	public static int modifyAmOrPm(String wxOpenId,String pm,String workDate){
+		String sql="update xjl_dw_checking set  pm='"+pm+"' where wx_open_id='"+wxOpenId+"' and WORK_DATE='"+workDate+"'";
 		Map<String, String> condition = new HashMap<String, String>();
 		return ModelUtils.executeDelete(condition, sql);
 	}

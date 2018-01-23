@@ -146,8 +146,24 @@ public class Execute  extends MobileFilter {
 		Calendar cal = Calendar.getInstance();
 		check.workMonth = String.valueOf(cal.get(Calendar.MONTH)+1);
 		DateFormat df3 = DateFormat.getTimeInstance();
+		String am = "";
+		if(d.getHours() < 10){
+			am ="0"+d.getHours()+":"; 
+		}else{
+			am =d.getHours()+":"; 
+		}
+		if(d.getMinutes() <10){
+			am+="0"+d.getMinutes()+":";
+		}else{
+			am+=d.getMinutes()+":";
+		}
+		if(d.getSeconds() <10){
+			am+="0"+d.getSeconds();
+		}else{
+			am+=d.getSeconds();
+		}
 		if("X".equals(checkFlag)){
-			check.am = df3.format(d);
+			check.am = am;
 		}
 		check.wxOpenId = wxuser.wxOpenId;
 		check = XjlDwCheckingBo.save(check);
@@ -158,9 +174,26 @@ public class Execute  extends MobileFilter {
 	 */
 	public static void doCheckingOver(){
 	    Date d = new Date();
-	    String checkId = params.get("checkId");
+	    WxUser wxuser = getWXUser();
+	    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
 	    DateFormat df3 = DateFormat.getTimeInstance();
-	    XjlDwChecking.modifyAmOrPm(checkId, df3.format(d));
+	    String pm = "";
+		if(d.getHours() < 10){
+			pm ="0"+d.getHours()+":"; 
+		}else{
+			pm =d.getHours()+":"; 
+		}
+		if(d.getMinutes() <10){
+			pm+="0"+d.getMinutes()+":";
+		}else{
+			pm+=d.getMinutes()+":";
+		}
+		if(d.getSeconds() <10){
+			pm+="0"+d.getSeconds();
+		}else{
+			pm+=d.getSeconds();
+		}
+	    XjlDwChecking.modifyAmOrPm(wxuser.wxOpenId, pm,sf.format(d));
 	    ok();
 	}
 	
@@ -184,7 +217,10 @@ public class Execute  extends MobileFilter {
 				_map.put("am",xjlDwChecking.am);
 				_map.put("pm",xjlDwChecking.pm);
 				_map.put("amval",xjlDwChecking.am.compareTo(GOTO)<1);
-				_map.put("pmval", xjlDwChecking.pm.compareTo(GOBACK)>1);
+				if(StringUtil.isNotEmpty(xjlDwChecking.pm)){
+					Logger.info("记录："+xjlDwChecking.pm+">>"+xjlDwChecking.pm.compareTo(GOBACK));
+				}
+				_map.put("pmval", StringUtil.isNotEmpty(xjlDwChecking.pm)?xjlDwChecking.pm.compareTo(GOBACK)>=1:false);
 				_map.put("isNow",sf.format(now).equals(xjlDwChecking.workDate));
 				listMap.add(_map);
 			}
@@ -227,7 +263,7 @@ public class Execute  extends MobileFilter {
 					Logger.info("迟到"+chidao);
 				}
 				//早退
-				if(xjlDwChecking.pm.compareTo(GOBACK)<1){
+				if(xjlDwChecking.pm.compareTo(GOBACK)>=1){
 					zaotui++;
 					Logger.info("早退"+zaotui);
 				}

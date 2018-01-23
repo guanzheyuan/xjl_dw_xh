@@ -86,13 +86,10 @@ angular.module('app', ['ngTouch'])
  						 }
 					  }) 
 			  },
-			  saveDuty:function(checkId){
+			  saveDuty:function(){
 				  return $http({
 						 method: 'GET',
-						 url:'/xh/mobile/Execute/doCheckingOver',
-						 params:{
-							 checkId:checkId
-						 }
+						 url:'/xh/mobile/Execute/doCheckingOver'
 					  })  
 			  },
 			  query:function(month){
@@ -135,13 +132,17 @@ angular.module('app', ['ngTouch'])
     	 $scope.selectDate = function(me){
     		  var month = $("#monthDate").val();
     		  if(month != ""){
+    			  $.showLoading();
     			  agentRemote.statisChecking(month).then(function(res){
         			  console.log(res);
+        			  $.hideLoading();
         			  $scope.quanqin = res.data.data.quanqin;
         			  $scope.chidao = res.data.data.chidao;
         			  $scope.zaotui =  res.data.data.zaotui;
         			  $scope.queqin = res.data.data.queqing;
         		  })
+    		  }else{
+    			  $.toast("请选择时间查询", "cancel");
     		  }
     	 }
     	 $scope.changeCheck = function(flag){
@@ -160,8 +161,8 @@ angular.module('app', ['ngTouch'])
     		 }
     	 }
     	  //下班打卡
- 		 $scope.saveDuty = function(id){
- 			 agentRemote.saveDuty(id).then(function(res){
+ 		 $scope.saveDuty = function(){
+ 			 agentRemote.saveDuty().then(function(res){
  				 $.toast("操作成功");
  				 $scope.initChecking();
  			 })
@@ -236,11 +237,11 @@ angular.module('app', ['ngTouch'])
             	    <div class="weui_cell">
 		                <div class="weui_cell_hd"><label for="" class="weui_label">日期:</label></div>
 		                <div class="weui_cell_bd weui_cell_primary">
-		                    <input class="weui_input" id="monthDate" type="month"   ng-model="checkDate"/>
+		                    <input class="weui_input" id="monthDate" type="month"   ng-model="checkDate" ng-blur="selectDate()"/>
 		                </div>
-		                <div class="weui_cell_bd weui_cell_primary">
+		               <!--  <div class="weui_cell_bd weui_cell_primary">
 		                		<a href="javascript:;" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-click="selectDate()">查询</a>
-		                </div>
+		                </div> -->
 		            </div>
 		            <div class="weui_cell" >
 		                <div class="weui_cell_bd weui_cell_primary">
