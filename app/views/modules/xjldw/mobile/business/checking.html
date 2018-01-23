@@ -25,7 +25,7 @@
 	-webkit-border-radius: 50%;
 	-moz-border-radius: 50%;
 	border-radius: 50%; 
-	background-color:#73CBF5;
+	background-color:#C0C0C0;
  }
 </style>
 <script type="text/javascript">
@@ -49,6 +49,7 @@ function timeClock(){
 	var date = new Date();
 	var intHours = date.getHours();//获得小时
 	var intMinutes = date.getMinutes();//获得分钟
+	var second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
      if(intHours == 0){
          hours = '00:';
      }else if(intHours < 10){
@@ -64,9 +65,9 @@ function timeClock(){
      }else{
          minutes = intMinutes;
      }
-     var timeClock = hours+minutes;
+     var timeClock = hours+minutes+":"+second;
      $("#timeClock").html(timeClock);
-     window.setInterval('timeClock()',9000);
+     window.setInterval('timeClock()',1000);
 }
 angular.module('app', ['ngTouch'])
       .factory('agentRemote', ['$http', function ($http, appValue) {
@@ -121,6 +122,7 @@ angular.module('app', ['ngTouch'])
     	  $scope.chidao = 0;
     	  $scope.zaotui = 0;
     	  $scope.queqin = 0;
+    	  $scope.searchName = false;
     	  $scope.query = function(me){
     		  var date = new Date();
     		  agentRemote.query(date.getMonth() + 1).then(function(res){
@@ -158,7 +160,21 @@ angular.module('app', ['ngTouch'])
 			     $("#detail").removeClass("bg-blue");
 		    	 $("#detail").addClass("weui_btn_default"); 
 		    	 $scope.checkShow = false;
+		    	 setTimeout(function () {
+		    		 $scope.startDate()
+			     }, 1000);
     		 }
+    	 }
+    	 $scope.startDate = function(){
+    		    var date = new Date();
+    			this.year = date.getFullYear();
+    			this.month = date.getMonth() + 1;
+    			this.date = date.getDate();
+    			this.month = this.month < 10 ? "0" + this.month : this.month;
+    			var nowDate = this.year+"-"+this.month ;
+    			console.log(nowDate);
+    			$("#monthDate").val(nowDate);
+    			$scope.selectDate();
     	 }
     	  //下班打卡
  		 $scope.saveDuty = function(){
@@ -185,6 +201,7 @@ angular.module('app', ['ngTouch'])
  		 $scope.initChecking();
  		 $scope.query();
       }])
+      
 </script>
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
@@ -196,10 +213,10 @@ angular.module('app', ['ngTouch'])
       <div class="weui-flex">
             <div class="weui-flex-item" style="text-align:center;">
             	<div class="radiu" style="margin-left:35%;">
-            	   <p style="font-weight: bold;color:white;padding-top:20%;" ng-if="checkFlag == 'X'"   ng-click="save(checkFlag)">上班打卡</p>
-            	   <p style="font-weight: bold;color:white;padding-top:20%;" ng-if="checkFlag == 'B'"   ng-click="saveDuty(check.checkId)">下班打卡</p>
-            	   <p style="font-weight: bold;color:white;padding-top:20%;" ng-if="checkFlag == 'A'" >今日已打卡</p>
-            	   <p id="timeClock" style="font-weight: bold;color:white;"></p>
+            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'X'"   ng-click="save(checkFlag)">上班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'B'"   ng-click="saveDuty(check.checkId)">下班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'A'" >今日已打卡</p>
+            	   <p id="timeClock" style="color:white;font-size:13px;"></p>
             	</div>
             </div>
         </div>
@@ -235,13 +252,17 @@ angular.module('app', ['ngTouch'])
             	</table>
             	  <div class="weui_cells" style="margin-top:0%;" ng-if="checkShow == false" >
             	    <div class="weui_cell">
-		                <div class="weui_cell_hd"><label for="" class="weui_label">日期:</label></div>
-		                <div class="weui_cell_bd weui_cell_primary">
-		                    <input class="weui_input" id="monthDate" type="month"   ng-model="checkDate" ng-blur="selectDate()"/>
+		                <div class="weui_cell_hd"><label for="" class="weui_label"></label></div>
+		                <div id="monthDiv" class="weui_cell_bd weui_cell_primary" style="padding-left:25%;">
+		                    <input class="weui_input" style="width:100%;" id="monthDate" type="month" ng-model="checkDate" ng-blur="selectDate()"/>
 		                </div>
-		               <!--  <div class="weui_cell_bd weui_cell_primary">
-		                		<a href="javascript:;" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-click="selectDate()">查询</a>
-		                </div> -->
+		                <div class="weui_cell_bd">
+		                	 <div class="icon_sp_area">
+		                	 	<!--  <i id="searchName"><font style="color:#808080;font-style: normal">月份</font></i> -->
+		                	 	<!--  <i class="weui_icon_search" style="color:#808080"></i> -->
+		                	 	 <span class="icon icon-6"></span>
+		                	 </div>
+		                </div>
 		            </div>
 		            <div class="weui_cell" >
 		                <div class="weui_cell_bd weui_cell_primary">

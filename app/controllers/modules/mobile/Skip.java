@@ -74,4 +74,28 @@ public class Skip extends MobileFilter {
 		render("modules/xjldw/mobile/business/checking.html");
 	}
 	
+	/**
+	 * 跳转到述职报告新增页面
+	 */
+	public static void toReportAdd(){
+		render("modules/xjldw/mobile/report/report_add.html");
+	}
+	
+	/**
+	 * 跳转到述职报告修改页面
+	 */
+	public static void toReportModify(){
+		renderArgs.put("reportType","modify");
+		renderArgs.put("reportId",params.get("reportId"));
+		renderArgs.put("isThis",params.get("isThis"));
+		render("modules/xjldw/mobile/report/report_add.html");
+	}
+	
+	/**
+	 * 跳转到述职报告列表
+	 */
+	public static void toReportList(){
+		render("modules/xjldw/mobile/report/report_list.html");
+	}
+	
 }

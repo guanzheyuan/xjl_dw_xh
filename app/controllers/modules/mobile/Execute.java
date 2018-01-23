@@ -11,12 +11,14 @@ import java.util.Map;
 
 import controllers.modules.mobile.bo.WxUserInfoBo;
 import controllers.modules.mobile.bo.XjlDwCheckingBo;
+import controllers.modules.mobile.bo.XjlDwReportBo;
 import controllers.modules.mobile.filter.MobileFilter;
 import models.modules.mobile.WxUser;
 import models.modules.mobile.WxUserInfo;
 import models.modules.mobile.XjlDwChecking;
 import models.modules.mobile.XjlDwCities;
 import models.modules.mobile.XjlDwProvinces;
+import models.modules.mobile.XjlDwReport;
 import play.Logger;
 import utils.DateUtil;
 import utils.StringUtil;
@@ -263,7 +265,7 @@ public class Execute  extends MobileFilter {
 					Logger.info("迟到"+chidao);
 				}
 				//早退
-				if(xjlDwChecking.pm.compareTo(GOBACK)>=1){
+				if(StringUtil.isNotEmpty(xjlDwChecking.pm)&&xjlDwChecking.pm.compareTo(GOBACK)>=1){
 					zaotui++;
 					Logger.info("早退"+zaotui);
 				}
@@ -280,4 +282,104 @@ public class Execute  extends MobileFilter {
 		_temp.put("queqing", queqing);
 		ok(_temp);
 	}
+	
+	/**
+	 * 述职新增
+	 */
+	public static void doSaveReport(){
+		WxUser wxuser = getWXUser();
+		String workProgress = params.get("workProgress");
+		String workPlan = params.get("workPlan");
+		String isevection = params.get("isevection");
+		//当前时间
+        Date now = new Date();
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy年MM月");
+		XjlDwReport xjlDwReport = new XjlDwReport();
+		xjlDwReport.workProgress = workProgress;
+		Calendar cal = Calendar.getInstance();
+		xjlDwReport.month = String.valueOf(cal.get(Calendar.MONTH)+1);
+		xjlDwReport.year = String.valueOf(cal.get(Calendar.YEAR));
+		xjlDwReport.workPlan = workPlan;
+		xjlDwReport.title=sf.format(now)+"述职报告";
+		xjlDwReport.isevection = isevection;
+		xjlDwReport.wxOpenId = wxuser.wxOpenId;
+		xjlDwReport = XjlDwReportBo.save(xjlDwReport);
+		ok(xjlDwReport);
+	}
+	
+	/**
+	 * 述职修改
+	 */
+	public static void modifyReport(){
+		String workProgress = params.get("workProgress");
+		String workPlan = params.get("workPlan");
+		String isevection = params.get("isevection");
+		String reportId = params.get("reportId");
+		XjlDwReport.modifyReportById(reportId, workProgress, workPlan, isevection);
+		ok();
+	}
+	
+	/**
+	 * 根据reportid 修改内容
+	 */
+	public static void doQueryReportById(){
+		String id = params.get("reportId");
+		XjlDwReport report = XjlDwReport.queryReportByid(id);
+		ok(report);
+	}
+	/**
+	 * 述职列表
+	 */
+	public static void doQueryReportList(){
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		Map ret = XjlDwReport.queryReportByPage(condition, pageIndex, pageSize);
+		List<Map<String,Object>> listMap = new ArrayList<>();
+		Map<String,Object> _map = null;
+		WxUser wxuser = getWXUser();
+		if(null != ret){
+			//得到当前月份
+			Calendar cal = Calendar.getInstance();
+			int month = cal.get(Calendar.MONTH)+1;
+			String year = String.valueOf(cal.get(Calendar.YEAR));
+			SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+			for (int i = 1; i < month+1; i++) {
+				_map = new HashMap<>();
+				_map.put("title",year+"年"+i+"月");
+				_map.put("isSave", XjlDwReport.queryReportByisSave(year,String.valueOf(i), wxuser.wxOpenId));
+				_map.put("isThis",i==month);
+				XjlDwReport report = XjlDwReport.queryReportByMonth(year, String.valueOf(i), wxuser.wxOpenId);
+				Logger.info("述职"+report);
+				if(StringUtil.isNotEmpty(report)){
+					_map.put("reportId",report.reportId);
+					_map.put("createtime",sf.format(report.createTime));
+				}
+				if((i!=month && StringUtil.isNotEmpty(report)) || (i!=month)&&!StringUtil.isNotEmpty(report) ||(i==month)&&StringUtil.isNotEmpty(report) ){listMap.add(_map);}
+			}
+			
+			
+//			SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+//			List<XjlDwReport> data = (List<XjlDwReport>) ret.get("data");
+//			for (XjlDwReport xjlDwReport : data) {
+//				_map = new HashMap<>();
+//				xjlDwReport.time = sf.format(xjlDwReport.createTime);
+//			}
+		}
+		ok(listMap);
+	}
+	
+	/**
+	 * 判断当年当月是否录入过述职
+	 */
+	public static void isSaveReport(){
+		WxUser wxuser = getWXUser();
+		Calendar cal = Calendar.getInstance();
+		String month = String.valueOf(cal.get(Calendar.MONTH)+1);
+		String year = String.valueOf(cal.get(Calendar.YEAR));
+		boolean flag = XjlDwReport.queryReportByisSave(year, month, wxuser.wxOpenId);
+		ok(flag);
+	}
+	
+	
 }

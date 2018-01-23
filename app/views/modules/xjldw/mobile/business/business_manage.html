@@ -22,8 +22,8 @@
 <script src="/xh/public/js/zepto.min.js"></script>
 <style type="text/css">
 .radiu{
-	width: 100px;
-	height: 100px;
+	width: 98px;
+	height: 98px;
 	-webkit-border-radius: 50%;
 	-moz-border-radius: 50%;
 	border-radius: 50%; 
@@ -95,9 +95,9 @@ angular.module('app', ['ngTouch'])
            		</div>
             </div>
              <div class="weui-flex-item">
-             	<h4 class='weui_media_title f114'>${userInfo.userinfoName}</h4>
-             	<p class="weui_media_title f114">岗位:${userInfo.userinfoTypeName}</p>
-             		<p class="weui_media_title f114">电话:${userInfo.iphone}</p>
+             	<h4 class='weui_media_title f114' style="margin-left:10%">${userInfo.userinfoName}</h4>
+             	<p class="weui_media_title f114" style="margin-left:10%">岗位:${userInfo.userinfoTypeName}</p>
+             		<p class="weui_media_title f114" style="margin-left:10%">电话:${userInfo.iphone}</p>
              </div>
      </div>
      <div class="weui-flex">
@@ -105,9 +105,9 @@ angular.module('app', ['ngTouch'])
              <span class='f-blue' style="padding-left:25%;">本月出勤:{{workDay}}</span>
          </div>
          <div class="weui-flex-item" style="margin-top:-5%;">
-               <a href="javascript:;" class="weui_btn weui_btn_mini bg-blue" style="width:100px;" ng-if="checkFlag == 'X'"  ng-click="save(checkFlag)">上班打卡</a>
-         	   <a href="javascript:;" class="weui_btn weui_btn_mini bg-blue" style="width:100px;" ng-if="checkFlag == 'B'" ng-click="saveDuty(check.checkId)">下班打卡</a>
-         	    <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default weui_btn_disabled" style="width:100px;" ng-if="checkFlag == 'A'">今日已打卡</a>
+               <a href="javascript:;" class="weui_btn weui_btn_mini bg-blue" style="width:100px;margin-left:10%" ng-if="checkFlag == 'X'"  ng-click="save(checkFlag)" >上班打卡</a>
+         	   <a href="javascript:;" class="weui_btn weui_btn_mini bg-blue" style="width:100px;margin-left:10%" ng-if="checkFlag == 'B'" ng-click="saveDuty(check.checkId)">下班打卡</a>
+         	    <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default weui_btn_disabled" style="width:100px;margin-left:10%" ng-if="checkFlag == 'A'">今日已打卡</a>
          </div>
      </div>
      <div class="weui-flex">
@@ -117,70 +117,72 @@ angular.module('app', ['ngTouch'])
      </div>
      
      <div class="weui-flex">
-            <div class="weui-flex-item">
+            <div class="weui-flex-item" style="margin:5px;">
             <a href="">
-	            <div class="placeholder" style="border-radius:10px;width:80%;height:40%;background-color: white;">
+	            <div class="placeholder" style="border-radius:10px;width:88%;height:40%;background-color: white;">
 	            	<div class="thumbnail" >
-	                    <img src="/xh/public/images/mobile/xsgl.png" style="width:40%;height:10%;">
-	                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-12%;">
-	                    	<p style="color: #000000"><strong>销售管理</strong></p>
+	                    <img src="/xh/public/images/mobile/xsgl.png" style="width:35%;height:10%;margin-top:3%;">
+	                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-8%;">
+	                    	<p style="color:gray;" ><strong>销售管理</strong></p>
 	                    </div>
 		             </div>
 	            </div>
 	            </a>
             </div>
             <div class="weui-flex-item">
-	             <div class="placeholder" style="border-radius:10px;width:80%;height:60%;background-color: white;">
+	             <div class="placeholder" style="border-radius:10px;width:90%;height:60%;background-color: white;">
 	            	<div class="thumbnail"  >
-	                    <img src="/xh/public/images/mobile/xzgl.png" style="width:40%;height:10%;">
-	                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-12%;">
-	                    	<p style="color: #000000"><strong>薪资管理</strong></p>
+	                    <img src="/xh/public/images/mobile/xzgl.png" style="width:35%;height:10%;margin-top:3%;">
+	                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-8%;">
+	                    	<p  style="color:gray;" ><strong>薪资管理</strong></p>
 	                    </div>
 		             </div>
 	            </div>	
             </div>
      </div>
        <div class="weui-flex">
-	       	 <div class="weui-flex-item">
+	       	 <div class="weui-flex-item" style="margin:5px;">
 	       	  <a href="/xh/mobile/Skip/toChecking">
-		            <div class="placeholder" style="border-radius:10px;width:80%;height:60%;background-color: white;">
+		            <div class="placeholder" style="border-radius:10px;width:88%;height:60%;background-color: white;">
 		            	<div class="thumbnail"  >
-		                    <img src="/xh/public/images/mobile/kqgl.png" style="width:40%;height:10%;">
-		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-12%;">
-		                    	<p style="color: #000000"><strong>考勤管理</strong></p>
+		                    <img src="/xh/public/images/mobile/kqgl.png" style="width:35%;height:10%;margin-top:3%;">
+		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-8%;">
+		                    	<p style="color:gray;" ><strong>考勤管理</strong></p>
 		                    </div>
 			             </div>
 		            </div>
 	            </a>
 	            </div>
 	             <div class="weui-flex-item">
-		            <div class="placeholder" style="border-radius:10px;width:80%;height:60%;background-color: white;">
+	              <a href="/xh/mobile/Skip/toReportList">
+		            <div class="placeholder" style="border-radius:10px;width:90%;height:60%;background-color: white;">
 		            	<div class="thumbnail"  >
-		                    <img src="/xh/public/images/mobile/bg.png" style="width:40%;height:10%;">
-		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-12%;">
-		                    	<p style="color: #000000"><strong>述职报告</strong></p>
+		                    <img src="/xh/public/images/mobile/bg.png" style="width:35%;height:10%;margin-top:3%;">
+		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-8%;">
+		                    	<p  style="color:gray;" ><strong>述职报告</strong></p>
 		                    </div>
 			             </div>
 		            </div>
+		            </a>
 	            </div>
        </div>
        <div class="weui-flex">
-             <div class="weui-flex-item">
-		            <div class="placeholder" style="border-radius:10px;width:80%;height:60%;background-color: white;">
+             <div class="weui-flex-item" style="margin:5px;">
+		            <div class="placeholder" style="border-radius:10px;width:88%;height:60%;background-color: white;">
 		            	<div class="thumbnail"  >
-		                    <img src="/xh/public/images/mobile/luntan.png" style="width:40%;height:10%;">
-		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-12%;">
-		                    	<p style="color: #000000"><strong>西桓论坛</strong></p>
+		                    <img src="/xh/public/images/mobile/luntan.png" style="width:35%;height:10%;margin-top:3%;">
+		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-8%;">
+		                    	<p style="color:gray;"  ><strong>西桓论坛</strong></p>
 		                    </div>
 			             </div>
 		            </div>
 	            </div>
 	             <div class="weui-flex-item">
-		            <div class="placeholder" style="border-radius:10px;width:80%;height:60%;background-color: white;">
+		            <div class="placeholder" style="border-radius:10px;width:90%;height:60%;background-color: white;">
 		            	<div class="thumbnail"  >
-		                    <img src="/xh/public/images/mobile/cuncu.png" style="width:40%;height:10%;">
-		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-12%;">
-		                    	<p style="color: #000000"><strong>资料存储</strong></p>
+		                    <img src="/xh/public/images/mobile/cuncu.png" style="width:35%;height:10%;margin-top:3%;">
+		                    <div class="caption" style="padding:0px;text-decoration: none;margin-top:-8%;">
+		                    	<p style="color:gray;"  ><strong>资料存储</strong></p>
 		                    </div>
 			             </div>
 		            </div>
