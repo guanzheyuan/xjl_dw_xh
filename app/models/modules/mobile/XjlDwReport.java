@@ -14,6 +14,7 @@ import javax.persistence.Transient;
 import org.slf4j.LoggerFactory;
 
 import play.db.jpa.GenericModel;
+import utils.StringUtil;
 import utils.jpa.SQLResult;
 
 @Entity
@@ -64,7 +65,12 @@ public class XjlDwReport extends GenericModel {
 	 * @return
 	 */
 	public static Map queryReportByPage(Map<String, String> condition,int pageIndex, int pageSize){
-		String sql="select * from xjl_dw_report where status='0AA' ";
+		String sql="select * from xjl_dw_report where status='0AA'  ";
+		if(StringUtil.isNotEmpty(condition.get("wxOpenId"))){
+			String searchKeyWord = condition.get("wxOpenId");
+			sql += "and wx_open_id='"+searchKeyWord+"' ";
+	    }
+		sql+= "  order by year,month";
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwReport> data = ModelUtils.queryData(pageIndex, pageSize, ret, XjlDwReport.class);
 		return ModelUtils.createResultMap(ret, data);
@@ -117,6 +123,14 @@ public class XjlDwReport extends GenericModel {
     	}else{
     		return data.get(0);
     	}
+    }
+    
+    public static int queryCountReportForAdmin(String year,String month){
+    	String sql="select count(1)   from xjl_dw_report where year='"+year+"' and month='"+month+"' and wx_open_id in (select wx_open_id from xjl_dw_userinfo where status='0AA' and userinfo_type !='')";
+    	Map<String,String> condition = new HashMap<>();
+    	SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwReport> data = ModelUtils.queryData(1,10, ret);
+		return Integer.parseInt(String.valueOf(data.get(0)));
     }
     
     /**

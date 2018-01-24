@@ -47,7 +47,6 @@ angular.module('app', ['ngTouch'])
     	 $scope.isSave = function(){
     		 agentRemote.isSave().then(function(res){
     			 $scope.reportIsSave =  res.data.data;
-    			 console.log($scope.reportIsSave);
     		 });
     	 }
     	 $scope.initReport = function(me){
@@ -62,9 +61,9 @@ angular.module('app', ['ngTouch'])
 </script>
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
-<div class="weui_cells_title">
-	<a href="/xh/mobile/Skip/toReportAdd" id="detail" class="weui_btn weui_btn_mini bg-blue" style="margin-left:85%;" ng-if="reportIsSave == false" >新增</a>
-	<a   id="detail_false" class="weui_btn weui_btn_mini bg-blue weui_btn_disabled" style="margin-left:85%;" ng-if="reportIsSave == true" >新增</a>
+<div class="weui_cells_title" style="text-align: right;">
+	<a href="/xh/mobile/Skip/toReportAdd" id="detail" class="weui_btn weui_btn_mini bg-blue"ng-if="reportIsSave == false" >新增</a>
+	<a  id="detail_false" class="weui_btn weui_btn_mini bg-blue weui_btn_disabled" ng-if="reportIsSave == true" >新增</a>
 </div>
 <div class="weui_cells">
 	 <div class="weui_cell"  ng-if="reportList.length == 0">

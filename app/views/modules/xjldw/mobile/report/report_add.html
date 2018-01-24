@@ -31,7 +31,7 @@ function currerDay(){
 	this.hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
 	this.minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
 	this.second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-	var currentTime = this.year + "年" + this.month + "月" + this.date + "日 " + this.day;
+	var currentTime = this.year + "年" + this.month + "月"
 	$("#weuiTime").html(currentTime);
 }
 angular.module('app', ['ngTouch'])
@@ -106,6 +106,11 @@ angular.module('app', ['ngTouch'])
 		 $scope.isModify = function(){
     		 var vaildRes =  agentRemote.valid($scope.report);
     		 if(vaildRes.flag){
+    			 if($('#s11').is(':checked')){
+    				 $scope.report.isevection = 'true';
+    			 }else{
+    				 $scope.report.isevection ='';
+    			 }
     			 agentRemote.modifyReport($scope.report).then(function(res){
     				 if (res.data.ret == '-1') {
 		    			  $.toast(res.data.desc, "forbidden");
@@ -138,9 +143,10 @@ angular.module('app', ['ngTouch'])
     		 if("modify" ==  $scope.reportType){
     			 agentRemote.doQueryReport(${reportId}).then(function(res){
         			 $scope.report = res.data.data;
-        			 console.log(res.data.data);
-        			 if(res.data.data.isevection == "true"){
-        				 $("#s11").attr("checked",'checked');
+        			 if(res.data.data.isevection == "true" || res.data.data.isevection ==true){
+        				 //$("#s11").attr("checked",'checked');
+        				 var el = document.getElementById('s11')
+        				 el.checked = true;
         			 }
         		 });
     		 }
@@ -154,12 +160,11 @@ angular.module('app', ['ngTouch'])
 <div class="page-bd">
 	<div class="weui-flex"  style="margin-top:-5%;">
             <div class="weui-flex-item" >
-            	<span>
-	              <div class="weui_cells weui_cells_checkbox">
-	          		 <label class="weui_cell weui_check_label" for="s11">
-	          		   <div class="weui_cell_hd"> <span id="weuiTime"></span></div>
-		                <div class="weui_cell_hd" style="padding-left:20%;">
-		                    <input type="checkbox" class="weui_check" name="checkbox1" id="s11" ng-model="report.isevection" value="1" >
+	              <div class="weui_cells weui_cells_checkbox" >
+	          		 <label class="weui_cell weui_check_label" for="s11" style="float:right;">
+	          		   <div class="weui_cell_hd" > <span id="weuiTime"></span></div>
+		                <div class="weui_cell_hd" >
+		                    <input type="checkbox" class="weui_check" name="checkbox1" id="s11" ng-model="report.isevection">
 		                    <i class="weui_icon_checked"></i>
 		                </div>
 		                <div class="weui_cell_bd weui_cell_primary">
@@ -167,7 +172,6 @@ angular.module('app', ['ngTouch'])
 		                </div>
 	                  </label>
 	                </div>
-            	</span>
             </div>
     </div>
     <div class="weui-flex"  style="margin-top:-5%;">
@@ -196,7 +200,7 @@ angular.module('app', ['ngTouch'])
    </div>
     <div class="button_sp_area" style="margin-left:80%;">
     	  <a href="javascript:;" class="weui_btn weui_btn_mini  bg-blue" ng-click="save()" ng-if="reportType == ''">确定</a>
-    	  <a href="javascript:;" class="weui_btn weui_btn_mini  bg-blue" ng-click="isModify()" ng-if="reportType == 'modify' && isthis == 'true'">修改</a>
+    	  <a href="javascript:;" class="weui_btn weui_btn_mini  bg-blue" ng-click="isModify()" ng-if="reportType == 'modify' && isthis == 'true'">确定</a>
     </div>
 </div>
 </body>

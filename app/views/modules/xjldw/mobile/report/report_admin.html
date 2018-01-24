@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html  ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>述职管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+.factory('agentRemote', ['$http', function ($http, appValue) {
+	 return {
+		 userList:function(year,month){
+			 return $http({
+				 method: 'GET',
+				 url:'/xh/mobile/Execute/doQueryWxUserInfo',
+				 params:{
+					 year:year,
+					 month:month
+				 }
+			  })
+		 },
+		 count:function(year,month){
+			 return $http({
+				 method: 'GET',
+				 url:'/xh/mobile/Execute/doQueryCountReport',
+				 params:{
+					 year:year,
+					 month:month
+				 }
+			  })
+		 }
+	 }
+}])
+.controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+	 $scope.userList = [];
+	 $scope.countReport = 0;
+	 $scope.count = function(year,month){
+		 agentRemote.count(year,month).then(function(res){
+			 $scope.countReport  = res.data.data;
+			 console.log(res.data.data);
+		  })
+	 }
+	 $scope.selectDate = function(me){
+		 var date = new Date();
+ 		 this.year = date.getFullYear();
+ 		 this.month = date.getMonth() + 1;
+		 var month = $("#monthDate").val();
+		  if(month != ""){
+			  //增加验证 选择时间不能大于当前时间
+			  var montArr = month.split("-");
+			    if(parseInt(montArr[0])>parseInt(date.getFullYear())){
+			    	$.toast('未到时间不可选', "forbidden");
+			    	return;
+			    }
+			    if(parseInt(montArr[0])==parseInt(date.getFullYear())){
+			    	if(parseInt(montArr[1]) > parseInt(date.getMonth() + 1)){
+	    				   $.toast('未到时间不可选', "forbidden");
+	   			    	   return;
+	    			   }
+			    }
+			  $.showLoading();
+			  $scope.count(montArr[0],montArr[1]);
+			  agentRemote.userList(montArr[0],montArr[1]).then(function(res){
+				  $scope.userList = res.data.data.data;
+    			  $.hideLoading();
+    		  })
+		  }else{
+			  $.toast("请选择时间查询", "cancel");
+		  }
+	 }
+	 $scope.startDate = function(){
+		    var date = new Date();
+			this.year = date.getFullYear();
+			this.month = date.getMonth() + 1;
+			this.date = date.getDate();
+			this.month = this.month < 10 ? "0" + this.month : this.month;
+			var nowDate = this.year+"-"+this.month ;
+			console.log(nowDate);
+			$("#monthDate").val(nowDate);
+			$scope.selectDate();
+			$scope.count(this.year,this.month);
+	 }
+	 $scope.clickModify = function(id,report){
+		 if(report!=false){
+			 window.location.href="/xh/mobile/Skip/toReportModify?reportId="+id+"&isThis=false";
+		 }
+	 }
+	 $scope.initSales = function(me){
+		 agentRemote.userList('','').then(function(res){
+			 console.log(res);
+			 $scope.userList = res.data.data.data;
+		 })
+	 }
+	 $scope.initSales();
+	 setTimeout(function () {
+		 $scope.startDate()
+     }, 1000);
+}]);
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<div class="weui-flex">
+            <div class="weui-flex-item"><div class="weui_cell">报告({{countReport}})</div></div>
+            <div class="weui-flex-item">
+			   <div class="weui_cell">
+	                <div id="monthDiv" class="weui_cell_bd weui_cell_primary" >
+	                    <input class="weui_input" style="width:100%;padding-left:28%" id="monthDate" type="month"   ng-model="checkDate" ng-blur="selectDate()"/>
+	                </div>
+	                <span class="icon icon-6"></span>
+	            </div>
+			</div>
+        </div>
+ <div class="weui_cells">
+       <div class="weui_cell" ng-repeat="user in userList" ng-click="clickModify({{user.reportId}},{{user.report}})">
+          <div class="weui_cell_bd weui_cell_primary">
+              <p>{{user.userinfoName}}</p>
+          </div>
+          <div class="weui_cell_ft" ng-if="user.report == 'false'"style="color:red;">未提交</div>
+          <div class="weui_cell_ft" ng-if="user.report != 'false'">{{user.report}}</div>
+      </div>
+  </div>
+</body>
+</html>

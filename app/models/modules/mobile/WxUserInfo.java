@@ -1,5 +1,6 @@
 package models.modules.mobile;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,12 @@ public class WxUserInfo  extends GenericModel{
 	@Transient
 	public String statusName;
 	
+	@Transient
+	public String report;
+	
+	@Transient
+	public String reportId;
+	
 	
 	
 	
@@ -112,12 +119,20 @@ public class WxUserInfo  extends GenericModel{
 			String searchKeyWord = condition.get("wxOpenId");
 			sql += "and a.wx_open_id='"+searchKeyWord+"' ";
 	    }
+		if(StringUtil.isNotEmpty(condition.get("userinfoType"))){
+			String searchKeyWord = condition.get("userinfoType");
+			sql += "and a.USERINFO_TYPE !='' ";
+	    }
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
 		List<WxUserInfo> data = ModelUtils.queryData(pageIndex, pageSize, ret, WxUserInfo.class);
 		for (WxUserInfo wxUserInfo : data) {
 			if(StringUtil.isNotEmpty(wxUserInfo.userinfoType)){
 				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
 			}
+			XjlDwReport report = XjlDwReport.queryReportByMonth(condition.get("year"), condition.get("month"), wxUserInfo.wxOpenId);
+			wxUserInfo.report = null ==report?"false":sf.format(report.createTime);
+			wxUserInfo.reportId = null == report?"false":String.valueOf(report.reportId);
 		}
 		return ModelUtils.createResultMap(ret, data);
 	}

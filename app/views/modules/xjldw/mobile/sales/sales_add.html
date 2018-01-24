@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html  ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>销售管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+	 .factory('agentRemote', ['$http', function ($http, appValue) {
+		 return {
+			 valid:function(obj){
+			   if(obj.userinfo == ""){
+				   return {flag:false, msg: '请选择员工信息'}; 
+				}
+				if(obj.month == ""){
+					 return {flag:false, msg: '请选择月份'};  
+			    }
+				if(obj.market == ""){
+					 return {flag:false, msg: '请输入销售额'}; 
+				}
+				if(obj.returned == ""){
+					 return {flag:false, msg: '请输入回款额'}; 
+				}
+				if(obj.receivable == ""){
+					 return {flag:false, msg: '请输入应收款'}; 
+				}
+				if(obj.client == ""){
+					 return {flag:false, msg: '请输入客户费用'}; 
+				}
+				if(obj.travel == ""){
+					 return {flag:false, msg: '请输入差旅费'}; 
+				}
+				return {flag: true, msg: '验证通过'};
+			 }, 
+			 userInfo:function(){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQueryWxUserInfo'
+				  })
+			 }
+		 }
+	 }])
+     .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+    	 $scope.sales ={
+    			 userinfo:'',
+    			 month:'',
+    			 market:'',
+    			 returned:'',
+    			 receivable:'',
+    			 client:'',
+    			 travel:''
+    	 };
+    	  $scope.userList = [];
+    	  
+    	  $scope.save = function(me){
+    		  var vaildRes =  agentRemote.valid($scope.sales);
+    		  if(vaildRes.flag){
+    			  
+    		  }else{
+    			  $.toast(vaildRes.msg, "forbidden");
+    		  }
+    	  }
+    	  $scope.initUser = function(me){
+    		  agentRemote.userInfo().then(function(res){
+    			  $scope.userList = res.data.data.data;
+    			  console.log($scope.userList);
+    		  })
+    	  }
+    	  $scope.initUser();
+     }]);
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+ <div class="weui_cells weui_cells_form">
+ 	 <div class="weui_cell weui_cell_select weui_select_after">
+            <div class="weui_cell_hd">
+                <label for="" class="weui_label">员工</label>
+            </div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <select class="weui_select" name="select2" ng-model="sales.userinfo" ng-options=" userinfo.userinfoName for userinfo in userList" >
+                	  <option value="" style="font-size:20px;">--选择员工--</option>
+                </select>
+            </div>
+        </div>
+        <div class="weui_cell">
+              <div class="weui_cell_hd"><label for="" class="weui_label">月份</label></div>
+              <div id="monthDiv" class="weui_cell_bd weui_cell_primary">
+                  <input class="weui_input" style="width:100%;" id="monthDate" type="month"   ng-model="sales.month" placeholder="选择月份"/>
+              </div>
+         </div>
+         <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">销售额</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" pattern="[0-9]*"   placeholder="请填写销售额" ng-model="sales.market"/>
+	         </div>
+	     </div>
+	     <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">回款额</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写回款额" ng-model="sales.returned"/>
+	         </div>
+	    </div>
+	    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">应收款</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写应收款" ng-model="sales.receivable"/>
+	         </div>
+	    </div>
+	    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">客户费用</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" pattern="[0-9]*"  placeholder="请填写客户费用" ng-model="sales.client"/>
+	         </div>
+	    </div>
+	    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">差旅费</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写差旅费" ng-model="sales.travel"/>
+	         </div>
+	    </div>
+	    <div class="button_sp_area" style="text-align: right;" >
+    	  <a href="javascript:;" class="weui_btn weui_btn_mini  bg-blue" ng-click="save()" >确定</a>
+    </div>
+ </div>
+</body>
+</html>

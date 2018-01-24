@@ -78,8 +78,8 @@ public class XjlDwChecking extends GenericModel {
 	 * 得到正常打卡数据
 	 * @return
 	 */
-	public static Map queryWxCheckByWorking(){
-		String sql="select * from xjl_dw_checking where status='0AA'  and  am is not  null and pm is not null";
+	public static Map queryWxCheckByWorking(String wxOpenid){
+		String sql="select * from xjl_dw_checking where status='0AA' and wx_open_id='"+wxOpenid+"'  and  am is not  null and pm is not null";
 		Map<String, String> condition = new HashMap<>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwChecking> data = ModelUtils.queryData(1,1000000000, ret, XjlDwChecking.class);

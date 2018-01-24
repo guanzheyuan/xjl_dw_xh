@@ -95,7 +95,27 @@ public class Skip extends MobileFilter {
 	 * 跳转到述职报告列表
 	 */
 	public static void toReportList(){
-		render("modules/xjldw/mobile/report/report_list.html");
+		WxUser wxuser = getWXUser();
+		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
+		if(!flag){
+			render("modules/xjldw/mobile/report/report_admin.html");
+		}else{
+			render("modules/xjldw/mobile/report/report_list.html");
+		}
+	}
+	
+	/**
+	 * 跳转到销售管理页面
+	 */
+	public static void toSales(){
+		render("modules/xjldw/mobile/sales/sales_list.html");
+	}
+	
+	/**
+	 * 跳转到销售新增
+	 */
+	public static void toSalesAdd(){
+		render("modules/xjldw/mobile/sales/sales_add.html");
 	}
 	
 }
