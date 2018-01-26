@@ -51,6 +51,21 @@ angular.module('app', ['ngTouch'])
 					 method: 'GET',
 					 url:'/xh/mobile/Execute/doQueryWxUserInfo'
 				  })
+			 },
+			 save:function(obj){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doSaveWxUserInfo',
+					 params:{
+						 userinfoId:obj.userinfoId,
+						 month:obj.month,
+						 market:obj.market,
+						 returned:obj.returned,
+						 receivable:obj.receivable,
+						 client:obj.client,
+						 travel:obj.travel
+					 }
+				  })
 			 }
 		 }
 	 }])
@@ -62,14 +77,28 @@ angular.module('app', ['ngTouch'])
     			 returned:'',
     			 receivable:'',
     			 client:'',
-    			 travel:''
+    			 travel:'',
+    			 userinfoId:''
     	 };
     	  $scope.userList = [];
     	  
     	  $scope.save = function(me){
     		  var vaildRes =  agentRemote.valid($scope.sales);
     		  if(vaildRes.flag){
-    			  
+        		  var userInfoId = $scope.sales.userinfo.userInfoId;
+        		  $scope.sales.userinfoId = userInfoId;
+        		  if(""!=$("#monthDate").val()){
+        			  $scope.sales.month = $("#monthDate").val();
+        		  }
+        		  console.log($scope.sales);
+    			  agentRemote.save($scope.sales).then(function(res){
+    				  if (res.data.ret == '-1') {
+							$.toast(res.data.desc, "forbidden");
+    				  }else{
+    					  $.toast("操作成功");
+    					  window.location.href="/xh/mobile/Skip/toSales";
+    				  }
+    			  });
     		  }else{
     			  $.toast(vaildRes.msg, "forbidden");
     		  }
@@ -81,6 +110,15 @@ angular.module('app', ['ngTouch'])
     		  })
     	  }
     	  $scope.initUser();
+    	  setTimeout(function () {
+    		  var date = new Date();
+        	  this.year = date.getFullYear();
+        	  this.month = date.getMonth() + 1;
+        	  this.month = this.month < 10 ? "0" + this.month : this.month;
+        	  console.log(this.year+"-"+this.month);
+        	  $scope.sales.month = this.year+"-"+this.month;
+        	  $("#monthDate").val(this.year+"-"+this.month);
+		     }, 1000);
      }]);
 </script>
 </head>
@@ -99,37 +137,37 @@ angular.module('app', ['ngTouch'])
         <div class="weui_cell">
               <div class="weui_cell_hd"><label for="" class="weui_label">月份</label></div>
               <div id="monthDiv" class="weui_cell_bd weui_cell_primary">
-                  <input class="weui_input" style="width:100%;" id="monthDate" type="month"   ng-model="sales.month" placeholder="选择月份"/>
+                  <input class="weui_input" style="width:100%;"  id="monthDate" type="month"   ng-model="sales.month" />
               </div>
          </div>
          <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">销售额</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*"   placeholder="请填写销售额" ng-model="sales.market"/>
+	             <input class="weui_input" type="number" pattern="[0-9]*"   placeholder="请填写销售额(单位万元)" ng-model="sales.market"/>
 	         </div>
 	     </div>
 	     <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">回款额</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写回款额" ng-model="sales.returned"/>
+	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写回款额(单位万元)" ng-model="sales.returned"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">应收款</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写应收款" ng-model="sales.receivable"/>
+	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写应收款(单位万元)" ng-model="sales.receivable"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">客户费用</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*"  placeholder="请填写客户费用" ng-model="sales.client"/>
+	             <input class="weui_input" type="number" pattern="[0-9]*"  placeholder="请填写客户费用(单位万元)" ng-model="sales.client"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">差旅费</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写差旅费" ng-model="sales.travel"/>
+	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写差旅费(单位万元)" ng-model="sales.travel"/>
 	         </div>
 	    </div>
 	    <div class="button_sp_area" style="text-align: right;" >

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>考勤管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+	 .factory('agentRemote', ['$http', function ($http, appValue) {
+		 return {
+			 queryList:function(month){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQueryCheckingByMonth',
+					 params:{
+						 month:month
+					 }
+				  })
+			 }
+		 }
+	 }])
+     .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+    	 $scope.checkList = [];
+    	 $scope.query = function(me){
+   		  agentRemote.queryList(${month}).then(function(res){
+   			  $scope.checkList = res.data.data;
+   		  });
+   	  }
+    	 $scope.query();
+     }]);
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<table class="weui-table weui-border-tb">
+              <thead>
+              <tr><th>日期</th><th>上班</th><th>下班</th></tr>
+              </thead>
+              <tbody >
+              <tr ng-repeat="check in checkList">
+               <td>{{check.workday}}</td>
+               <td ng-if="check.am !='' && check.amval">{{check.am}}</td>
+               <td ng-if="check.am !='' && !check.amval" style="color:red;">{{check.am}}</td>
+               <td ng-if="check.am =='' && !check.isNow" style="color:red;">暂无数据</td>
+               <td ng-if="check.am =='' && check.isNow">{{check.am}}</td>
+               
+               
+               <td ng-if="check.pm !='' && check.pm!=null && check.pmval">{{check.pm}}</td>
+               <td ng-if="check.pm !='' && check.pm!=null && !check.pmval" style="color:red;">{{check.pm}}</td>
+               <td ng-if="check.pm ==''|| check.pm ==null  && !check.isNow" style="color:red;">暂无数据</td>
+               <td ng-if="check.pm =='' || check.pm ==null && check.isNow" >{{check.pm}}</td>
+               
+              </tr>
+              </tbody>
+</table>
+</body>
+</html>

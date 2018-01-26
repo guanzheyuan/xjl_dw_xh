@@ -114,12 +114,14 @@ angular.module('app', ['ngTouch'])
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
 <div class="weui-flex">
             <div class="weui-flex-item"><div class="weui_cell">报告({{countReport}})</div></div>
-            <div class="weui-flex-item">
-			   <div class="weui_cell">
-	                <div id="monthDiv" class="weui_cell_bd weui_cell_primary" >
-	                    <input class="weui_input" style="width:100%;padding-left:28%" id="monthDate" type="month"   ng-model="checkDate" ng-blur="selectDate()"/>
+            <div class="weui-flex-item"  >
+			   <div class="weui_cell"  >
+	                <div id="monthDiv" class="weui_cell_bd weui_cell_primary" style="text-align: right;">
+	                    <input class="weui_input" style="width:100%;" id="monthDate" type="month"   ng-model="checkDate"/>
 	                </div>
-	                <span class="icon icon-6"></span>
+	                <div class="page-bd-15">
+	                	 <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_default" style="width:50px;" ng-click="selectDate()">查询</a>
+	                </div>
 	            </div>
 			</div>
         </div>

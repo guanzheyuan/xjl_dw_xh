@@ -144,7 +144,6 @@ angular.module('app', ['ngTouch'])
     			 agentRemote.doQueryReport(${reportId}).then(function(res){
         			 $scope.report = res.data.data;
         			 if(res.data.data.isevection == "true" || res.data.data.isevection ==true){
-        				 //$("#s11").attr("checked",'checked');
         				 var el = document.getElementById('s11')
         				 el.checked = true;
         			 }
@@ -164,7 +163,9 @@ angular.module('app', ['ngTouch'])
 	          		 <label class="weui_cell weui_check_label" for="s11" style="float:right;">
 	          		   <div class="weui_cell_hd" > <span id="weuiTime"></span></div>
 		                <div class="weui_cell_hd" >
-		                    <input type="checkbox" class="weui_check" name="checkbox1" id="s11" ng-model="report.isevection">
+		                    <input type="checkbox" class="weui_check" name="checkbox1" id="s11" ng-model="report.isevection" ng-if="isthis == 'true'">
+		                     <input type="checkbox" class="weui_check" name="checkbox1" id="s11" ng-model="report.isevection" ng-if="isthis == ''">
+		                    <input type="checkbox" class="weui_check" name="checkbox1" id="s11" ng-model="report.isevection" ng-if="isthis == 'false'"  disabled="disabled">
 		                    <i class="weui_icon_checked"></i>
 		                </div>
 		                <div class="weui_cell_bd weui_cell_primary">
@@ -180,7 +181,11 @@ angular.module('app', ['ngTouch'])
 		<div class="weui_cells weui_cells_form">
             <div class="weui_cell">
                 <div class="weui_cell_bd weui_cell_primary">
-                    <textarea id="textarea" class="weui_textarea" placeholder="请填写本月工作内容,如有出差请记录客户交流内容。不少于600字" rows="6" ng-model="report.workProgress"></textarea>
+                    <textarea id="textarea1" class="weui_textarea" placeholder="请填写本月工作内容,如有出差请记录客户交流内容。不少于600字" rows="6" ng-model="report.workProgress" ng-if="isthis == 'true'"></textarea>
+                    <textarea id="textarea1" class="weui_textarea" placeholder="请填写本月工作内容,如有出差请记录客户交流内容。不少于600字" rows="6" ng-model="report.workProgress" ng-if="isthis == ''"></textarea>
+                      <div class="weui-weixin-content" ng-if="isthis == 'false'">
+                       	<p>{{report.workProgress}}</p>
+                     </div>
                 </div>
             </div>
         </div>
@@ -192,7 +197,11 @@ angular.module('app', ['ngTouch'])
 		<div class="weui_cells weui_cells_form">
             <div class="weui_cell">
                 <div class="weui_cell_bd weui_cell_primary">
-                    <textarea id="textarea" class="weui_textarea" placeholder="请填写下月工作计划,不少于600字" rows="6" ng-model="report.workPlan"></textarea>
+                    <textarea id="textarea2" class="weui_textarea" placeholder="请填写下月工作计划,不少于600字" rows="6" ng-model="report.workPlan" ng-if="isthis == 'true'"></textarea>
+                     <textarea id="textarea2" class="weui_textarea" placeholder="请填写下月工作计划,不少于600字" rows="6" ng-model="report.workPlan" ng-if="isthis == ''"></textarea>
+                    <div class="weui-weixin-content" ng-if="isthis == 'false'">
+                       	<p>{{report.workPlan}}</p>
+                     </div>
                 </div>
             </div>
         </div>

@@ -79,7 +79,7 @@ public class XjlDwChecking extends GenericModel {
 	 * @return
 	 */
 	public static Map queryWxCheckByWorking(String wxOpenid){
-		String sql="select * from xjl_dw_checking where status='0AA' and wx_open_id='"+wxOpenid+"'  and  am is not  null and pm is not null";
+		String sql="select * from xjl_dw_checking where status='0AA' and wx_open_id='"+wxOpenid+"'";
 		Map<String, String> condition = new HashMap<>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwChecking> data = ModelUtils.queryData(1,1000000000, ret, XjlDwChecking.class);
@@ -111,6 +111,19 @@ public class XjlDwChecking extends GenericModel {
 		return ModelUtils.executeDelete(condition, sql);
 	}
 	
+	
+	public static boolean isnotCheckValid(String workDate,String wxopenId){
+		String sql="select * from xjl_dw_checking where work_date ='"+workDate+"' and wx_open_id='"+wxopenId+"'";
+		Map<String, String> condition = new HashMap<String, String>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwChecking> data = ModelUtils.queryData(1, 1000000000, ret, XjlDwChecking.class);
+		if(data.isEmpty()){
+			return false;
+		}else{
+			return  true;
+		}
+	}
+	
 	/**
 	 * 通过月份和微信id获取考勤数据
 	 * @param openid
@@ -122,6 +135,15 @@ public class XjlDwChecking extends GenericModel {
 		Map<String, String> condition = new HashMap<String, String>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwChecking> data = ModelUtils.queryData(1, 1000000000, ret, XjlDwChecking.class);
+		return ModelUtils.createResultMap(ret, data);
+	}
+	
+	
+	public static Map queryCheckingGroupDate(String wxOpenId){
+		String sql="select work_date from xjl_dw_checking where wx_open_id='"+wxOpenId+"' group by work_date order by work_date desc";
+		Map<String, String> condition = new HashMap<String, String>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwChecking> data = ModelUtils.queryData(1, 1000000000, ret);
 		return ModelUtils.createResultMap(ret, data);
 	}
 	

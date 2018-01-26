@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,16 +123,16 @@ public class Execute  extends MobileFilter {
 		Date d = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
 		XjlDwChecking checking = XjlDwChecking.queryCheckingInfoByWxOpenId(wxuser.wxOpenId,sdf.format(d));
-		Map ret = XjlDwChecking.queryWxCheckByWorking(wxuser.wxOpenId);
+		Calendar cal = Calendar.getInstance();
+		int month = cal.get(Calendar.MONTH)+1;
+		Map ret = XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId,String.valueOf(month));
 		int workDay = 0;
 		Logger.info("得到工作日集合");
 		if(null != ret){
 			List<XjlDwChecking> data  = (List<XjlDwChecking>) ret.get("data");
 			for (XjlDwChecking xjlDwChecking : data) {
 				Logger.info("记录编号"+xjlDwChecking.checkId);
-				if(StringUtil.isNotEmpty(xjlDwChecking.am)&& StringUtil.isNotEmpty(xjlDwChecking.pm)){
-					workDay ++;
-				}
+				workDay ++;
 			}
 		}
 		String checkFlag = null == checking?"X":StringUtil.isNotEmpty(checking.pm)?"A":"B";
@@ -205,9 +206,46 @@ public class Execute  extends MobileFilter {
 	}
 	
 	/**
-	 * 月份查询考勤
+	 * 查询所有月份数据
 	 */
-	public static void doQueryCheckingByMonth(){
+	public static void doQueryCheckingByGroupDate(){
+		WxUser wxuser = getWXUser();
+		Map ret = XjlDwChecking.queryCheckingGroupDate(wxuser.wxOpenId);
+		List<Map<String,Object>> dataList = new ArrayList<>();
+		if(null != ret){
+			Map<String,Object> _temp = null;
+			List<XjlDwChecking> data  = (List<XjlDwChecking>) ret.get("data");
+			Logger.info("循环得到数据"+data.size());
+			if(!data.isEmpty()){
+				String flag = "";
+				String _time ="";
+				String _month = "";
+				List<XjlDwChecking> _data = null;
+				for (int i = 0; i < data.size(); i++) {
+					_temp = new HashMap();
+					 _time = String.valueOf(data.get(i)).substring(0, String.valueOf(data.get(i)).lastIndexOf("-"));
+					 _month = _time.substring(_time.indexOf("-")+1, _time.length());
+					 if(!_time.equals(flag)){
+						flag = _time;
+						_temp.put("workDate",_time);
+						_temp.put("month", _month);
+						_data = (List<XjlDwChecking>) XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId,String.valueOf(Integer.parseInt(_month))).get("data");
+						Logger.info("统计出勤："+_data.size());
+						_temp.put("turn",null==_data?0:_data.size());
+						dataList.add(_temp);
+					}
+					
+				}
+			}
+		}
+		ok(dataList);
+	}
+	
+	/**
+	 * 月份查询考勤
+	 * @throws ParseException 
+	 */
+	public static void doQueryCheckingByMonth() throws ParseException{
 		WxUser wxuser = getWXUser();
 		String month = params.get("month");
 		Map ret = XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId, month);
@@ -218,6 +256,7 @@ public class Execute  extends MobileFilter {
 	        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
 			List<XjlDwChecking> data = (List<XjlDwChecking>) ret.get("data");
 			Map<String,Object>  _map = null;
+			Calendar calendar = Calendar.getInstance();  
 			for (XjlDwChecking xjlDwChecking : data) {
 				_map = new HashMap<>();
 				_map.put("workday",xjlDwChecking.workDate);
@@ -230,6 +269,52 @@ public class Execute  extends MobileFilter {
 				_map.put("pmval", StringUtil.isNotEmpty(xjlDwChecking.pm)?xjlDwChecking.pm.compareTo(GOBACK)>=1:false);
 				_map.put("isNow",sf.format(now).equals(xjlDwChecking.workDate));
 				listMap.add(_map);
+			}
+			//统计是否有漏打卡日期
+			if(!listMap.isEmpty()){
+				int count = 0;
+					if(count == 0){
+						Date theDate=calendar.getTime();
+						GregorianCalendar gcLast=(GregorianCalendar)Calendar.getInstance();
+						gcLast.setTime(theDate);
+						//设置为第一天
+						gcLast.set(Calendar.DAY_OF_MONTH, 1);
+						String day_first=sf.format(gcLast.getTime());
+						boolean flag = false;
+						Logger.info("这个月第一天"+sf.format(gcLast.getTime()));
+						calendar.setTime(gcLast.getTime());  
+					    calendar.add(Calendar.DAY_OF_MONTH, -1);  
+						for (int i = 1; i < 30+1; i++) {
+							if(calendar.getTime().getTime() <now.getTime()){
+								Logger.info("小于今天日期"+sf.format(calendar.getTime()));
+								calendar.setTime(gcLast.getTime());  
+							    calendar.add(Calendar.DAY_OF_MONTH, +i);  
+							    flag = XjlDwChecking.isnotCheckValid(sf.format(calendar.getTime()),wxuser.wxOpenId);
+							    if(!flag){
+									_map = new HashMap<>();
+									_map.put("workday",sf.format(calendar.getTime()));
+									_map.put("am","");
+									_map.put("pm","");
+									_map.put("amval",false);
+									_map.put("pmval", false);
+									_map.put("isNow",false);
+									listMap.add(_map);
+								}
+							}
+							
+						   Collections.sort(listMap,new Comparator<Map<String,Object>>(){
+
+							@Override
+							public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+								 return o2.get("workday").toString().compareTo(o1.get("workday").toString());
+							}
+							   
+						   });
+						}
+						
+						 
+					}
+					count++;
 			}
 		}
 		ok(listMap);
@@ -358,7 +443,6 @@ public class Execute  extends MobileFilter {
 		Map<String,Object> _map = null;
 		List<XjlDwReport> newDate = new ArrayList<>();
 		String _year = "";
-		String _month="";
 		if(null != ret){
 			//得到当前月份
 			Calendar cal = Calendar.getInstance();
@@ -410,7 +494,7 @@ public class Execute  extends MobileFilter {
 								Logger.info("遍历循环数据："+xjlDwReport.year+"年"+i+"月");
 								_map.put("title",xjlDwReport.year+"年"+i+"月");
 								_map.put("isSave", XjlDwReport.queryReportByisSave(xjlDwReport.year,String.valueOf(i), wxuser.wxOpenId));
-								_map.put("isThis",i==month);
+								_map.put("isThis",false);
 								XjlDwReport report = XjlDwReport.queryReportByMonth(xjlDwReport.year, String.valueOf(i), wxuser.wxOpenId);
 								Logger.info("述职"+report);
 								if(StringUtil.isNotEmpty(report)){
@@ -440,17 +524,6 @@ public class Execute  extends MobileFilter {
 	}
 	
 	/**
-	 * 销售管理页面
-	 */
-	public static void doQuerySalesByPage(){
-		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
-		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
-		Map condition = params.allSimple();
-		Map ret = XjlDwSales.querySalesByPage(condition, pageIndex, pageSize);
-		ok(ret);
-	}
-	
-	/**
 	 * 查询有效员工信息
 	 */
 	public static void doQueryWxUserInfo(){
@@ -473,8 +546,9 @@ public class Execute  extends MobileFilter {
 	
 	/**
 	 * 保存销售数据
+	 * @throws ParseException 
 	 */
-	public static void doSaveWxUserInfo(){
+	public static void doSaveWxUserInfo() throws ParseException{
 		String userInfo = params.get("userinfoId");
 		String month = params.get("month");
 		String market = params.get("market");
@@ -483,16 +557,97 @@ public class Execute  extends MobileFilter {
 		String client = params.get("client");
 		String travel = params.get("travel");
 		XjlDwSales sales = new XjlDwSales();
+		WxUser wxuser = getWXUser();
 		sales.userinfoId = userInfo;
-		sales.workDate = month;
+		sales.workDate =  month;
 		sales.market = market;
 		sales.returned = returned;
 		sales.receivable = receivable;
 		sales.client = client;
 		sales.travel = travel;
+		sales.wxOpenId = wxuser.wxOpenId;
 		XjlDwSalesBo.save(sales);
 	}
-	
-	
-	
+
+	/**
+	 * 销售管理页面
+	 */
+	public static void doQuerySalesByPage(){
+		String width = params.get("width");
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		//得到所有的销售管理数据
+		Map ret = XjlDwSales.querySalesByPage(condition, pageIndex, pageSize);
+		List<Map<String,Object>> _data = new ArrayList<>();
+	    if(null!=ret){
+	    	List<XjlDwSales> data = (List<XjlDwSales>) ret.get("data");
+	    	int _width = Integer.parseInt(width);
+	    	int count = 0;
+	    	WxUserInfo userinfo = null;
+	    	String userInfoId = "";
+	    	Map<String,Object> _temp = null;
+	    	Map<String,Object> _temp1 = null;
+	    	List<Map<String,Object>> listMap = null;
+	    	List<XjlDwSales> salesList = null;
+	    	//遍历销售管理数据组装
+	    	for (XjlDwSales xjlDwSales : data) {
+	    		if(!xjlDwSales.userinfoId.equals(userInfoId)){
+	    			userInfoId = xjlDwSales.userinfoId;
+	    			_temp = new HashMap<>();
+	    			userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(xjlDwSales.userinfoId));
+	    			_temp.put("username", userinfo.userinfoName);
+	    			Logger.info("username:"+userinfo.userinfoName);
+	    			 salesList = (List<XjlDwSales>) XjlDwSales.querySalesByWxOpenId(userInfoId).get("data");
+	    			 Logger.info("销售管理数量:"+salesList.size());
+	    			 listMap = new ArrayList<>();
+	    			 for (XjlDwSales xjlDwSales1 : salesList) {
+	    				 _temp1 = new HashMap<>();
+	    				 Logger.info("销售日期："+xjlDwSales1.workDate);
+	    				 _temp1.put("workDate", xjlDwSales1.workDate);
+	    				 _temp1.put("client", xjlDwSales1.client);
+	    				 _temp1.put("market", xjlDwSales1.market);
+	    				 _temp1.put("receivable",xjlDwSales1.receivable);
+	    				 _temp1.put("returned",xjlDwSales1.returned);
+	    				 _temp1.put("travel",xjlDwSales1.travel);
+	    				  if(count<4){
+		 						_temp1.put("width", _width);
+		 					}else{
+		 						_temp1.put("width",_width+2);
+		 				 }
+	    				 listMap.add(_temp1);
+	    			 }
+	    			 _temp.put("saleList", listMap);
+	    			 _data.add(_temp);
+	    		}
+			}
+	    }
+		ok(_data);
+	}
+	/**
+	 * 根据微信编号获取自己的销售管理数据（销售）
+	 */
+	public static void doQuerySalesPage(){
+		String width = params.get("width");
+		WxUser wxuser = getWXUser();
+		WxUserInfo userinfo = WxUserInfo.getFindByOpenId(wxuser.wxOpenId);
+		Map ret  = XjlDwSales.querySalesByWxOpenId(String.valueOf(userinfo.userInfoId));
+		if(null != ret){
+			int count = 0;
+			int _width = Integer.parseInt(width);
+			List<XjlDwSales> data = (List<XjlDwSales>) ret.get("data");
+			for (XjlDwSales xjlDwSales : data) {
+				if(count == 0){
+					xjlDwSales.userName = userinfo.userinfoName;
+				}
+				if(count<4){
+					xjlDwSales.width = _width;
+				}else{
+					xjlDwSales.width = _width+2;
+				}
+				count++;
+			}
+		}
+		ok(ret);
+	}
 }

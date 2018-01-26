@@ -75,6 +75,13 @@ public class Skip extends MobileFilter {
 	}
 	
 	/**
+	 * 跳转到考勤log记录
+	 */
+	public static void toCheckingLog(){
+		renderArgs.put("month",params.get("month"));
+		render("modules/xjldw/mobile/business/check_log.html");
+	}
+	/**
 	 * 跳转到述职报告新增页面
 	 */
 	public static void toReportAdd(){
@@ -90,6 +97,8 @@ public class Skip extends MobileFilter {
 		renderArgs.put("isThis",params.get("isThis"));
 		render("modules/xjldw/mobile/report/report_add.html");
 	}
+	
+
 	
 	/**
 	 * 跳转到述职报告列表
@@ -108,6 +117,9 @@ public class Skip extends MobileFilter {
 	 * 跳转到销售管理页面
 	 */
 	public static void toSales(){
+		WxUser wxuser = getWXUser();
+		boolean flag =  WxUserInfo.queryShangwuOrAdmin(wxuser.wxOpenId);
+		renderArgs.put("isadminorSw", flag);
 		render("modules/xjldw/mobile/sales/sales_list.html");
 	}
 	

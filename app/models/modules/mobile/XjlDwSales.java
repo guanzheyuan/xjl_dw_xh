@@ -1,6 +1,7 @@
 package models.modules.mobile;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.slf4j.LoggerFactory;
 
@@ -53,11 +55,29 @@ public class XjlDwSales extends GenericModel {
 	@Column(name = "userinfoId")
 	public String userinfoId;
 	
+	@Transient
+	public int width;
+	
+	@Transient
+	public String userName;
+	
+	
 	public static Map querySalesByPage(Map<String, String> condition,int pageIndex, int pageSize){
-		String sql = "select * from xjl_dw_sales where status='0AA'";
+		String sql = "select * from xjl_dw_sales where status='0AA' order by userinfoid";
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwSales> data = ModelUtils.queryData(pageIndex, pageSize, ret, XjlDwSales.class);
 		return ModelUtils.createResultMap(ret, data);
 	}
+	
+	
+	public static Map querySalesByWxOpenId(String userinfoId){
+		String sql = "select * from xjl_dw_sales where status='0AA' and userinfoId='"+userinfoId+"' order by work_date desc";
+		Map<String,String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwSales> data = ModelUtils.queryData(1,999999, ret, XjlDwSales.class);
+		return ModelUtils.createResultMap(ret, data);
+	}
+	
+	
 	
 }

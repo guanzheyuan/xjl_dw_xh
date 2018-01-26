@@ -103,6 +103,21 @@ public class WxUserInfo  extends GenericModel{
         	return wxUserInfo;
         }
 	}
+	
+	public static WxUserInfo getFindByUserInfoId(String userInfoId){
+		int pageIndex = 1;
+        int pageSize = 100;
+        Map condition = new HashMap<String, String>();
+        condition.put("userInfoId", userInfoId);
+        Map returnMap = queryWxUserListByPage(condition,pageIndex,pageSize);
+        List<WxUserInfo> retData = (List<WxUserInfo>) returnMap.get("data");
+        if(retData.isEmpty()){
+        	throw new RuntimeException("没有该用户基本信息:"+userInfoId);
+        }else{
+        	WxUserInfo wxUserInfo = retData.get(0);
+        	return wxUserInfo;
+        }
+	}
 	/**
 	 * 查询用户基本信息
 	 * @param condition
@@ -122,6 +137,10 @@ public class WxUserInfo  extends GenericModel{
 		if(StringUtil.isNotEmpty(condition.get("userinfoType"))){
 			String searchKeyWord = condition.get("userinfoType");
 			sql += "and a.USERINFO_TYPE !='' ";
+	    }
+		if(StringUtil.isNotEmpty(condition.get("userInfoId"))){
+			String searchKeyWord = condition.get("userInfoId");
+			sql += "and a.USERINFO_ID ='"+searchKeyWord+"'";
 	    }
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
@@ -225,6 +244,18 @@ public class WxUserInfo  extends GenericModel{
 	 */
 	public static boolean queryAdminInfoByFlag(String wxOpenId){
 		String sql="select * from xjl_dw_userinfo where status='0AA' and isadmin='0AA' and  wx_open_id='"+wxOpenId+"' ";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
+		if(data.isEmpty()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public static boolean queryShangwuOrAdmin(String wxOpenId){
+		String sql="select * from xjl_dw_userinfo where status='0AA' and  wx_open_id='"+wxOpenId+"' and (USERINFO_TYPE='1' or isadmin='0AA' )  ";
 		Map<String, String> condition = new HashMap<>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);

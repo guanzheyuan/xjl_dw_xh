@@ -76,6 +76,10 @@ public class WxUser extends GenericModel {
 	@Transient
 	public boolean isRegister = false;
 	
+	@Transient
+	public WxUserInfo wxUserInfo;
+	
+	
 	/**
 	 * 通过微信编号得到用户信息
 	 * @param openid
@@ -97,6 +101,7 @@ public class WxUser extends GenericModel {
         	log.debug("一共查询符合条件的数据有:" + retData.size());
         	WxUser wxUser = retData.get(0);
         	wxUser.isRegister = WxUserInfo.queryUserInfoByWxOpenId(openid);
+        	wxUser.wxUserInfo =WxUserInfo.getFindByOpenId(openid);
         	return wxUser;
         }
 	}

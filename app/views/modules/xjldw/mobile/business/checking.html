@@ -110,6 +110,12 @@ angular.module('app', ['ngTouch'])
 							 month:month
 						 }
 					  })  
+			  },
+			  queryGroupByDate:function(){
+				  return $http({
+						 method: 'GET',
+						 url:'/xh/mobile/Execute/doQueryCheckingByGroupDate'
+					  }) 
 			  }
     	  }
       }])
@@ -123,43 +129,27 @@ angular.module('app', ['ngTouch'])
     	  $scope.zaotui = 0;
     	  $scope.queqin = 0;
     	  $scope.searchName = false;
+    	  
+    	  
+    	  $scope.toCheck = function(month){
+    		  if(""!=month){
+    			  console.log(parseInt(month));
+    			  window.location.href="/xh/mobile/Skip/toCheckingLog?month="+parseInt(month);
+    		  }
+    	  }
     	  $scope.query = function(me){
-    		  var date = new Date();
-    		  agentRemote.query(date.getMonth() + 1).then(function(res){
+    		  agentRemote.queryGroupByDate().then(function(res){
     			  $scope.checkList = res.data.data;
     			  console.log(res.data.data);
     		  });
     	  }
     	  
-    	 $scope.selectDate = function(me){
-    		 var date = new Date();
-	 		 this.year = date.getFullYear();
-	 		 this.month = date.getMonth() + 1;
-    		 var month = $("#monthDate").val();
-    		  if(month != ""){
+    	 $scope.selectDate = function(nowDate){
+    		  if(nowDate != ""){
     			  //增加验证 选择时间不能大于当前时间
-    			  var montArr = month.split("-");
-    			    if(parseInt(montArr[0])>parseInt(date.getFullYear())){
-    			    	$.toast('未到时间不可选', "forbidden");
-    			    	 $scope.quanqin = 0;
-    			    	 $scope.chidao = 0;
-    			    	 $scope.zaotui = 0;
-    			    	 $scope.queqin = 0;
-    			    	return;
-    			    }
-    			    if(parseInt(montArr[0])==parseInt(date.getFullYear())){
-    			    	if(parseInt(montArr[1]) > parseInt(date.getMonth() + 1)){
-    	    				   $.toast('未到时间不可选', "forbidden");
-    	    				   $scope.quanqin = 0;
-    	    			       $scope.chidao = 0;
-    	    			       $scope.zaotui = 0;
-    	    			       $scope.queqin = 0;
-    	   			    	   return;
-    	    			   }
-    			    }
-    			   
+    			  var montArr = nowDate.split("-");
     			  $.showLoading();
-    			  agentRemote.statisChecking(month).then(function(res){
+    			  agentRemote.statisChecking(nowDate).then(function(res){
         			  console.log(res);
         			  $.hideLoading();
         			  $scope.quanqin = res.data.data.quanqin;
@@ -195,11 +185,11 @@ angular.module('app', ['ngTouch'])
     			this.month = date.getMonth() + 1;
     			this.date = date.getDate();
     			this.month = this.month < 10 ? "0" + this.month : this.month;
-    			var nowDate = this.year+"-"+this.month ;
+    			var nowDate = this.year+"年"+this.month+"月" ;
+    			var _nowDate = this.year+"-"+this.month;
     			console.log(nowDate);
-    			$("#monthDate").val(nowDate);
-    			$("#monthDate").attr("max",nowDate);
-    			$scope.selectDate();
+    			$("#monthDate").html(nowDate);
+    			$scope.selectDate(_nowDate);
     	 }
     	  //下班打卡
  		 $scope.saveDuty = function(){
@@ -259,41 +249,20 @@ angular.module('app', ['ngTouch'])
       <div class="weui-flex">
             <div class="weui-flex-item">
             	<hr>
-            	<table class="weui-table weui-border-tb" ng-if="checkShow == true">
-	                <thead>
-	                <tr><th>日期</th><th>上班</th><th>下班</th></tr>
-	                </thead>
-	                <tbody >
-	                <tr ng-repeat="check in checkList">
-		                <td>{{check.workday}}</td>
-		                <td ng-if="check.am !='' && check.amval">{{check.am}}</td>
-		                <td ng-if="check.am !='' && !check.amval" style="color:red;">{{check.am}}</td>
-		                <td ng-if="check.am =='' && !check.isNow" style="color:red;">暂无数据</td>
-		                 <td ng-if="check.am =='' && check.isNow">{{check.am}}</td>
-		                
-		                
-		                <td ng-if="check.pm !=''&& check.pmval">{{check.pm}}</td>
-		                <td ng-if="check.pm !=''&& !check.pmval" style="color:red;">{{check.pm}}</td>
-		                <td ng-if="check.pm =='' && !check.isNow" style="color:red;">暂无数据</td>
-		                <td ng-if="check.pm =='' && check.isNow" >{{check.pm}}</td>
-		                
-	                </tr>
-	                </tbody>
-            	</table>
+            	 <div class="weui_cells" style="margin-top:0%;"  ng-if="checkShow == true">
+                    <div class="weui_cell" ng-repeat="check in checkList" ng-click="toCheck({{check.month}})">
+		                <div class="weui_cell_bd weui_cell_primary">
+		                    <p>{{check.workDate}}</p>
+		                </div>
+		                 <div class="weui_cell_ft">出勤天数:{{check.turn}}</div>
+	            	</div>
+           	 	</div>
             	  <div class="weui_cells" style="margin-top:0%;" ng-if="checkShow == false" >
             	    <div class="weui_cell">
-		                <div class="weui_cell_hd"><label for="" class="weui_label"></label></div>
-		                <div id="monthDiv" class="weui_cell_bd weui_cell_primary" >
-		                    <input class="weui_input" style="width:100%;padding-left:45%;" id="monthDate" type="month"   ng-model="checkDate" ng-blur="selectDate()"/>
+		                <div class="weui_cell_bd weui_cell_primary">
+		                	 <p> </p>
 		                </div>
-		                <span class="icon icon-6"></span>
-		                <!-- <div class="weui_cell_bd">
-		                	 <div class="icon_sp_area">
-		                	 	 <i id="searchName"><font style="color:#808080;font-style: normal">月份</font></i>
-		                	 	 <i class="weui_icon_search" style="color:#808080"></i>
-		                	 	 
-		                	 </div>
-		                </div> -->
+		                 <div class="weui_cell_ft" id="monthDate"> </div>
 		            </div>
 		            <div class="weui_cell" >
 		                <div class="weui_cell_bd weui_cell_primary">
