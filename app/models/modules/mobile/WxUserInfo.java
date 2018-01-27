@@ -97,7 +97,7 @@ public class WxUserInfo  extends GenericModel{
         Map returnMap = queryWxUserListByPage(condition,pageIndex,pageSize);
         List<WxUserInfo> retData = (List<WxUserInfo>) returnMap.get("data");
         if(retData.isEmpty()){
-        	throw new RuntimeException("没有该用户基本信息:"+openid);
+        	return null;
         }else{
         	WxUserInfo wxUserInfo = retData.get(0);
         	return wxUserInfo;
@@ -112,7 +112,7 @@ public class WxUserInfo  extends GenericModel{
         Map returnMap = queryWxUserListByPage(condition,pageIndex,pageSize);
         List<WxUserInfo> retData = (List<WxUserInfo>) returnMap.get("data");
         if(retData.isEmpty()){
-        	throw new RuntimeException("没有该用户基本信息:"+userInfoId);
+        	return null;
         }else{
         	WxUserInfo wxUserInfo = retData.get(0);
         	return wxUserInfo;
@@ -244,6 +244,18 @@ public class WxUserInfo  extends GenericModel{
 	 */
 	public static boolean queryAdminInfoByFlag(String wxOpenId){
 		String sql="select * from xjl_dw_userinfo where status='0AA' and isadmin='0AA' and  wx_open_id='"+wxOpenId+"' ";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
+		if(data.isEmpty()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public static boolean isRegist(String wxOpenid){
+		String sql="select * from xjl_dw_userinfo where status='0AB' and  wx_open_id='"+wxOpenid+"' ";
 		Map<String, String> condition = new HashMap<>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);

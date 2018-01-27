@@ -1,4 +1,7 @@
 package controllers.modules.mobile;
+import java.util.HashMap;
+import java.util.Map;
+
 import controllers.comm.SessionInfo;
 import controllers.modules.mobile.filter.MobileFilter;
 import models.modules.mobile.WxUser;
@@ -7,6 +10,7 @@ import models.modules.mobile.XjlDwChecking;
 import play.Logger;
 import play.i18n.Messages;
 import utils.StringUtil;
+import utils.WxPushMsg;
 public class Skip extends MobileFilter {
 	
 	/**
@@ -14,13 +18,38 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toRegisterOrAudit() {
 		WxUser wxuser = getWXUser();
-		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
-		if(!flag){
-			render("modules/xjldw/mobile/user/audit.html");
+		boolean flag = WxUserInfo.isRegist(wxuser.wxOpenId);
+		if(flag){
+			flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
+			if(!flag){
+				render("modules/xjldw/mobile/user/audit.html");
+			}else{
+				render("modules/xjldw/mobile/user/register.html");
+			}
 		}else{
-			render("modules/xjldw/mobile/user/register.html");
+			pushMsgForRegist(wxuser.wxOpenId);
 		}
+		  
     }
+	
+	public static void pushMsgForRegist(String wxOpenId){
+		 Map<String, Object> mapData = new HashMap<String, Object>();
+		 Map<String, Object> mapDataSon = new HashMap<String, Object>();
+		 mapDataSon.put("value","操作提醒");
+	     mapDataSon.put("color", "#68A8C3");
+	     mapData.put("first", mapDataSon);
+	     mapDataSon = new HashMap<String, Object>();
+		 mapDataSon.put("value","注册认证操作");
+		 mapData.put("keyword1", mapDataSon);
+		 mapDataSon = new HashMap<String, Object>();
+		 mapDataSon.put("value","您已经申请提交,请勿再次注册！");
+		 mapData.put("keyword2", mapDataSon);
+		 mapDataSon = new HashMap<String, Object>();
+		 mapDataSon.put("value","申请已经提交，请等待审核！");
+		 mapDataSon.put("color","#808080");
+		 mapData.put("remark", mapDataSon);
+		 WxPushMsg.wxMsgPusheTmplate("bMXSVB4eAjPlJwjRBheRQ_opJTwgxNFIuGWVGf1FDlc","", mapData,wxOpenId);
+	}
 	
 	/**
 	 * 跳转到员工注册
@@ -64,13 +93,23 @@ public class Skip extends MobileFilter {
 		WxUserInfo userInfo = WxUserInfo.getFindByOpenId(wxuser.wxOpenId);
 		renderArgs.put("wxUser",wxuser);
 		renderArgs.put("userInfo",userInfo);
-		render("modules/xjldw/mobile/business/business_manage.html");
+		if(StringUtil.isNotEmpty(userInfo.userinfoType)){
+			render("modules/xjldw/mobile/business/business_manage.html");
+		}
+	}
+	
+	/**
+	 * 跳转到产品咨询
+	 */
+	public static void toProductConsult(){
+		//只有员工才能跳转
 	}
 	
 	/**
 	 * 跳转到考勤管理
 	 */
 	public static void toChecking(){
+		renderArgs.put("wxOpenId",params.get("wxOpenId"));
 		render("modules/xjldw/mobile/business/checking.html");
 	}
 	
@@ -128,6 +167,63 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toSalesAdd(){
 		render("modules/xjldw/mobile/sales/sales_add.html");
+	}
+	
+	/**
+	 * 跳转到薪资管理
+	 */
+	public static void toSalaryList(){
+		WxUser wxuser = getWXUser();
+		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
+		if(!flag){
+			render("modules/xjldw/mobile/salary/salary_list.html");
+			renderArgs.put("noAdd", false);
+		}else{
+			WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(wxuser.wxUserInfo.userInfoId));
+			renderArgs.put("userinfoName",userinfo.userinfoName);
+			renderArgs.put("userinfoId",userinfo.userInfoId);
+			renderArgs.put("noAdd", true);
+			render("modules/xjldw/mobile/salary/salary_info.html");
+		}
+	}
+	
+	/**
+	 * 跳转到薪资管理信息页面
+	 */
+	public static void toSalaryInfo(){
+		Logger.info("路过信息资源信息页面："+params.get("userinfoId"));
+		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
+		renderArgs.put("userinfoName",userinfo.userinfoName);
+		renderArgs.put("userinfoId",userinfo.userInfoId);
+		render("modules/xjldw/mobile/salary/salary_info.html");
+	}
+	
+	/**
+	 * 跳转到薪资管理新增页面
+	 */
+	public static void toSalaryAdd(){
+		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
+		renderArgs.put("userinfoName",userinfo.userinfoName);
+		renderArgs.put("userinfoId",userinfo.userInfoId);
+		renderArgs.put("openid",userinfo.wxOpenId);
+		render("modules/xjldw/mobile/salary/salary_add.html");
+	}
+	
+	/**
+	 * 跳转到薪资说明页面
+	 */
+	public static void toSalaryExplain(){
+		render("modules/xjldw/mobile/salary/salary_explain.html");
+	}
+	
+	/**
+	 * 跳转到薪资考勤查看
+	 */
+	public static void toSalaryChecking(){
+		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
+		renderArgs.put("wxOpenId",userinfo.wxOpenId);
+		renderArgs.put("workDate",params.get("workDate"));
+		render("modules/xjldw/mobile/salary/salary_checking.html");
 	}
 	
 }

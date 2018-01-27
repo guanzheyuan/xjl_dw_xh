@@ -18,6 +18,7 @@
 <script src="/xh/public/widgets/angularjs/angular.min.js"></script>
 <script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
 <script src="/xh/public/js/zepto.min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 <script type="text/javascript">
 angular.module('app', ['ngTouch'])
 			.factory('agentRemote', ['$http', function ($http, appValue) {
@@ -99,7 +100,28 @@ angular.module('app', ['ngTouch'])
 									 if (res.data.ret == '-1') {
 										 $.toast(res.data.desc, "forbidden");
 						    		  }else{
-						    			  $.toast("操作成功");
+						    			  $.toast("申请已提交");
+						    			  if(typeof(WeixinJSBridge)!="undefined"){
+						    	                WeixinJSBridge.call('closeWindow');
+						    	            }else{
+						    	                if (navigator.userAgent.indexOf("MSIE") > 0) {  
+						    	                    if (navigator.userAgent.indexOf("MSIE 6.0") > 0) {  
+						    	                        window.opener = null; window.close();  
+						    	                    }  
+						    	                    else {  
+						    	                        window.open('', '_top'); window.top.close();  
+						    	                    }  
+						    	                }  
+						    	                else if (navigator.userAgent.indexOf("Firefox") > 0) {  
+						    	                    window.location.href = 'about:blank ';  
+						    	                    //window.history.go(-2);  
+						    	                }  
+						    	                else {  
+						    	                    window.opener = null;   
+						    	                    window.open('', '_self', '');  
+						    	                    window.close();  
+						    	                }
+						    	            }
 						    		  }
 								});
 							}else{

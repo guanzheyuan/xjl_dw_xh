@@ -17,6 +17,7 @@ import com.mysql.fabric.xmlrpc.base.Array;
 import controllers.modules.mobile.bo.WxUserInfoBo;
 import controllers.modules.mobile.bo.XjlDwCheckingBo;
 import controllers.modules.mobile.bo.XjlDwReportBo;
+import controllers.modules.mobile.bo.XjlDwSalaryBo;
 import controllers.modules.mobile.bo.XjlDwSalesBo;
 import controllers.modules.mobile.filter.MobileFilter;
 import models.modules.mobile.WxUser;
@@ -25,6 +26,7 @@ import models.modules.mobile.XjlDwChecking;
 import models.modules.mobile.XjlDwCities;
 import models.modules.mobile.XjlDwProvinces;
 import models.modules.mobile.XjlDwReport;
+import models.modules.mobile.XjlDwSalary;
 import models.modules.mobile.XjlDwSales;
 import play.Logger;
 import utils.DateUtil;
@@ -121,11 +123,18 @@ public class Execute  extends MobileFilter {
 	public static void doQueryCheckingLog(){
 		WxUser wxuser = getWXUser();
 		Date d = new Date();
+		String openid = params.get("wxOpenId");
+		String wxopenid="";
+		if(StringUtil.isNotEmpty(openid)){
+			wxopenid = openid;
+		}else{
+			wxopenid = wxuser.wxOpenId;
+		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
-		XjlDwChecking checking = XjlDwChecking.queryCheckingInfoByWxOpenId(wxuser.wxOpenId,sdf.format(d));
+		XjlDwChecking checking = XjlDwChecking.queryCheckingInfoByWxOpenId(wxopenid,sdf.format(d));
 		Calendar cal = Calendar.getInstance();
 		int month = cal.get(Calendar.MONTH)+1;
-		Map ret = XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId,String.valueOf(month));
+		Map ret = XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId,String.valueOf(month),String.valueOf(cal.get(Calendar.YEAR)));
 		int workDay = 0;
 		Logger.info("得到工作日集合");
 		if(null != ret){
@@ -153,6 +162,7 @@ public class Execute  extends MobileFilter {
 		check.workDate = sdf.format(d);
 		Calendar cal = Calendar.getInstance();
 		check.workMonth = String.valueOf(cal.get(Calendar.MONTH)+1);
+		check.workYear =String.valueOf(cal.get(Calendar.YEAR));
 		DateFormat df3 = DateFormat.getTimeInstance();
 		String am = "";
 		if(d.getHours() < 10){
@@ -210,7 +220,14 @@ public class Execute  extends MobileFilter {
 	 */
 	public static void doQueryCheckingByGroupDate(){
 		WxUser wxuser = getWXUser();
-		Map ret = XjlDwChecking.queryCheckingGroupDate(wxuser.wxOpenId);
+		String wxopenid="";
+		String openid = params.get("wxOpenId");
+		if(StringUtil.isNotEmpty(openid)){
+			wxopenid = openid;
+		}else{
+			wxopenid = wxuser.wxOpenId;
+		}
+		Map ret = XjlDwChecking.queryCheckingGroupDate(wxopenid);
 		List<Map<String,Object>> dataList = new ArrayList<>();
 		if(null != ret){
 			Map<String,Object> _temp = null;
@@ -220,16 +237,18 @@ public class Execute  extends MobileFilter {
 				String flag = "";
 				String _time ="";
 				String _month = "";
+				String year = "";
 				List<XjlDwChecking> _data = null;
 				for (int i = 0; i < data.size(); i++) {
 					_temp = new HashMap();
 					 _time = String.valueOf(data.get(i)).substring(0, String.valueOf(data.get(i)).lastIndexOf("-"));
 					 _month = _time.substring(_time.indexOf("-")+1, _time.length());
+					  year = _time.substring(0, _time.indexOf("-"));
 					 if(!_time.equals(flag)){
 						flag = _time;
 						_temp.put("workDate",_time);
 						_temp.put("month", _month);
-						_data = (List<XjlDwChecking>) XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId,String.valueOf(Integer.parseInt(_month))).get("data");
+						_data = (List<XjlDwChecking>) XjlDwChecking.queryCheckingByMonth(openid,String.valueOf(Integer.parseInt(_month)),year).get("data");
 						Logger.info("统计出勤："+_data.size());
 						_temp.put("turn",null==_data?0:_data.size());
 						dataList.add(_temp);
@@ -247,8 +266,29 @@ public class Execute  extends MobileFilter {
 	 */
 	public static void doQueryCheckingByMonth() throws ParseException{
 		WxUser wxuser = getWXUser();
-		String month = params.get("month");
-		Map ret = XjlDwChecking.queryCheckingByMonth(wxuser.wxOpenId, month);
+		String _month = params.get("month");
+		String wxOpenId = "";
+		String year = "";
+		String month="";
+		if(StringUtil.isNotEmpty(_month)){
+			if(_month.indexOf("-")==-1){
+				Calendar cal = Calendar.getInstance();
+				year = String.valueOf(cal.get(Calendar.YEAR));
+				month = _month;
+			}else{
+				Logger.info("月份："+_month);
+				year= _month.substring(0, _month.lastIndexOf("-"));
+				month = _month.substring(_month.lastIndexOf("-")+1,_month.length());
+			}
+		}
+		if(StringUtil.isNotEmpty(wxOpenId)){
+			 wxOpenId = params.get("wxopenid");
+		}else{
+			wxOpenId = wxuser.wxOpenId;
+		}
+		Logger.info("参数年："+year);
+		Logger.info("参数月："+month);
+		Map ret = XjlDwChecking.queryCheckingByMonth(wxOpenId, String.valueOf(Integer.parseInt(month)),year);
 		List<Map<String,Object>> listMap = new ArrayList<>();
 		if(null != ret){
 			//当前时间
@@ -410,6 +450,21 @@ public class Execute  extends MobileFilter {
 		ok();
 	}
 	
+	/**
+	 * 考勤扣款
+	 */
+	public static void reportWidthHold(){
+		//验证上个月是否述职
+		//得到当前月份
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());//设置当前日期  
+		cal.add(Calendar.MONTH, -1);//月份减一  
+		String year = String.valueOf(cal.get(Calendar.YEAR));
+		String month = String.valueOf(cal.get(Calendar.MONTH)+1);
+		String wxopenId = String.valueOf(params.get("wxOpenId"));
+		XjlDwReport xjlDwReport = XjlDwReport.queryReportByMonth(year, month, wxopenId);
+		ok(null == xjlDwReport);
+	}
 	
 	/**
 	 * 根据时间统计员工的述职报告数量
@@ -568,7 +623,26 @@ public class Execute  extends MobileFilter {
 		sales.wxOpenId = wxuser.wxOpenId;
 		XjlDwSalesBo.save(sales);
 	}
-
+	
+	/**
+	 * 修改信息数据
+	 */
+	public static void modifySales(){
+		String salesId = params.get("salesId");
+		String market = params.get("market");
+		String returned = params.get("returned");
+		String receivable = params.get("receivable");
+		String client = params.get("client");
+		String travel = params.get("travel");
+		XjlDwSales sales = new XjlDwSales();
+		sales.salesId = Long.parseLong(salesId);
+		sales.market = market;
+		sales.returned = returned;
+		sales.receivable = receivable;
+		sales.client = client;
+		sales.travel = travel;
+		XjlDwSales.modifySales(sales);
+	}
 	/**
 	 * 销售管理页面
 	 */
@@ -596,29 +670,31 @@ public class Execute  extends MobileFilter {
 	    			userInfoId = xjlDwSales.userinfoId;
 	    			_temp = new HashMap<>();
 	    			userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(xjlDwSales.userinfoId));
-	    			_temp.put("username", userinfo.userinfoName);
-	    			Logger.info("username:"+userinfo.userinfoName);
-	    			 salesList = (List<XjlDwSales>) XjlDwSales.querySalesByWxOpenId(userInfoId).get("data");
-	    			 Logger.info("销售管理数量:"+salesList.size());
-	    			 listMap = new ArrayList<>();
-	    			 for (XjlDwSales xjlDwSales1 : salesList) {
-	    				 _temp1 = new HashMap<>();
-	    				 Logger.info("销售日期："+xjlDwSales1.workDate);
-	    				 _temp1.put("workDate", xjlDwSales1.workDate);
-	    				 _temp1.put("client", xjlDwSales1.client);
-	    				 _temp1.put("market", xjlDwSales1.market);
-	    				 _temp1.put("receivable",xjlDwSales1.receivable);
-	    				 _temp1.put("returned",xjlDwSales1.returned);
-	    				 _temp1.put("travel",xjlDwSales1.travel);
-	    				  if(count<4){
-		 						_temp1.put("width", _width);
-		 					}else{
-		 						_temp1.put("width",_width+2);
-		 				 }
-	    				 listMap.add(_temp1);
-	    			 }
-	    			 _temp.put("saleList", listMap);
-	    			 _data.add(_temp);
+	    			if(null !=userinfo){
+	    				_temp.put("username", userinfo.userinfoName);
+		    			Logger.info("username:"+userinfo.userinfoName);
+		    			 salesList = (List<XjlDwSales>) XjlDwSales.querySalesByWxOpenId(userInfoId).get("data");
+		    			 Logger.info("销售管理数量:"+salesList.size());
+		    			 listMap = new ArrayList<>();
+		    			 for (XjlDwSales xjlDwSales1 : salesList) {
+		    				 _temp1 = new HashMap<>();
+		    				 Logger.info("销售日期："+xjlDwSales1.workDate);
+		    				 _temp1.put("workDate", xjlDwSales1.workDate);
+		    				 _temp1.put("client", xjlDwSales1.client);
+		    				 _temp1.put("market", xjlDwSales1.market);
+		    				 _temp1.put("receivable",xjlDwSales1.receivable);
+		    				 _temp1.put("returned",xjlDwSales1.returned);
+		    				 _temp1.put("travel",xjlDwSales1.travel);
+		    				  if(count<4){
+			 						_temp1.put("width", _width);
+			 					}else{
+			 						_temp1.put("width",_width+2);
+			 				 }
+		    				 listMap.add(_temp1);
+		    			 }
+		    			 _temp.put("saleList", listMap);
+		    			 _data.add(_temp);
+	    			}
 	    		}
 			}
 	    }
@@ -650,4 +726,102 @@ public class Execute  extends MobileFilter {
 		}
 		ok(ret);
 	}
+	
+	/**
+	 * 通过用户id和年月确定销售管理数据
+	 */
+	public static void doQuerySalesByIdAndMonth(){
+		String userinfoId = params.get("userinfoId");
+		String workdate = params.get("workDate");
+		Map ret = XjlDwSales.querySalesByWxOpenIdAndMonth(userinfoId, workdate);
+		ok(ret);
+	}
+	
+	/**
+	 * 保存薪资
+	 */
+	public static void doSaveSalary(){
+		WxUser wxuser = getWXUser();
+		XjlDwSalary xjlDwSalary = new XjlDwSalary();
+		xjlDwSalary.userinfoId = Long.parseLong(String.valueOf(params.get("userInfoId")));
+		xjlDwSalary.month = String.valueOf(params.get("month"));
+		xjlDwSalary.basicSalary = String.valueOf(params.get("basicSalary"));
+		xjlDwSalary.subsidy = String.valueOf(params.get("subsidy"));
+		xjlDwSalary.bonus = String.valueOf(params.get("bonus"));
+		xjlDwSalary.telcharge = String.valueOf(params.get("telcharge"));
+		xjlDwSalary._float = String.valueOf(params.get("_float"));
+		xjlDwSalary.otherdeductions = String.valueOf(params.get("otherdeductions"));
+		xjlDwSalary.reportwithhold = String.valueOf(params.get("reportwithhold"));
+		xjlDwSalary.reportwidthholdContent = String.valueOf(params.get("reportwidthholdContent"));
+		xjlDwSalary.otherwithholdcontent = String.valueOf(params.get("otherwithholdcontent"));
+		xjlDwSalary.incometax = String.valueOf(params.get("incometax"));
+		xjlDwSalary.insurance = String.valueOf(params.get("insurance"));
+		xjlDwSalary.total = String.valueOf(params.get("total"));
+		xjlDwSalary.wxOpenId = wxuser.wxOpenId;
+		xjlDwSalary = XjlDwSalaryBo.save(xjlDwSalary);
+		ok(xjlDwSalary);
+	}
+	
+	/**
+	 * 执行修改
+	 */
+	public static void doModifySalary(){
+		XjlDwSalary xjlDwSalary = new XjlDwSalary();
+		xjlDwSalary.month = String.valueOf(params.get("month"));
+		xjlDwSalary.basicSalary = String.valueOf(params.get("basicSalary"));
+		xjlDwSalary.subsidy = String.valueOf(params.get("subsidy"));
+		xjlDwSalary.bonus = String.valueOf(params.get("bonus"));
+		xjlDwSalary.telcharge = String.valueOf(params.get("telcharge"));
+		xjlDwSalary._float = String.valueOf(params.get("_float"));
+		xjlDwSalary.otherdeductions = String.valueOf(params.get("otherdeductions"));
+		xjlDwSalary.reportwithhold = String.valueOf(params.get("reportwithhold"));
+		xjlDwSalary.reportwidthholdContent = String.valueOf(params.get("reportwidthholdContent"));
+		xjlDwSalary.otherwithholdcontent = String.valueOf(params.get("otherwithholdcontent"));
+		xjlDwSalary.incometax = String.valueOf(params.get("incometax"));
+		xjlDwSalary.insurance = String.valueOf(params.get("insurance"));
+		xjlDwSalary.total = String.valueOf(params.get("total"));
+		xjlDwSalary.salaryId = Long.parseLong(String.valueOf(params.get("salaryId")));
+		XjlDwSalary.modifySalary(xjlDwSalary);
+	}
+	/**
+	 * 薪资列表个人
+	 */
+	public static void doQuerySalaryInfo(){
+		String userInfoId = params.get("userInfoId");
+		Map ret = XjlDwSalary.querySalaryByUserInfoId(userInfoId);
+		List<Map<String,Object>> _data = new ArrayList<>();
+		if(null !=ret){
+			List<XjlDwSalary> data = (List<XjlDwSalary>) ret.get("data");
+			Map<String,Object> _temp = null;
+			for (XjlDwSalary xjlDwSalary : data) {
+				_temp = new HashMap<>();
+				_temp.put("month", xjlDwSalary.month);
+				_temp.put("basicSalary",xjlDwSalary.basicSalary);
+				_temp.put("subsidy",xjlDwSalary.subsidy);
+				_temp.put("bonus",xjlDwSalary.bonus);
+				_temp.put("telcharge",xjlDwSalary.telcharge);
+				_temp.put("_float",xjlDwSalary._float);
+				_temp.put("otherdeductions",xjlDwSalary.otherdeductions);
+				_temp.put("otherwithholdcontent",xjlDwSalary.otherwithholdcontent);
+				_temp.put("reportwithhold",xjlDwSalary.reportwithhold);
+				_temp.put("reportwidthholdContent",xjlDwSalary.reportwidthholdContent);
+				_temp.put("incometax",xjlDwSalary.incometax);
+				_temp.put("insurance",xjlDwSalary.insurance);
+				_temp.put("total", xjlDwSalary.total);
+				_data.add(_temp);
+			}
+		}
+		ok(_data);
+	}
+	
+	/**
+	 * 通过id和时间获取
+	 */
+	public static void doQuerySalaryByIdAndDate(){
+		String userInfoId = params.get("userInfoId");
+		String month = params.get("month");
+		XjlDwSalary xjlDwSalary = XjlDwSalary.querySalaryByUserInfoIdAndtime(userInfoId,month);
+		ok(xjlDwSalary);
+	}
+	
 }

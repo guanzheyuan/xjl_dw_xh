@@ -2,7 +2,7 @@
 <html ng-app="app">
 <head>
 <meta charset="UTF-8">
-<title>考勤管理</title>
+<title>薪资管理</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
@@ -22,11 +22,12 @@
 angular.module('app', ['ngTouch'])
 	 .factory('agentRemote', ['$http', function ($http, appValue) {
 		 return {
-			 queryList:function(month){
+			 userList:function(year,month){
 				 return $http({
 					 method: 'GET',
-					 url:'/xh/mobile/Execute/doQueryCheckingByMonth',
+					 url:'/xh/mobile/Execute/doQueryWxUserInfo',
 					 params:{
+						 year:year,
 						 month:month
 					 }
 				  })
@@ -34,38 +35,36 @@ angular.module('app', ['ngTouch'])
 		 }
 	 }])
      .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
-    	 $scope.checkList = [];
-    	 $scope.workDate = '${month}';
-    	 $scope.query = function(me){
-   		  agentRemote.queryList($scope.workDate).then(function(res){
-   			  $scope.checkList = res.data.data;
-   		  });
-   	  }
-    	 $scope.query();
+    	 $scope.salesList = [];
+    	 $scope.salaryUserList = [];
+    	 
+    	 $scope.toSalaryInfo = function(id){
+    		 console.log();
+    		 window.location.href="/xh/mobile/Skip/toSalaryInfo?userinfoId="+id;
+    	 }
+    	 $scope.init = function(){
+    		 agentRemote.userList().then(function(res){
+    			 $scope.salaryUserList= res.data.data.data;
+    			 console.log(res);
+    		 })
+    	 }
+    	 $scope.init();
      }]);
 </script>
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
-<table class="weui-table weui-border-tb">
-              <thead>
-              <tr><th>日期</th><th>上班</th><th>下班</th></tr>
-              </thead>
-              <tbody >
-              <tr ng-repeat="check in checkList">
-               <td>{{check.workday}}</td>
-               <td ng-if="check.am !='' && check.amval">{{check.am}}</td>
-               <td ng-if="check.am !='' && !check.amval" style="color:red;">{{check.am}}</td>
-               <td ng-if="check.am =='' && !check.isNow" style="color:red;">暂无数据</td>
-               <td ng-if="check.am =='' && check.isNow">{{check.am}}</td>
-               
-               
-               <td ng-if="check.pm !='' && check.pm!=null && check.pmval">{{check.pm}}</td>
-               <td ng-if="check.pm !='' && check.pm!=null && !check.pmval" style="color:red;">{{check.pm}}</td>
-               <td ng-if="check.pm ==''|| check.pm ==null  && !check.isNow" style="color:red;">暂无数据</td>
-               <td ng-if="check.pm =='' || check.pm ==null && check.isNow" >{{check.pm}}</td>
-               
-              </tr>
-              </tbody>
-</table>
+ <div class="weui_cells">
+ <div class="weui_cell">
+       <div class="weui_cell_bd weui_cell_primary" ng-if="salaryUserList.length == 0">
+           <p>暂无数据</p>
+       </div>
+   </div>
+    <div class="weui_cell" ng-repeat="salary in salaryUserList" ng-click="toSalaryInfo({{salary.userInfoId}});">
+       <div class="weui_cell_bd weui_cell_primary">
+           <p>{{salary.userinfoName}}</p>
+       </div>
+    <!--    <div class="weui_cell_ft">说明文字</div> -->
+   </div>
+</div>
 </body>
 </html>

@@ -47,7 +47,6 @@ angular.module('app', ['ngTouch'])
     	 $scope.salesName =""; 
     	 $scope.isadminOrWs="${isadminorSw}";
     	 $scope.initSales = function(me){
-    		 console.log($(document).width());
     		 if( $scope.isadminOrWs == 'true'){
     			 agentRemote.salesList($(document).width()).then(function(res){
         			 if(res.data.data.data.length >0){
@@ -76,6 +75,10 @@ angular.module('app', ['ngTouch'])
 		 	</div>
 		 </div>
 	</div>
+	<div class="weui-flex">
+		<div class="weui-flex-item"><hr>
+		</div>
+	</div>
 	<!-- <div class="weui_cells_title" style="text-align: right;">
 		<a href="/xh/mobile/Skip/toSalesAdd" id="detail" class="weui_btn weui_btn_mini bg-blue" >新增</a>
 	</div> -->
@@ -95,11 +98,11 @@ angular.module('app', ['ngTouch'])
             </div>
     </div> -->
     <div class="weui_cell" ng-if="isadminOrWs == 'true'" >
-		          <div class="weui_cell_bd weui_cell_primary">
-		              <p >{{salesName}}</p>
-		          </div>
+          <div class="weui_cell_bd weui_cell_primary">
+              <p >{{salesName}}</p>
+          </div>
 	 </div>
-	<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'true'">
+	<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'true' && salesList.length != 0">
         <thead >
         <tr><th></th><th ng-repeat="sales in salesList" >{{sales.workDate}}</th></tr>
         </thead>
@@ -111,15 +114,17 @@ angular.module('app', ['ngTouch'])
         <tr><td>差旅费</td><td ng-repeat="sales in salesList" style="color: gray;">{{sales.travel}}</td></tr>
         </tbody>
    </table>
-   <hr>
+   <hr ng-if="isadminOrWs == 'true' && salesList.length != 0">
+   
+   
     <div ng-if="isadminOrWs == 'false'" ng-repeat="sales in salesList" >
 	     <div class="weui_cell"  >
 		          <div class="weui_cell_bd weui_cell_primary">
 		              <p>{{sales.username}}</p>
 		          </div>
 	      </div>
-	    <hr>
-		<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'false'"  >
+	    <hr ng-if="isadminOrWs == 'false' && salesList.length != 0" >
+		<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'false' && salesList.length != 0"  >
 	        <thead >
 	        <tr ><th></th><th ng-repeat="sale in sales.saleList" >{{sale.workDate}}</th></tr>
 	        </thead>
@@ -131,7 +136,7 @@ angular.module('app', ['ngTouch'])
 	        <tr><td>差旅费</td><td ng-repeat="sale in sales.saleList" style="color: gray;">{{sale.travel}}</td></tr>
 	        </tbody>
 	   </table>
-	   <hr>
+	   <hr ng-if="isadminOrWs == 'false' && salesList.length != 0" >
     </div>
 </body>
 </body>

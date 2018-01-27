@@ -30,6 +30,9 @@ public class XjlDwChecking extends GenericModel {
 	@Column(name = "WORK_MONTH")
 	public String workMonth;
 	
+	@Column(name = "work_year")
+	public String workYear;
+	
 	@Column(name = "AM")
 	public String am;
 	
@@ -130,8 +133,8 @@ public class XjlDwChecking extends GenericModel {
 	 * @param month
 	 * @return
 	 */
-	public static Map  queryCheckingByMonth(String openid,String month){
-		String sql = "select * from xjl_dw_checking where work_month= '"+month+"' and wx_open_id='"+openid+"' order by work_date desc";
+	public static Map  queryCheckingByMonth(String openid,String month,String year){
+		String sql = "select * from xjl_dw_checking where work_month= '"+month+"' and work_year='"+year+"' and wx_open_id='"+openid+"' order by work_date desc";
 		Map<String, String> condition = new HashMap<String, String>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwChecking> data = ModelUtils.queryData(1, 1000000000, ret, XjlDwChecking.class);

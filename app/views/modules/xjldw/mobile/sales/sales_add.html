@@ -23,25 +23,25 @@ angular.module('app', ['ngTouch'])
 	 .factory('agentRemote', ['$http', function ($http, appValue) {
 		 return {
 			 valid:function(obj){
-			   if(obj.userinfo == ""){
+			   if(obj.userinfo === ""){
 				   return {flag:false, msg: '请选择员工信息'}; 
 				}
-				if(obj.month == ""){
+				if(obj.month === ""){
 					 return {flag:false, msg: '请选择月份'};  
 			    }
-				if(obj.market == ""){
+				if(obj.market === ""){
 					 return {flag:false, msg: '请输入销售额'}; 
 				}
-				if(obj.returned == ""){
+				if(obj.returned === ""){
 					 return {flag:false, msg: '请输入回款额'}; 
 				}
-				if(obj.receivable == ""){
+				if(obj.receivable === ""){
 					 return {flag:false, msg: '请输入应收款'}; 
 				}
-				if(obj.client == ""){
+				if(obj.client === ""){
 					 return {flag:false, msg: '请输入客户费用'}; 
 				}
-				if(obj.travel == ""){
+				if(obj.travel === ""){
 					 return {flag:false, msg: '请输入差旅费'}; 
 				}
 				return {flag: true, msg: '验证通过'};
@@ -66,6 +66,30 @@ angular.module('app', ['ngTouch'])
 						 travel:obj.travel
 					 }
 				  })
+			 },
+			 querySalesByIdAndWorkDate:function(obj){
+				  return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQuerySalesByIdAndMonth',
+					 params:{
+						 userinfoId:obj.userinfoId,
+						 workDate:obj.month
+					 }
+				  })
+			 },
+			 modifySales:function(obj,id){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/modifySales',
+					 params:{
+						 salesId:id,
+						 market:obj.market,
+						 returned:obj.returned,
+						 receivable:obj.receivable,
+						 client:obj.client,
+						 travel:obj.travel
+					 }
+				  })
 			 }
 		 }
 	 }])
@@ -81,24 +105,51 @@ angular.module('app', ['ngTouch'])
     			 userinfoId:''
     	 };
     	  $scope.userList = [];
-    	  
+    	  $scope.isModify = false;
+    	  $scope.salesId='';
+    	  $scope.selectOne = function(){
+    		  $scope.sales.userinfoId =$scope.sales.userinfo.userInfoId;
+    		  agentRemote.querySalesByIdAndWorkDate($scope.sales).then(function(res){
+    			  if(res.data.data.data.length >0){
+    				  $("#market").val(res.data.data.data[0].market);
+    				  $("#returned").val(res.data.data.data[0].returned);
+    				  $("#receivable").val(res.data.data.data[0].receivable);
+    				  $("#client").val(res.data.data.data[0].client);
+    				  $("#travel").val(res.data.data.data[0].travel);
+    				  $scope.sales = res.data.data.data[0];
+    				  $scope.salesId = res.data.data.data[0].salesId;
+        			  console.log($scope.sales);
+        			  $scope.isModify = true;
+    			  }else{
+    				  $scope.isModify = false;
+    			  }
+    		  })
+    	  }
     	  $scope.save = function(me){
+    		  console.log($scope.sales);
     		  var vaildRes =  agentRemote.valid($scope.sales);
     		  if(vaildRes.flag){
-        		  var userInfoId = $scope.sales.userinfo.userInfoId;
-        		  $scope.sales.userinfoId = userInfoId;
-        		  if(""!=$("#monthDate").val()){
-        			  $scope.sales.month = $("#monthDate").val();
-        		  }
-        		  console.log($scope.sales);
-    			  agentRemote.save($scope.sales).then(function(res){
-    				  if (res.data.ret == '-1') {
-							$.toast(res.data.desc, "forbidden");
-    				  }else{
+    			  if(!$scope.isModify){
+    				  var userInfoId = $scope.sales.userinfo.userInfoId;
+            		  $scope.sales.userinfoId = userInfoId;
+            		  if(""!=$("#monthDate").val()){
+            			  $scope.sales.month = $("#monthDate").val();
+            		  }
+            		  console.log($scope.sales);
+        			  agentRemote.save($scope.sales).then(function(res){
+        				  if (res.data.ret == '-1') {
+    							$.toast(res.data.desc, "forbidden");
+        				  }else{
+        					  $.toast("操作成功");
+        					  window.location.href="/xh/mobile/Skip/toSales";
+        				  }
+        			  });
+    			  }else{
+    				  agentRemote.modifySales($scope.sales,$scope.salesId).then(function(res){
     					  $.toast("操作成功");
     					  window.location.href="/xh/mobile/Skip/toSales";
-    				  }
-    			  });
+    				  })
+    			  }
     		  }else{
     			  $.toast(vaildRes.msg, "forbidden");
     		  }
@@ -129,7 +180,7 @@ angular.module('app', ['ngTouch'])
                 <label for="" class="weui_label">员工</label>
             </div>
             <div class="weui_cell_bd weui_cell_primary">
-                <select class="weui_select" name="select2" ng-model="sales.userinfo" ng-options=" userinfo.userinfoName for userinfo in userList" >
+                <select class="weui_select" name="select2" ng-change="selectOne()"  ng-model="sales.userinfo" ng-options=" userinfo.userinfoName for userinfo in userList" >
                 	  <option value="" style="font-size:20px;">--选择员工--</option>
                 </select>
             </div>
@@ -143,31 +194,31 @@ angular.module('app', ['ngTouch'])
          <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">销售额</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*"   placeholder="请填写销售额(单位万元)" ng-model="sales.market"/>
+	             <input class="weui_input" type="number" id="market" pattern="[0-9]*"   placeholder="请填写销售额(单位万元)" ng-model="sales.market"/>
 	         </div>
 	     </div>
 	     <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">回款额</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写回款额(单位万元)" ng-model="sales.returned"/>
+	             <input class="weui_input" type="number" id="returned" pattern="[0-9]*" placeholder="请填写回款额(单位万元)" ng-model="sales.returned"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">应收款</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写应收款(单位万元)" ng-model="sales.receivable"/>
+	             <input class="weui_input" type="number" id="receivable" pattern="[0-9]*" placeholder="请填写应收款(单位万元)" ng-model="sales.receivable"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">客户费用</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*"  placeholder="请填写客户费用(单位万元)" ng-model="sales.client"/>
+	             <input class="weui_input" type="number" id="client" pattern="[0-9]*"  placeholder="请填写客户费用(单位万元)" ng-model="sales.client"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">差旅费</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" pattern="[0-9]*" placeholder="请填写差旅费(单位万元)" ng-model="sales.travel"/>
+	             <input class="weui_input" type="number" id="travel" pattern="[0-9]*" placeholder="请填写差旅费(单位万元)" ng-model="sales.travel"/>
 	         </div>
 	    </div>
 	    <div class="button_sp_area" style="text-align: right;" >

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html  ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>薪资管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+	 .factory('agentRemote', ['$http', function ($http, appValue) {
+		 return {
+			 userList:function(userInfoId){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQuerySalaryInfo',
+					 params:{
+						 userInfoId:userInfoId
+					 }
+				  })
+			 }
+		 }
+	 }])
+     .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+    	 $scope.userName = '${userinfoName}';
+    	 $scope.userInfoId='${userinfoId}';
+    	 $scope.noAdd = '${noAdd}';
+    	 $scope.salaryList = [];
+    	 $scope.toSalaryExplain = function(){
+    		 console.log(123);
+    		 window.location.href='/xh/mobile/Skip/toSalaryExplain';
+    	 }
+    	 
+    	 $scope.init = function(){
+    		 agentRemote.userList($scope.userInfoId).then(function(res){
+    			 console.log(res);
+    			 $scope.salaryList = res.data.data;
+    		 });
+    	 }
+    	 $scope.init();
+     }]);
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<div class="weui-flex">
+		 <div class="weui-flex-item" style="text-align: right;">
+			 <div class="weui_cell"  style="padding-left:70%" >
+		 		<a href="/xh/mobile/Skip/toSalaryAdd?userinfoId=${userinfoId}" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-if="noAdd == false">新增</a>
+		 	</div>
+		 </div>
+</div>
+<div class="weui_cell">
+       <div class="weui_cell_bd weui_cell_primary">
+           <p >{{userName}}</p>
+       </div>
+</div>
+<div class="weui_cells">
+		<div class="weui_cell"  ng-if="salaryList.length == 0">
+          <div class="weui_cell_bd weui_cell_primary">
+              <p>暂无数据</p>
+          </div>
+      </div>
+</div>
+<table class="weui-table" style="overflow-x: auto;"  ng-if="salaryList.length != 0">
+        <thead >
+        <tr><th></th><th ng-repeat="salary in salaryList" >{{salary.month}}</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>基本工资</td><td ng-repeat="salary in salaryList"style="color: gray;" >{{salary.basicSalary}}</td></tr>
+        <tr><td>岗位津贴</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.subsidy}}</td></tr>
+        <tr><td>销售奖金</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.bonus}}</td></tr>
+        <tr><td>话费补贴</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.telcharge}}</td></tr>
+        <tr><td>考勤浮动</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary._float}}</td></tr>
+        <tr><td>社会保险</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.insurance}}</td></tr>
+        <tr><td>述职扣款</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.reportwithhold}}</td></tr>
+        <tr><td>其他扣款</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.otherdeductions}}</td></tr>
+        <tr><td>所得税</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.incometax}}</td></tr>
+       	<tr><td>合计</td><td ng-repeat="salary in salaryList" style="color:blue;" ng-click="toSalaryExplain()" >{{salary.total}}</td></tr>
+        </tbody>
+ </table>
+</body>
+</html>

@@ -78,6 +78,20 @@ public class XjlDwSales extends GenericModel {
 		return ModelUtils.createResultMap(ret, data);
 	}
 	
+	public static Map querySalesByWxOpenIdAndMonth(String userinfoId,String workDate){
+		String sql = "select * from xjl_dw_sales where status='0AA' and userinfoId='"+userinfoId+"' and WORK_DATE='"+workDate+"' order by work_date desc";
+		Map<String,String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwSales> data = ModelUtils.queryData(1,999999, ret, XjlDwSales.class);
+		return ModelUtils.createResultMap(ret, data);
+	}
+	
+	public static int modifySales(XjlDwSales xjlDwSales){
+		String sql="update xjl_dw_sales set market='"+xjlDwSales.market+"',returned='"+xjlDwSales.returned+"',"
+				+ "receivable='"+xjlDwSales.receivable+"',client='"+xjlDwSales.client+"',travel='"+xjlDwSales.travel+"' where SALES_ID='"+xjlDwSales.salesId+"'";
+		Map<String, String> condition = new HashMap<String, String>();
+		return ModelUtils.executeDelete(condition, sql);
+	}
 	
 	
 }

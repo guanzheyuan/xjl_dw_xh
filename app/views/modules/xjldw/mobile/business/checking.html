@@ -72,10 +72,13 @@ function timeClock(){
 angular.module('app', ['ngTouch'])
       .factory('agentRemote', ['$http', function ($http, appValue) {
     	  return {
-    		  checkingInfo:function(){
+    		  checkingInfo:function(wxOpenId){
 				  return $http({
 					 method: 'GET',
-					 url:'/xh/mobile/Execute/doQueryCheckingLog'
+					 url:'/xh/mobile/Execute/doQueryCheckingLog',
+					 params:{
+						 wxOpenId:wxOpenId
+					 }
 				  })
 			  },
 			  save:function(checkFlag){
@@ -111,10 +114,13 @@ angular.module('app', ['ngTouch'])
 						 }
 					  })  
 			  },
-			  queryGroupByDate:function(){
+			  queryGroupByDate:function(wxOpenId){
 				  return $http({
 						 method: 'GET',
-						 url:'/xh/mobile/Execute/doQueryCheckingByGroupDate'
+						 url:'/xh/mobile/Execute/doQueryCheckingByGroupDate',
+						 params:{
+							 wxOpenId:wxOpenId
+						 }
 					  }) 
 			  }
     	  }
@@ -132,13 +138,15 @@ angular.module('app', ['ngTouch'])
     	  
     	  
     	  $scope.toCheck = function(month){
+    		  var date = new Date();
     		  if(""!=month){
+    			  var year = date.getFullYear(); //获取当前日期的年份 
     			  console.log(parseInt(month));
     			  window.location.href="/xh/mobile/Skip/toCheckingLog?month="+parseInt(month);
     		  }
     	  }
     	  $scope.query = function(me){
-    		  agentRemote.queryGroupByDate().then(function(res){
+    		  agentRemote.queryGroupByDate('${wxOpenId}').then(function(res){
     			  $scope.checkList = res.data.data;
     			  console.log(res.data.data);
     		  });
@@ -208,7 +216,7 @@ angular.module('app', ['ngTouch'])
  		 }
     	 //初始化展示打开状态
  		  $scope.initChecking = function(me){
- 			 agentRemote.checkingInfo().then(function(res){
+ 			 agentRemote.checkingInfo('${wxOpenId}').then(function(res){
  				 $scope.checkFlag = res.data.data.checkFlag;
  				 console.log(res);
  				  if('A' == $scope.checkFlag){

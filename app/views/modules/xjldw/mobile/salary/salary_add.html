@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>薪资管理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+	 .factory('agentRemote', ['$http', function ($http, appValue) {
+		 return {
+			 valid:function(obj){
+				 if(obj.month ===""){
+					 return {flag:false, msg: '请选择月份'};  
+			     }
+				 if(obj.basicSalary === "" ){
+					 return {flag:false, msg: '请填写基本工资'};  
+				 }
+				 if(obj.subsidy === ""){
+					 return {flag:false, msg: '请填写岗位津贴'}; 
+				 }
+				 if(obj.bonus === ""){
+					 return {flag:false, msg: '请填写销售奖金'}; 
+				 }
+				 if(obj.telcharge ===""){
+					 return {flag:false, msg: '请填写话费补贴'}; 
+				 }
+				 if(obj._float ===""){
+					 return {flag:false, msg: '请填写考勤浮动'}; 
+				 }
+				 if(obj.insurance===""){
+					 return {flag:false, msg: '请填写社会保险'}; 
+				 }
+				 if(obj.reportwithhold === ""){
+					 return {flag:false, msg: '请填写述职扣款'}; 
+				 }
+				 if(obj.otherdeductions === ""){
+					 return {flag:false, msg: '请填写其他扣款'}; 
+				 }
+				 if(obj.incometax ===""){
+					 return {flag:false, msg: '请填写所得税'}; 
+				 }
+				 return {flag: true, msg: '验证通过'};
+			 },
+			 save:function(obj,total){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doSaveSalary',
+					 params:{
+						    userInfoId:obj.userInfoId,
+			    			month:obj.month,
+			    			basicSalary:obj.basicSalary,
+			    			subsidy:obj.subsidy,
+			    			bonus:obj.bonus,
+			    			telcharge:obj.telcharge,
+			    			_float:obj._float,
+			    			otherdeductions:obj.otherdeductions,
+			    			reportwithhold:obj.reportwithhold,
+			    			reportwidthholdContent:obj.reportwidthholdContent,
+			    			otherwithholdcontent:obj.otherwithholdcontent,
+			    			incometax:obj.incometax,
+			    			insurance:obj.insurance,
+			    			total:total
+					 }
+				  })
+			 },
+			 reportWithHold:function(openid){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/reportWidthHold',
+					 params:{
+						 wxOpenId:openid
+					 }
+				  })
+			 },
+			 queryIdAndDate:function(userInfoId,month){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQuerySalaryByIdAndDate',
+					 params:{
+						 userInfoId:userInfoId,
+						 month:month
+					 }
+				  })
+			 },
+			 modifySalary:function(obj,total,id){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doModifySalary',
+					 params:{
+						    userInfoId:obj.userInfoId,
+			    			month:obj.month,
+			    			basicSalary:obj.basicSalary,
+			    			subsidy:obj.subsidy,
+			    			bonus:obj.bonus,
+			    			telcharge:obj.telcharge,
+			    			_float:obj._float,
+			    			otherdeductions:obj.otherdeductions,
+			    			reportwithhold:obj.reportwithhold,
+			    			reportwidthholdContent:obj.reportwidthholdContent,
+			    			otherwithholdcontent:obj.otherwithholdcontent,
+			    			incometax:obj.incometax,
+			    			insurance:obj.insurance,
+			    			total:total,
+			    			salaryId:id
+					 }
+				  })
+			 }
+		 }
+	 }])
+     .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+    	 $scope.userName = '${userinfoName}';
+    	 $scope.userOpenid='${openid}';
+    	 $scope.isChecking = false;
+    	 $scope.ismodify = false;
+    	 $scope.salaryId="";
+    	 $scope.allCount = 0;
+    	 $scope.allDay = "";
+    	 var date = new Date();
+    	 $scope.salary = {
+    			userInfoId:'${userinfoId}',
+    			month:'',
+    			basicSalary:0,
+    			subsidy:0,
+    			bonus:0,
+    			telcharge:0,
+    			_float:0,
+    			otherdeductions:0,
+    			reportwithhold:0,
+    			reportwidthholdContent:'',
+    			otherwithholdcontent:'',
+    			incometax:0,
+    			insurance:0
+    			
+    	 }
+    	 
+    	 $scope.salaryChecking = function(){
+    		 if("" != $("#monthDate").val()){
+    			 $scope.salary.month = $("#monthDate").val()
+    		 }
+    		 //window.location.href="/xh/mobile/Skip/toSalaryChecking?userinfoId=${userinfoId}&workDate="+$scope.salary.month;
+    		 window.location.href="/xh/mobile/Skip/toChecking?wxOpenId=${openid}";
+    	 }
+    	 $scope.calculate = function(){
+    		 $scope.allCount = parseFloat($scope.salary.basicSalary) + parseFloat($scope.salary.subsidy)+
+    		 parseFloat($scope.salary.bonus)+parseFloat($scope.salary.telcharge)+parseFloat($scope.salary._float)-
+    		 parseFloat($scope.salary.insurance)-parseFloat($scope.salary.reportwithhold)-parseFloat($scope.salary.otherdeductions)-
+    		 parseFloat($scope.salary.incometax);
+    		 console.log( $scope.allCount);
+    	 }
+    	 $scope.initLastMonth = function(){
+             var year = date.getFullYear(); //获取当前日期的年份  
+             var month = date.getMonth()+1; //获取当前日期的月份  
+             var year2 = year;  
+             var month2 = parseInt(month) - 1;  
+             if (month2 == 0) {  
+                 year2 = parseInt(year2) - 1;  
+                 month2 = 12;  
+             }  
+             if (month2 < 10) {  
+                 month2 = '0' + month2;  
+             }  
+             var t2 = year2 + '-' + month2 ;  
+              $scope.salary.month = t2;
+              $scope.allDay  = t2;
+             $("#monthDate").val(t2);
+    	 }
+    	 //考勤扣款
+    	 $scope.initCheck = function(){
+    		 setTimeout(function () {
+    	       	 $scope.initLastMonth();
+    		 },1000);
+    		 //得到上个月是否考勤
+    		 agentRemote.reportWithHold($scope.userOpenid).then(function(res){
+    			$scope.isChecking = res.data.data;
+    			if($scope.isChecking){
+    				 $scope.salary.reportwithhold = 200;
+    			}
+    		 });
+    		 setTimeout(function () {
+    			 if("" != $("#monthDate").val()){
+        			 $scope.salary.month = $("#monthDate").val()
+        		 }
+        		 //查询该月份是否有薪资记录
+        		 agentRemote.queryIdAndDate($scope.salary.userInfoId,$scope.salary.month).then(function(res){
+        			 console.log(res.data.data != null);
+        			 if(res.data.data != null){
+        				 $scope.salary = res.data.data;
+        				 console.log($scope.salary);
+            			 $("#basicSalary").val(res.data.data.basicSalary);
+            			 $("#subsidy").val(res.data.data.subsidy)
+            			 $("#bonus").val(res.data.data.bonus)
+            			 $("#telcharge").val(res.data.data.telcharge)
+            			 $("#_float").val(res.data.data._float)
+            			 $("#insurance").val(res.data.data.insurance)
+            			 $("#reportwithhold").val(res.data.data.reportwithhold)
+            			 $("#otherdeductions").val(res.data.data.otherdeductions)
+         			     $("#incometax").val(res.data.data.incometax)
+         			     $scope.allCount = res.data.data.total;
+            			 $scope.salaryId = res.data.data.salaryId;
+         			     $scope.ismodify = true;
+        			 }
+        		 })
+    		 },2000);
+    	 }
+    	 $scope.save = function(){
+    		 console.log($scope.salary);
+    		 if("" != $("#monthDate").val()){
+    			 $scope.salary.month = $("#monthDate").val()
+    		 }
+    		var vaildRes  = agentRemote.valid($scope.salary);
+    		  if(vaildRes.flag){
+    			  if($scope.salary.month != $scope.allDay){
+    				  agentRemote.save($scope.salary,$scope.allCount).then(function(res){
+        				  if (res.data.ret == '-1') {
+    		    			  $.toast(res.data.desc, "forbidden");
+    		    		  }else{
+    		    			  $.toast("操作成功");
+    		    			  window.location.href='/xh/mobile/Skip/toSalaryInfo?userinfoId=${userinfoId}';
+    		    		  }
+        			  })
+    			  }else{
+    				  agentRemote.modifySalary($scope.salary,$scope.allCount,$scope.salaryId).then(function(res){
+    					  $.toast("操作成功");
+    					  window.location.href='/xh/mobile/Skip/toSalaryInfo?userinfoId=${userinfoId}';
+    				  })
+    			  }
+    			 
+    		  }else{
+    			  $.toast(vaildRes.msg, "forbidden");
+    		  }
+    	 }
+    	 $scope.initCheck();
+     }]);
+</script>
+</head>
+</head>
+<body  ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+ <div class="weui_cells_title">{{userName}}</div>
+ <div class="weui_cells weui_cells_form">
+ 	<div class="weui_cell">
+              <div class="weui_cell_hd"><label for="" class="weui_label">月份</label></div>
+              <div id="monthDiv" class="weui_cell_bd weui_cell_primary">
+                  <input class="weui_input" style="width:100%;"  id="monthDate" type="month"  ng-model="salary.month" />
+              </div>
+     </div>
+     <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">基本工资</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number"  id="basicSalary"  pattern="[0-9]*" ng-change="calculate()"   placeholder="请填写基本工资" ng-model="salary.basicSalary"/>
+	         </div>
+    </div>
+    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">岗位津贴</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="subsidy"  pattern="[0-9]*" ng-change="calculate()"   placeholder="请填写岗位津贴" ng-model="salary.subsidy"/>
+	         </div>
+    </div>
+     <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">销售奖金</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number"  id="bonus" pattern="[0-9]*"  ng-change="calculate()"   placeholder="请填写销售奖金" ng-model="salary.bonus"/>
+	         </div>
+    </div>
+    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">话费补贴</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="telcharge" pattern="[0-9]*"  ng-change="calculate()"  placeholder="请填写话费补贴" ng-model="salary.telcharge"/>
+	         </div>
+    </div>
+     <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">考勤浮动</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="_float"  pattern="[0-9]*" ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
+	         </div>
+	          <div class="weui_cell_ft">
+                    <a href="javascript:;" class="weui-vcode-btn" ng-click="salaryChecking()">考勤查看</a>
+                </div>
+    </div>
+    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">社会保险</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="insurance"  pattern="[0-9]*"  ng-change="calculate()" placeholder="请填写社会保险" ng-model="salary.insurance"/>
+	         </div>
+    </div>
+    <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">述职扣款</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="reportwithhold" pattern="[0-9]*" ng-change="calculate()" placeholder="请填写述职扣款" ng-model="salary.reportwithhold"/>
+	         </div>
+    </div>
+     <div class="weui_cell">
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="text"  id="reportwidthholdContent"  placeholder="请填写扣款说明" ng-model="salary.reportwidthholdContent"/>
+	         </div>
+    </div>
+     <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">其他扣款</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="otherdeductions"  pattern="[0-9]*" ng-change="calculate()" placeholder="请填写其他扣款" ng-model="salary.otherdeductions"/>
+	         </div>
+    </div>
+    <div class="weui_cell">
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="text"    placeholder="请填写扣款说明" ng-model="salary.otherwithholdcontent"/>
+	         </div>
+    </div>
+     <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">所得税</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input"  type="number" id="incometax"   pattern="[0-9]*"  ng-change="calculate()"  placeholder="请填写所得税" ng-model="salary.incometax"/>
+	         </div>
+    </div>
+     <div class="weui_cells_tips" style="text-align:right;">合计：{{allCount}}</div>
+         
+       <div class="weui_btn_area">
+           <a class="weui_btn weui_btn_primary" href="javascript:" ng-click="save()" id="btn">确定</a>
+       </div> 
+ </div>
+</body>
+</html>
