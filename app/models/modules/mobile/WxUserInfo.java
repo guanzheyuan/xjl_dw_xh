@@ -150,6 +150,7 @@ public class WxUserInfo  extends GenericModel{
 				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
 			}
 			XjlDwReport report = XjlDwReport.queryReportByMonth(condition.get("year"), condition.get("month"), wxUserInfo.wxOpenId);
+			Logger.info("得到每个人对应月份的报告："+report.reportId);
 			wxUserInfo.report = null ==report?"false":sf.format(report.createTime);
 			wxUserInfo.reportId = null == report?"false":String.valueOf(report.reportId);
 		}
