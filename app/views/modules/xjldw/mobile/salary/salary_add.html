@@ -197,11 +197,12 @@ angular.module('app', ['ngTouch'])
     		 window.location.href="/xh/mobile/Skip/toChecking?userinfoId="+$scope.salary.seluserInfoId;
     	 }
     	 $scope.calculate = function(){
-    		 $scope.allCount = parseFloat($scope.salary.basicSalary) + parseFloat($scope.salary.subsidy)+
-    		 parseFloat($scope.salary.bonus)+parseFloat($scope.salary.telcharge)+parseFloat($scope.salary._float)-
-    		 parseFloat($scope.salary.insurance)-parseFloat($scope.salary.reportwithhold)-parseFloat($scope.salary.otherdeductions)-
-    		 parseFloat($scope.salary.incometax);
-    		 console.log( $scope.allCount);
+    		 console.log('进入');
+    		 $scope.allCount = Number($scope.salary.basicSalary) + Number($scope.salary.subsidy)+
+    		 Number($scope.salary.bonus)+Number($scope.salary.telcharge)+Number($scope.salary._float)-
+    		 Number($scope.salary.insurance)-Number($scope.salary.reportwithhold)-Number($scope.salary.otherdeductions)-
+    		 Number($scope.salary.incometax);
+    		 console.log($scope.allCount);
     	 }
     	 $scope.initLastMonth = function(){
              var year = date.getFullYear(); //获取当前日期的年份  
@@ -350,7 +351,7 @@ angular.module('app', ['ngTouch'])
      <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">基本工资</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number"  id="basicSalary"  pattern="[0-9]*" ng-change="calculate()"   placeholder="请填写基本工资" ng-model="salary.basicSalary"/>
+	             <input class="weui_input" type="number"  id="basicSalary"  pattern="[0-9]*"  ng-change="calculate()"   placeholder="请填写基本工资" ng-model="salary.basicSalary"/>
 	         </div>
     </div>
     <div class="weui_cell">
@@ -374,7 +375,7 @@ angular.module('app', ['ngTouch'])
      <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">考勤浮动</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="_float"  pattern="[0-9]*" ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
+	             <input class="weui_input" type="number" id="_float"   ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
 	         </div>
 	          <div class="weui_cell_ft">
                     <a href="javascript:;" class="weui-vcode-btn" ng-click="salaryChecking()">考勤查看</a>

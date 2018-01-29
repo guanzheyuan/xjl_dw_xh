@@ -282,4 +282,12 @@ public class Skip extends MobileFilter {
 		render("modules/xjldw/mobile/salary/salary_checking.html");
 	}
 	
+	/**
+	 * 跳转到
+	 */
+	public static void toExhibition(){
+		render("modules/xjldw/mobile/exhibition/product_activity.html");
+	}
+	
+	
 }

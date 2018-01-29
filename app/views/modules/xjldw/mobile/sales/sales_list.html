@@ -75,14 +75,11 @@ angular.module('app', ['ngTouch'])
 		 	</div>
 		 </div>
 	</div>
-	<div class="weui_cells">
-		<div class="weui_cell"  ng-if="salesList.length == 0">
+	<div class="weui_cell" >
           <div class="weui_cell_bd weui_cell_primary">
-              <p>暂无数据</p>
+              <!-- <p ></p> -->
           </div>
-      </div>
-      <hr>
-	</div>
+	 </div>
 	<!-- <div class="weui-flex" ng-if="isadminOrWs == 'true'">
             <div class="weui-flex-item">
              <div class="weui-weixin-content">
@@ -91,21 +88,17 @@ angular.module('app', ['ngTouch'])
             <div class="placeholder"  style="text-align:left;color:black;"></div>
             </div>
     </div> -->
-    <div class="weui_cell" ng-if="isadminOrWs == 'true'" >
-          <div class="weui_cell_bd weui_cell_primary">
-              <p >{{salesName}}</p>
-          </div>
-	 </div>
+     <hr ng-if="isadminOrWs == 'true' && salesList.length != 0">
 	<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'true' && salesList.length != 0">
         <thead >
-        <tr><th></th><th ng-repeat="sales in salesList" >{{sales.workDate}}</th></tr>
+        <tr><th style="font-weight:bolder;">{{salesName}}</th><th ng-repeat="sales in salesList" ><p style="width:70%;text-align:right;">{{sales.workDate}}</p></th></tr>
         </thead>
         <tbody>
-        <tr><td>销售额</td><td ng-repeat="sales in salesList"style="color: gray;" >{{sales.market}}</td></tr>
-        <tr><td>回款额</td><td ng-repeat="sales in salesList" style="color: gray;">{{sales.returned}}</td></tr>
-        <tr><td>应收款</td><td ng-repeat="sales in salesList" style="color: gray;">{{sales.receivable}}</td></tr>
-        <tr><td>客户费用</td><td ng-repeat="sales in salesList" style="color: gray;">{{sales.client}}</td></tr>
-        <tr><td>差旅费</td><td ng-repeat="sales in salesList" style="color: gray;">{{sales.travel}}</td></tr>
+        <tr><td>销售额</td><td ng-repeat="sales in salesList"style="color: gray;" ><p style="width:70%;text-align:right;">{{sales.market}}</p></td></tr>
+        <tr><td>回款额</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.returned}}</p></td></tr>
+        <tr><td>应收款</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.receivable}}</p></td></tr>
+        <tr><td>客户费用</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.client}}</p></td></tr>
+        <tr><td>差旅费</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.travel}}</p></td></tr>
         </tbody>
    </table>
    <hr ng-if="isadminOrWs == 'true' && salesList.length != 0">
@@ -114,24 +107,30 @@ angular.module('app', ['ngTouch'])
     <div ng-if="isadminOrWs == 'false'" ng-repeat="sales in salesList" >
 	     <div class="weui_cell"  >
 		          <div class="weui_cell_bd weui_cell_primary">
-		              <p>{{sales.username}}</p>
+		              <!-- <p></p> -->
 		          </div>
 	      </div>
 	    <hr ng-if="isadminOrWs == 'false' && salesList.length != 0" >
 		<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'false' && salesList.length != 0"  >
 	        <thead >
-	        <tr ><th></th><th ng-repeat="sale in sales.saleList" >{{sale.workDate}}</th></tr>
+	        <tr ><th style="font-weight:bolder;">{{sales.username}}</th><th ng-repeat="sale in sales.saleList" ><p style="width:70%;text-align:right;">{{sale.workDate}}</p></th></tr>
 	        </thead>
 	        <tbody>
-	        <tr><td>销售额</td><td ng-repeat="sale in sales.saleList" style="color: gray;">{{sale.market}}</td></tr>
-	        <tr><td>回款额</td><td ng-repeat="sale in sales.saleList" style="color: gray;">{{sale.returned}}</td></tr>
-	        <tr><td>应收款</td><td ng-repeat="sale in sales.saleList" style="color: gray;">{{sale.receivable}}</td></tr>
-	        <tr><td>客户费用</td><td ng-repeat="sale in sales.saleList" style="color: gray;">{{sale.client}}</td></tr>
-	        <tr><td>差旅费</td><td ng-repeat="sale in sales.saleList" style="color: gray;">{{sale.travel}}</td></tr>
+	        <tr><td>销售额</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.market}}</p></td></tr>
+	        <tr><td>回款额</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.returned}}</p></td></tr>
+	        <tr><td>应收款</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.receivable}}</p></td></tr>
+	        <tr><td>客户费用</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.client}}</p></td></tr>
+	        <tr><td>差旅费</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.travel}}</p></td></tr>
 	        </tbody>
 	   </table>
 	   <hr ng-if="isadminOrWs == 'false' && salesList.length != 0" >
     </div>
-</body>
+    <div class="weui_cells">
+		<div class="weui_cell"  ng-if="salesList.length == 0">
+          <div class="weui_cell_bd weui_cell_primary">
+              <p>暂无数据</p>
+          </div>
+      </div>
+	</div>
 </body>
 </html>

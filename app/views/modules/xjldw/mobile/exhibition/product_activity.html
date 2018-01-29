@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>产品活动</title>
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="weui-weixin">
+<div class="weui-weixin-ui">
+  <!--页面开始-->
+    <div class="weui-weixin-page">
+   <h2 class="weui-weixin-title">十年经验 品质保证</h2>
+   <div class="weui-weixin-info"><!--meta-->
+                       <a class="weui-weixin-a weui-weixin-nickname" href="javascript:void(0);" >南京西桓电气有限公司</a>
+                    </div><!--meta结束-->
+                    
+    <div class="weui-weixin-img"><!--图片开始-->
+    <img src="/xh/public/images/mobile/201403141442454569.jpg">
+    </div><!--图片结束-->
+                                        
+    <div class="weui-weixin-content"><!--内容-->
+                    <p> 德国西桓是全球领先的过程系统服务商，1969年成立于德国慕尼黑，为世界各地工业现场及设备制造商提供硬件、软件、解决方案和服务。南京西桓电气有限公司于2005年引进德国西桓先进的产品技术和管理理念，研发、生产、销售智能化仪表产品，并组建了相应的产品研发、自动化应用系统设计、施工安装、现场调试、售后技术支持团队。 
+  作为技术型企业我们始终以技术创新、市场创新、管理创新的核心经营理念勉励和鞭策自己，在多年的发展历程中，南京西桓电气不断寻求客户需求的新航标、构建以客户需求为中心的路线图，通过技术创新和卓越服务为客户创造更大的价值，也藉此实现了持续增长。
+  南京西桓电气有限公司经过近10年的专业化经验积累，建立了一整套完善的标准化管理体系，实现了低能耗的产品解决方案。目前各产品线均已通过ISO9001：2008质量管理体系认证，产品均按国际和国家标准进行严格的规范生产，自2005年以来已有不少于50万台件的产品在国内多个重大工程项目中得到广泛应用，应用业绩遍及冶金、电力、石油化工、生物制药、机械制造等工业领域，为中国智能化仪表的领先制造商。 </p>
+                    <p> 我们认为：产品品质不是检验出来的，而是通过设计和对生产中每个环节高度负责而得到的。 
+  我们注重节约自然资源，维护良好的环境，使我们的员工、业务伙伴以及自然环境从中受益。我们严格遵照国际标准、国家标准以及ISO9001:2008质量体系要求，建立了一整套面向流程的、集成的生产质量管理体系，此管理体系不仅保证了我们的产品生产也满足相应法律和标准，而且也兼顾了客户的要求。</p>
+                    <p><img src=""></p>
+                    <p>  如今，南京西桓电气有限公司已发展成为真正值得信赖的过程系统服务商。我们不仅拥有节省空间、安装方便、可靠性高的数千种产品，更可以在工业自动化、电子接口、浪涌保护领域为客户提供完整的解决方案。 
+  自2005年以来中国工业获得了高速的发展，在此期间，南京西桓电气有限公司引进德国先进技术，为国内工业领域提供更先进、更可靠的产品。无论是产品还是系统解决方案，西桓电气都具有突出的实际应用表现，得到了广泛的认可，得到了客户的肯定。</p>
+                    <p>我们在北京、上海、武汉、济南、唐山等地区已设立办事处。一直积极推行绿色生产、绿色文化、绿色管理，绿色战略已经全面深入到标准、研发、生产、营销、工程等所有公司经营范围之中。
+  随着公司工程业务发展，2013年在上海成立分公司上海凌锴电气有限公司与多家设计院以及机械制造企业进行合作，提供电力、石油化工、环保、冶金、食品、医疗、造纸、水利、轻工、纺织、印染、机械制造、科研、暖通等领域的工艺系统、机械设备、生产自动化系统、过程控制系统、EMS能源管理系统解决方案、电气成套、现场施工和安装调试。</p>
+                    </div><!--内容结束-->
+
+<div class="weui-weixin-tools"><!--工具条-->
+  <a href="javascript:void(0);" >阅读原文</a> 
+  <div class="weui-weixin-read">阅读<span id="readnum">100000+</span>  <span class="weui-weixin-read"><i class="weui-weixin-zan"></i><span class="weui-weixin-num">0</span></span></div>
+  <a href="javascript:void(0);" class="right" id="jubao">举报</a>
+</div><!--工具条结束-->
+ <script>
+ $(function(){
+ $("img").addClass('weixin');
+  $('.weui-weixin-zan').click(function(){
+ if($(this).hasClass('zaned')){
+ $(this).removeClass('zaned');
+ var  val = $(this).next().html();
+ if(parseInt(val)==0){
+ var i=1;
+ }else{
+ var  i  =  parseInt(val)-1;
+ }
+  $(this).next().html(i);
+  
+ }else{
+ $(this).addClass('zaned');
+  var  val = $(this).next().html();
+  $(this).next().html(parseInt(val)+1);
+  //ajax操作
+ }
+ 
+ });
+ 
+ 
+ });
+ </script> 
+
+</div><!--页面结束-->
+  </div>
+</div>        
+</body>
+</html>
