@@ -28,9 +28,6 @@ angular.module('app', ['ngTouch'])
 	 .factory('agentRemote', ['$http', function ($http, appValue) {
 		 return {
 			 valid:function(obj){
-			   if(obj.userinfo === ""){
-				   return {flag:false, msg: '请选择员工信息'}; 
-				}
 				if(obj.month === ""){
 					 return {flag:false, msg: '请选择月份'};  
 			    }
@@ -107,11 +104,13 @@ angular.module('app', ['ngTouch'])
     			 receivable:0,
     			 client:0,
     			 travel:0,
-    			 userinfoId:''
+    			 userinfoId:'${userinfoId}'
     	 };
     	  $scope.userList = [];
     	  $scope.isModify = false;
     	  $scope.salesId='';
+    	  $scope.userinfoId = '${userinfoId}';
+    	  $scope.salesName ="${userinfoName}"; 
     	  $scope.loadMobiscroll = function(){
     			var currYear = (new Date()).getFullYear();	
     			var opt={};
@@ -138,9 +137,7 @@ angular.module('app', ['ngTouch'])
     			$("#monthDate").mobiscroll($.extend(opt['date'], opt['default']));
     	  }
     	  $scope.selectOne = function(){
-    			  $scope.sales.userinfoId =$scope.sales.userinfo;
-    			  console.log($scope.sales.userinfo);
-        		  if($scope.sales.userinfoId === "" || $scope.sales.month === ""){
+        		  if($scope.sales.month === ""){
         			  return;
         		  }
         		   $.showLoading();
@@ -152,7 +149,6 @@ angular.module('app', ['ngTouch'])
         				  $("#receivable").val(res.data.data.data[0].receivable);
         				  $("#client").val(res.data.data.data[0].client);
         				  $("#travel").val(res.data.data.data[0].travel);
-        				  $(".select2").find("option[value='number:"+$scope.sales.userinfoId+"'']").attr("selected",true);
         				  $scope.salesId = res.data.data.data[0].salesId;
         				  $scope.sales.market=res.data.data.data[0].market;
         				  $scope.sales.returned=res.data.data.data[0].returned;
@@ -180,21 +176,19 @@ angular.module('app', ['ngTouch'])
     		  var vaildRes =  agentRemote.valid($scope.sales);
     		  if(vaildRes.flag){
     			  if(!$scope.isModify){
-            		  $scope.sales.userinfoId = $scope.sales.userinfo;
-            		  console.log($scope.sales);
         			  agentRemote.save($scope.sales).then(function(res){
         				  if (res.data.ret == '-1') {
     							$.toast(res.data.desc, "forbidden");
         				  }else{
         					  $.toast("操作成功");
-        					  window.location.href="/xh/mobile/Skip/toSales";
+        					  window.location.href="/xh/mobile/Skip/toSalesInfo?userinfoId=${userinfoId}";
         				  }
         			  });
     			  }else{
     				  
     				  agentRemote.modifySales($scope.sales,$scope.salesId).then(function(res){
     					  $.toast("操作成功");
-    					  window.location.href="/xh/mobile/Skip/toSales";
+    					  window.location.href="/xh/mobile/Skip/toSalesInfo?userinfoId=${userinfoId}";
     				  })
     			  }
     		  }else{
@@ -222,8 +216,9 @@ angular.module('app', ['ngTouch'])
 </script>
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+ <div class="weui_cells_title">{{salesName}}</div>
  <div class="weui_cells weui_cells_form">
- 	 <div class="weui_cell weui_cell_select weui_select_after">
+ 	 <!-- <div class="weui_cell weui_cell_select weui_select_after">
             <div class="weui_cell_hd">
                 <label for="" class="weui_label">员工</label>
             </div>
@@ -232,7 +227,7 @@ angular.module('app', ['ngTouch'])
                 	  <option value="" style="font-size:20px;">--选择员工--</option>
                 </select>
             </div>
-        </div>
+        </div> -->
         <div class="weui_cell">
               <div class="weui_cell_hd"><label for="" class="weui_label">月份</label></div>
               <div id="monthDiv" class="weui_cell_bd weui_cell_primary">

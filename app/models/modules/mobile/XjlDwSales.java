@@ -14,6 +14,7 @@ import javax.persistence.Transient;
 import org.slf4j.LoggerFactory;
 
 import play.db.jpa.GenericModel;
+import utils.StringUtil;
 import utils.jpa.SQLResult;
 
 @Entity
@@ -63,7 +64,11 @@ public class XjlDwSales extends GenericModel {
 	
 	
 	public static Map querySalesByPage(Map<String, String> condition,int pageIndex, int pageSize){
-		String sql = "select * from xjl_dw_sales where status='0AA' order by userinfoid";
+		String sql = "select * from xjl_dw_sales where status='0AA' ";
+		if(StringUtil.isNotEmpty(condition.get("userInfoId"))){
+			sql +=" and userinfoId='"+condition.get("userInfoId")+"'";
+		}
+		sql+=" order by userinfoid";
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwSales> data = ModelUtils.queryData(pageIndex, pageSize, ret, XjlDwSales.class);
 		return ModelUtils.createResultMap(ret, data);

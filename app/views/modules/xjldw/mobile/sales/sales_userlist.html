@@ -2,7 +2,7 @@
 <html ng-app="app">
 <head>
 <meta charset="UTF-8">
-<title>薪资管理</title>
+<title>销售管理</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport"
           content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
@@ -40,7 +40,7 @@ angular.module('app', ['ngTouch'])
     	 
     	 $scope.toSalaryInfo = function(id){
     		 console.log();
-    		 window.location.href="/xh/mobile/Skip/toSalaryInfo?userinfoId="+id;
+    		 window.location.href="/xh/mobile/Skip/toSalesInfo?userinfoId="+id;
     	 }
     	 $scope.init = function(){
     		 agentRemote.userList().then(function(res){

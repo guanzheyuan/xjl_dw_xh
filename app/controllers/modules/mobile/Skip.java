@@ -210,8 +210,35 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toSales(){
 		WxUser wxuser = getWXUser();
-		boolean flag =  WxUserInfo.queryShangwuOrAdmin(wxuser.wxOpenId);
-		renderArgs.put("isadminorSw", flag);
+		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
+		if(!flag){
+			render("modules/xjldw/mobile/sales/sales_userlist.html");
+	    	renderArgs.put("isAdmin",true);
+		}else{
+			 flag =  WxUserInfo.queryShangwuOrAdmin(wxuser.wxOpenId);
+			 if(!flag){
+				 render("modules/xjldw/mobile/sales/sales_userlist.html");
+			     renderArgs.put("isAdmin",true);
+			 }else{
+				   WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(wxuser.wxUserInfo.userInfoId));
+					renderArgs.put("userinfoName",userinfo.userinfoName);
+					renderArgs.put("userinfoId",userinfo.userInfoId);
+					renderArgs.put("isAdmin", StringUtil.isNotEmpty(userinfo.isadmin));
+					renderArgs.put("isadminorSw", flag);
+					render("modules/xjldw/mobile/sales/sales_list.html");
+			 }
+		}
+	}
+	
+	/**
+	 * 跳转到销售管理信息页面
+	 */
+	public static void toSalesInfo(){
+		Logger.info("路过信息资源信息页面："+params.get("userinfoId"));
+		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
+		renderArgs.put("userinfoName",userinfo.userinfoName);
+		renderArgs.put("userinfoId",userinfo.userInfoId);
+		renderArgs.put("isAdmin",true);
 		render("modules/xjldw/mobile/sales/sales_list.html");
 	}
 	
@@ -219,6 +246,9 @@ public class Skip extends MobileFilter {
 	 * 跳转到销售新增
 	 */
 	public static void toSalesAdd(){
+		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
+		renderArgs.put("userinfoName",userinfo.userinfoName);
+		renderArgs.put("userinfoId",userinfo.userInfoId);
 		render("modules/xjldw/mobile/sales/sales_add.html");
 	}
 	
@@ -228,27 +258,29 @@ public class Skip extends MobileFilter {
 	public static void toSalaryList(){
 		WxUser wxuser = getWXUser();
 		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
-//		if(!flag){
-//			render("modules/xjldw/mobile/salary/salary_list.html");
-//			renderArgs.put("noAdd", false);
-//		}else{
-			WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(wxuser.wxUserInfo.userInfoId));
+	    if(!flag){
+	    	render("modules/xjldw/mobile/salary/salary_list.html");
+	    	renderArgs.put("isAdmin",true);
+	    }else{
+	    	WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(wxuser.wxUserInfo.userInfoId));
 			renderArgs.put("userinfoName",userinfo.userinfoName);
 			renderArgs.put("userinfoId",userinfo.userInfoId);
 			renderArgs.put("isAdmin", StringUtil.isNotEmpty(userinfo.isadmin));
 			render("modules/xjldw/mobile/salary/salary_info.html");
-		//}
+	    }
 	}
 	
 	/**
 	 * 跳转到薪资管理信息页面
 	 */
 	public static void toSalaryInfo(){
+		WxUser wxuser = getWXUser();
+		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
 		Logger.info("路过信息资源信息页面："+params.get("userinfoId"));
 		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
 		renderArgs.put("userinfoName",userinfo.userinfoName);
 		renderArgs.put("userinfoId",userinfo.userInfoId);
-		renderArgs.put("isAdmin", StringUtil.isNotEmpty(userinfo.isadmin));
+		renderArgs.put("isAdmin", flag== false);
 		render("modules/xjldw/mobile/salary/salary_info.html");
 	}
 	

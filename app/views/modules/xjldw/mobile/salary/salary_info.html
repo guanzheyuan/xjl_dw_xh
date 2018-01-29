@@ -53,16 +53,13 @@ angular.module('app', ['ngTouch'])
     	 }
     	 
     	 $scope.init = function(){
-    		 if($scope.isAdmin == 'false'){
     			 agentRemote.userList($scope.userInfoId).then(function(res){
         			 console.log(res.data.data);
         			 $scope.salaryList = res.data.data;
         		 });
-    		 }else{
-    			 agentRemote.salaryList($(document).width()).then(function(res){
+    			 /* agentRemote.salaryList($(document).width()).then(function(res){
     				 $scope.salaryList = res.data.data;
-    			 })
-    		 }
+    			 }) */
     	 }
     	 $scope.init();
      }]);
@@ -82,8 +79,7 @@ angular.module('app', ['ngTouch'])
           <!--  <p >{{userName}}</p> -->
        </div>
 </div>
- <hr ng-if="isAdmin == 'false'">
-<table class="weui-table" style="overflow-x: auto;"  ng-if="salaryList.length != 0 && isAdmin == 'false'">
+<table class="weui-table" style="overflow-x: auto;"  ng-if="salaryList.length != 0 ">
         <thead >
         <tr><th style="font-weight:bolder;">{{userName}}</th><th ng-repeat="salary in salaryList" ><p style="width:70%;text-align:right;">{{salary.month}}</p></th></tr>
         </thead>
@@ -100,11 +96,11 @@ angular.module('app', ['ngTouch'])
        	<tr><td>合计</td><td ng-repeat="salary in salaryList" style="color:blue;" ng-click="toSalaryExplain({{salary.id}})" ><p style="width:70%;text-align:right;">{{salary.total}}</p></td></tr>
         </tbody>
  </table>
- <hr ng-if="isAdmin == 'false'">
+<!--  <hr ng-if="isAdmin == 'false'">
  <div ng-if="isAdmin == 'true'"  ng-repeat="salarys in salaryList" >
  	 <div class="weui_cell"  >
         <div class="weui_cell_bd weui_cell_primary">
-            <!-- <p>{{salarys.username}}</p> -->
+            <p>{{salarys.username}}</p>
         </div>
      </div> 
      <hr >
@@ -126,13 +122,11 @@ angular.module('app', ['ngTouch'])
         </tbody>
  </table>
   <hr >
- </div>
- <div class="weui_cells">
-		<div class="weui_cell"  ng-if="salaryList.length == 0">
+ </div> -->
+<div class="weui_cell"  ng-if="salaryList.length == 0">
           <div class="weui_cell_bd weui_cell_primary">
               <p>暂无数据</p>
           </div>
       </div>
-</div>
 </body>
 </html>

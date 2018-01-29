@@ -31,12 +31,13 @@ angular.module('app', ['ngTouch'])
 					 }
 				  })
 			 },
-			 salesAdminList:function(width){
+			 salesAdminList:function(width,userInfoId){
 				 return $http({
 					 method: 'GET',
 					 url:'/xh/mobile/Execute/doQuerySalesByPage',
 					 params:{
-						 width:width
+						 width:width,
+						 userInfoId:userInfoId
 					 }
 				  })
 			 }
@@ -44,23 +45,21 @@ angular.module('app', ['ngTouch'])
 	 }])
      .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
     	 $scope.salesList = [];
-    	 $scope.salesName =""; 
-    	 $scope.isadminOrWs="${isadminorSw}";
+    	 $scope.salesName ="${userinfoName}"; 
+    	 $scope.isadminOrWs='${isAdmin}';
+    	 $scope.userinfoId = '${userinfoId}';
     	 $scope.initSales = function(me){
-    		 if( $scope.isadminOrWs == 'true'){
-    			 agentRemote.salesList($(document).width()).then(function(res){
+    			 /* agentRemote.salesList($(document).width()).then(function(res){
         			 if(res.data.data.data.length >0){
         				 $scope.salesList  = res.data.data.data;
             			 $scope.salesName = res.data.data.data[0].userName;
             			 
         			 }
-        		 })
-    		 }else{
-    			 agentRemote.salesAdminList($(document).width()).then(function(res){
+        		 }) */
+     			 agentRemote.salesAdminList($(document).width(),$scope.userinfoId).then(function(res){
     				 $scope.salesList = res.data.data;
     				 console.log(res);
-    			 })
-    		 }
+    			 }) 
     	 }
     	 $scope.initSales();
      }]);
@@ -71,7 +70,7 @@ angular.module('app', ['ngTouch'])
 		<div class="weui-flex-item"><div class="weui_cell">单位(元)</div></div>
 		 <div class="weui-flex-item">
 			 <div class="weui_cell"  style="padding-left:40%;" >
-		 		<a href="/xh/mobile/Skip/toSalesAdd" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-if="isadminOrWs == 'false'">新增</a>
+		 		<a href="/xh/mobile/Skip/toSalesAdd?userinfoId=${userinfoId}" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-if="isadminOrWs == 'true'">新增</a>
 		 	</div>
 		 </div>
 	</div>
@@ -88,26 +87,26 @@ angular.module('app', ['ngTouch'])
             <div class="placeholder"  style="text-align:left;color:black;"></div>
             </div>
     </div> -->
-     <hr ng-if="isadminOrWs == 'true' && salesList.length != 0">
-	<table class="weui-table" style="overflow-x: auto;"  ng-if="isadminOrWs == 'true' && salesList.length != 0">
+     <hr ng-if=" salesList.length != 0">
+	<table class="weui-table" style="overflow-x: auto;"  ng-if=" salesList.length != 0" ng-repeat="sales in salesList" >
         <thead >
-        <tr><th style="font-weight:bolder;">{{salesName}}</th><th ng-repeat="sales in salesList" ><p style="width:70%;text-align:right;">{{sales.workDate}}</p></th></tr>
+        <tr><th style="font-weight:bolder;">{{salesName}}</th><th ng-repeat="sale in sales.saleList" ><p style="width:70%;text-align:right;">{{sale.workDate}}</p></th></tr>
         </thead>
         <tbody>
-        <tr><td>销售额</td><td ng-repeat="sales in salesList"style="color: gray;" ><p style="width:70%;text-align:right;">{{sales.market}}</p></td></tr>
-        <tr><td>回款额</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.returned}}</p></td></tr>
-        <tr><td>应收款</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.receivable}}</p></td></tr>
-        <tr><td>客户费用</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.client}}</p></td></tr>
-        <tr><td>差旅费</td><td ng-repeat="sales in salesList" style="color: gray;"><p style="width:70%;text-align:right;">{{sales.travel}}</p></td></tr>
+        <tr><td>销售额</td><td ng-repeat="sale in sales.saleList"style="color: gray;" ><p style="width:70%;text-align:right;">{{sale.market}}</p></td></tr>
+        <tr><td>回款额</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.returned}}</p></td></tr>
+        <tr><td>应收款</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.receivable}}</p></td></tr>
+        <tr><td>客户费用</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.client}}</p></td></tr>
+        <tr><td>差旅费</td><td ng-repeat="sale in sales.saleList" style="color: gray;"><p style="width:70%;text-align:right;">{{sale.travel}}</p></td></tr>
         </tbody>
    </table>
    <hr ng-if="isadminOrWs == 'true' && salesList.length != 0">
    
    
-    <div ng-if="isadminOrWs == 'false'" ng-repeat="sales in salesList" >
+    <!-- <div ng-if="isadminOrWs == 'false'" ng-repeat="sales in salesList" >
 	     <div class="weui_cell"  >
 		          <div class="weui_cell_bd weui_cell_primary">
-		              <!-- <p></p> -->
+		              <p></p>
 		          </div>
 	      </div>
 	    <hr ng-if="isadminOrWs == 'false' && salesList.length != 0" >
@@ -124,7 +123,7 @@ angular.module('app', ['ngTouch'])
 	        </tbody>
 	   </table>
 	   <hr ng-if="isadminOrWs == 'false' && salesList.length != 0" >
-    </div>
+    </div> -->
     <div class="weui_cells">
 		<div class="weui_cell"  ng-if="salesList.length == 0">
           <div class="weui_cell_bd weui_cell_primary">

@@ -65,7 +65,7 @@ angular.module('app', ['ngTouch'])
 					 method: 'GET',
 					 url:'/xh/mobile/Execute/doSaveSalary',
 					 params:{
-						    userInfoId:obj.seluserInfoId,
+						    userInfoId:obj.userInfoId,
 			    			month:obj.month,
 			    			basicSalary:obj.basicSalary,
 			    			subsidy:obj.subsidy,
@@ -107,7 +107,7 @@ angular.module('app', ['ngTouch'])
 					 method: 'GET',
 					 url:'/xh/mobile/Execute/doModifySalary',
 					 params:{
-						    userInfoId:obj.seluserInfoId,
+						    userInfoId:obj.userInfoId,
 			    			month:obj.month,
 			    			basicSalary:obj.basicSalary,
 			    			subsidy:obj.subsidy,
@@ -190,11 +190,7 @@ angular.module('app', ['ngTouch'])
     		 if("" != $("#monthDate").val()){
     			 $scope.salary.month = $("#monthDate").val()
     		 }
-    		 if($scope.salary.seluserInfoId === ""){
-    			 $.toast("请选择员工", "cancel");
-    			 return;
-    		 }
-    		 window.location.href="/xh/mobile/Skip/toChecking?userinfoId="+$scope.salary.seluserInfoId;
+    		 window.location.href="/xh/mobile/Skip/toChecking?userinfoId="+$scope.salary.userInfoId;
     	 }
     	 $scope.calculate = function(){
     		 console.log('进入');
@@ -222,12 +218,12 @@ angular.module('app', ['ngTouch'])
              $("#monthDate").val(t2);
     	 }
     	 $scope.selectOne = function(){
-    		 if($scope.salary.seluserInfoId ==="" || $scope.salary.month===""){
+    		 if($scope.salary.month===""){
     			 return;
     		 }
     		 $.showLoading();
     		 //查询该月份是否有薪资记录
-    		 agentRemote.queryIdAndDate($scope.salary.seluserInfoId,$scope.salary.month).then(function(res){
+    		 agentRemote.queryIdAndDate($scope.salary.userInfoId,$scope.salary.month).then(function(res){
     			 $.hideLoading();
     			 if(res.data.data != null){
         			 $("#basicSalary").val(res.data.data.basicSalary);
@@ -281,7 +277,7 @@ angular.module('app', ['ngTouch'])
     	 //考勤扣款
     	 $scope.initCheck = function(){
     		 //得到上个月是否写述职报告
-    		 agentRemote.reportWithHold($scope.salary.seluserInfoId, $scope.salary.month).then(function(res){
+    		 agentRemote.reportWithHold($scope.salary.userInfoId, $scope.salary.month).then(function(res){
     			$scope.isChecking = res.data.data;
     			if($scope.isChecking){
     				 $scope.salary.reportwithhold = 200;
@@ -331,7 +327,7 @@ angular.module('app', ['ngTouch'])
 <body  ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
  <div class="weui_cells_title">{{userName}}</div>
  <div class="weui_cells weui_cells_form">
- 	 <div class="weui_cell weui_cell_select weui_select_after">
+ 	<!--  <div class="weui_cell weui_cell_select weui_select_after">
             <div class="weui_cell_hd">
                 <label for="" class="weui_label">员工</label>
             </div>
@@ -340,7 +336,7 @@ angular.module('app', ['ngTouch'])
                 	  <option value="" style="font-size:20px;">--选择员工--</option>
                 </select>
             </div>
-        </div>
+        </div> -->
  	<div class="weui_cell">
               <div class="weui_cell_hd"><label for="" class="weui_label">月份</label></div>
               <div id="monthDiv" class="weui_cell_bd weui_cell_primary">

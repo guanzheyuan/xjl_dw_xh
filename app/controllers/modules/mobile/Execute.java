@@ -664,9 +664,11 @@ public class Execute  extends MobileFilter {
 	 */
 	public static void doQuerySalesByPage(){
 		String width = params.get("width");
+	   String _userInfoId = params.get("userInfoId");
 		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
 		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
 		Map condition = params.allSimple();
+		condition.put("userInfoId", _userInfoId);
 		//得到所有的销售管理数据
 		Map ret = XjlDwSales.querySalesByPage(condition, pageIndex, pageSize);
 		List<Map<String,Object>> _data = new ArrayList<>();
