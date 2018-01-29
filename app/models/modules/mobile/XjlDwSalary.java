@@ -61,6 +61,14 @@ public class XjlDwSalary extends GenericModel {
 	public String total;
 	
 	
+	
+	public static Map querySalary(){
+		String sql = "select * from xjl_dw_salary where status='0AA' order by month desc ";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwSalary> data = ModelUtils.queryData(1,99999, ret, XjlDwSalary.class);
+		return  ModelUtils.createResultMap(ret, data);
+	}
 	public static Map querySalaryByUserInfoId(String userInfoId){
 		String sql = "select * from xjl_dw_salary where status='0AA' and userinfoId='"+userInfoId+"' order by month desc ";
 		Map<String, String> condition = new HashMap<>();
@@ -70,6 +78,18 @@ public class XjlDwSalary extends GenericModel {
 	}
 	public static XjlDwSalary querySalaryByUserInfoIdAndtime(String userInfoId,String month){
 		String sql="select * from xjl_dw_salary where status='0AA' and userinfoId='"+userInfoId+"' and month='"+month+"'";
+		Map<String, String> condition = new HashMap<>();
+		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
+		List<XjlDwSalary> data = ModelUtils.queryData(1, 100, ret, XjlDwSalary.class);
+		if(data.isEmpty()){
+			return null;
+		}else{
+			return data.get(0);
+		}
+	}
+	
+	public static XjlDwSalary querySararyByPrimaryId(String id){
+		String sql = "select * from xjl_dw_salary where status='0AA' and salary_id='"+id+"'";
 		Map<String, String> condition = new HashMap<>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwSalary> data = ModelUtils.queryData(1, 100, ret, XjlDwSalary.class);

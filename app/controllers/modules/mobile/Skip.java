@@ -7,6 +7,7 @@ import controllers.modules.mobile.filter.MobileFilter;
 import models.modules.mobile.WxUser;
 import models.modules.mobile.WxUserInfo;
 import models.modules.mobile.XjlDwChecking;
+import models.modules.mobile.XjlDwSalary;
 import play.Logger;
 import play.i18n.Messages;
 import utils.StringUtil;
@@ -51,6 +52,7 @@ public class Skip extends MobileFilter {
 		 WxPushMsg.wxMsgPusheTmplate("bMXSVB4eAjPlJwjRBheRQ_opJTwgxNFIuGWVGf1FDlc","", mapData,wxOpenId);
 	}
 	
+	
 	/**
 	 * 跳转到员工注册
 	 */
@@ -81,8 +83,22 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toNavigation(){
 		WxUser wxuser = getWXUser();
-		renderArgs.put("wxUser",wxuser);
-		render("modules/xjldw/mobile/map/navigation.html");
+		//判断是否注册
+	   boolean flag = WxUserInfo.queryUserInfoByWxOpenId(wxuser.wxOpenId);
+		Logger.info("该用户是否注册："+flag);
+		if(flag){
+			 flag = WxUserInfo.isRegist(wxuser.wxOpenId);
+			  Logger.info("该用户是否提交注册："+flag);
+			  if(flag){
+				  render("modules/xjldw/mobile/user/register.html");
+			  }else{
+				  renderArgs.put("wxOpenId",wxuser.wxOpenId);
+				  render("modules/xjldw/mobile/error/errorhtml.html");
+			  }
+		}else{
+			renderArgs.put("wxUser",wxuser);
+			render("modules/xjldw/mobile/map/navigation.html");
+		}
 	}
 	
 	/**
@@ -90,11 +106,26 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toBusiness(){
 		WxUser wxuser = getWXUser();
-		WxUserInfo userInfo = WxUserInfo.getFindByOpenId(wxuser.wxOpenId);
-		renderArgs.put("wxUser",wxuser);
-		renderArgs.put("userInfo",userInfo);
-		if(StringUtil.isNotEmpty(userInfo.userinfoType)){
-			render("modules/xjldw/mobile/business/business_manage.html");
+		//判断是否注册
+		boolean flag = WxUserInfo.queryUserInfoByWxOpenId(wxuser.wxOpenId);
+		Logger.info("该用户是否注册："+flag);
+		if(flag){
+			  flag = WxUserInfo.isRegist(wxuser.wxOpenId);
+			  Logger.info("该用户是否提交注册："+flag);
+			  if(flag){
+				  render("modules/xjldw/mobile/user/register.html");
+			  }else{
+				  renderArgs.put("wxOpenId",wxuser.wxOpenId);
+				  render("modules/xjldw/mobile/error/errorhtml.html");
+			  }
+		}else{
+			WxUserInfo userInfo = WxUserInfo.getFindByOpenId(wxuser.wxOpenId);
+			renderArgs.put("wxUser",wxuser);
+			renderArgs.put("isadmin",StringUtil.isNotEmpty(userInfo.isadmin));
+			renderArgs.put("userInfo",userInfo);
+			if(StringUtil.isNotEmpty(userInfo.userinfoType)){
+				render("modules/xjldw/mobile/business/business_manage.html");
+			}
 		}
 	}
 	
@@ -103,13 +134,35 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toProductConsult(){
 		//只有员工才能跳转
+		WxUser wxuser = getWXUser();
+		//判断是否注册
+	    boolean flag = WxUserInfo.queryUserInfoByWxOpenId(wxuser.wxOpenId);
+		Logger.info("该用户是否注册："+flag);
+		if(flag){
+			 flag = WxUserInfo.isRegist(wxuser.wxOpenId);
+			  Logger.info("该用户是否提交注册："+flag);
+			  if(flag){
+				  render("modules/xjldw/mobile/user/register.html");
+			  }else{
+				  renderArgs.put("wxOpenId",wxuser.wxOpenId);
+				  render("modules/xjldw/mobile/error/errorhtml.html");
+			  }
+		}else{
+		}
 	}
 	
 	/**
 	 * 跳转到考勤管理
 	 */
 	public static void toChecking(){
-		renderArgs.put("wxOpenId",params.get("wxOpenId"));
+		String flag = params.get("flag");
+		if(StringUtil.isNotEmpty(flag)){
+			renderArgs.put("noShow", false);
+		}else{
+			WxUserInfo userInfo = WxUserInfo.getFindByUserInfoId(params.get("userinfoId"));
+			renderArgs.put("wxOpenId",null!= userInfo?userInfo.wxOpenId:"");
+			renderArgs.put("noShow", true);
+		}
 		render("modules/xjldw/mobile/business/checking.html");
 	}
 	
@@ -175,16 +228,16 @@ public class Skip extends MobileFilter {
 	public static void toSalaryList(){
 		WxUser wxuser = getWXUser();
 		boolean flag = WxUserInfo.queryAdminInfoByFlag(wxuser.wxOpenId);
-		if(!flag){
-			render("modules/xjldw/mobile/salary/salary_list.html");
-			renderArgs.put("noAdd", false);
-		}else{
+//		if(!flag){
+//			render("modules/xjldw/mobile/salary/salary_list.html");
+//			renderArgs.put("noAdd", false);
+//		}else{
 			WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(wxuser.wxUserInfo.userInfoId));
 			renderArgs.put("userinfoName",userinfo.userinfoName);
 			renderArgs.put("userinfoId",userinfo.userInfoId);
-			renderArgs.put("noAdd", true);
+			renderArgs.put("isAdmin", StringUtil.isNotEmpty(userinfo.isadmin));
 			render("modules/xjldw/mobile/salary/salary_info.html");
-		}
+		//}
 	}
 	
 	/**
@@ -195,6 +248,7 @@ public class Skip extends MobileFilter {
 		WxUserInfo userinfo = WxUserInfo.getFindByUserInfoId(String.valueOf(params.get("userinfoId")));
 		renderArgs.put("userinfoName",userinfo.userinfoName);
 		renderArgs.put("userinfoId",userinfo.userInfoId);
+		renderArgs.put("isAdmin", StringUtil.isNotEmpty(userinfo.isadmin));
 		render("modules/xjldw/mobile/salary/salary_info.html");
 	}
 	
@@ -213,6 +267,8 @@ public class Skip extends MobileFilter {
 	 * 跳转到薪资说明页面
 	 */
 	public static void toSalaryExplain(){
+		XjlDwSalary xjlDwSalary = XjlDwSalary.querySararyByPrimaryId(params.get("id"));
+		renderArgs.put("otherdeductions",null != xjlDwSalary?StringUtil.isNotEmpty(xjlDwSalary.otherwithholdcontent)?xjlDwSalary.otherwithholdcontent:"无":"");
 		render("modules/xjldw/mobile/salary/salary_explain.html");
 	}
 	

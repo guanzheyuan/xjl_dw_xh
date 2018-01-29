@@ -201,6 +201,9 @@ public class WxUserInfo  extends GenericModel{
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);
 		for (WxUserInfo wxUserInfo : data) {
+			if(StringUtil.isNotEmpty(wxUserInfo.userinfoType)){
+				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
+			}
 			wxUserInfo.statusName = "0AA".equals(wxUserInfo.status)?"通过":"0XX".equals(wxUserInfo.status)?"不通过":"";
 			if(StringUtil.isNotEmpty(wxUserInfo.conpanyProvince)){
 				XjlDwProvinces pro = XjlDwProvinces.queryProvinceByProvinceId(wxUserInfo.conpanyProvince);
@@ -243,7 +246,7 @@ public class WxUserInfo  extends GenericModel{
 	 * @return
 	 */
 	public static boolean queryAdminInfoByFlag(String wxOpenId){
-		String sql="select * from xjl_dw_userinfo where status='0AA' and isadmin='0AA' and  wx_open_id='"+wxOpenId+"' ";
+		String sql="select * from xjl_dw_userinfo where status='0AA'   and  wx_open_id='"+wxOpenId+"' and isadmin='0AA' ";
 		Map<String, String> condition = new HashMap<>();
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<WxUserInfo> data = ModelUtils.queryData(1, 500, ret, WxUserInfo.class);

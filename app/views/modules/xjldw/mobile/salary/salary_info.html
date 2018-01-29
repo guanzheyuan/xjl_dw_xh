@@ -30,24 +30,39 @@ angular.module('app', ['ngTouch'])
 						 userInfoId:userInfoId
 					 }
 				  })
+			 },
+			 salaryList:function(width){
+				 return $http({
+					 method: 'GET',
+					 url:'/xh/mobile/Execute/doQuerySalaryList',
+					 params:{
+						 width:width
+					 }
+				  })
 			 }
 		 }
 	 }])
      .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
     	 $scope.userName = '${userinfoName}';
     	 $scope.userInfoId='${userinfoId}';
-    	 $scope.noAdd = '${noAdd}';
+    	 $scope.isAdmin = '${isAdmin}';
     	 $scope.salaryList = [];
-    	 $scope.toSalaryExplain = function(){
+    	 $scope.toSalaryExplain = function(id){
     		 console.log(123);
-    		 window.location.href='/xh/mobile/Skip/toSalaryExplain';
+    		 window.location.href='/xh/mobile/Skip/toSalaryExplain?id='+id;
     	 }
     	 
     	 $scope.init = function(){
-    		 agentRemote.userList($scope.userInfoId).then(function(res){
-    			 console.log(res);
-    			 $scope.salaryList = res.data.data;
-    		 });
+    		 if($scope.isAdmin == 'false'){
+    			 agentRemote.userList($scope.userInfoId).then(function(res){
+        			 console.log(res.data.data);
+        			 $scope.salaryList = res.data.data;
+        		 });
+    		 }else{
+    			 agentRemote.salaryList($(document).width()).then(function(res){
+    				 $scope.salaryList = res.data.data;
+    			 })
+    		 }
     	 }
     	 $scope.init();
      }]);
@@ -57,14 +72,9 @@ angular.module('app', ['ngTouch'])
 <div class="weui-flex">
 		 <div class="weui-flex-item" style="text-align: right;">
 			 <div class="weui_cell"  style="padding-left:70%" >
-		 		<a href="/xh/mobile/Skip/toSalaryAdd?userinfoId=${userinfoId}" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-if="noAdd == false">新增</a>
+		 		<a href="/xh/mobile/Skip/toSalaryAdd?userinfoId=${userinfoId}" id="detail" class="weui_btn weui_btn_mini bg-blue" ng-if="isAdmin == 'true'">新增</a>
 		 	</div>
 		 </div>
-</div>
-<div class="weui_cell">
-       <div class="weui_cell_bd weui_cell_primary">
-           <p >{{userName}}</p>
-       </div>
 </div>
 <div class="weui_cells">
 		<div class="weui_cell"  ng-if="salaryList.length == 0">
@@ -73,7 +83,14 @@ angular.module('app', ['ngTouch'])
           </div>
       </div>
 </div>
-<table class="weui-table" style="overflow-x: auto;"  ng-if="salaryList.length != 0">
+ <hr >
+<div class="weui_cell" ng-if="isAdmin == 'false'">
+       <div class="weui_cell_bd weui_cell_primary">
+           <p >{{userName}}</p>
+       </div>
+</div>
+ <hr ng-if="isAdmin == 'false'">
+<table class="weui-table" style="overflow-x: auto;"  ng-if="salaryList.length != 0 && isAdmin == 'false'">
         <thead >
         <tr><th></th><th ng-repeat="salary in salaryList" >{{salary.month}}</th></tr>
         </thead>
@@ -87,8 +104,35 @@ angular.module('app', ['ngTouch'])
         <tr><td>述职扣款</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.reportwithhold}}</td></tr>
         <tr><td>其他扣款</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.otherdeductions}}</td></tr>
         <tr><td>所得税</td><td ng-repeat="salary in salaryList" style="color: gray;">{{salary.incometax}}</td></tr>
-       	<tr><td>合计</td><td ng-repeat="salary in salaryList" style="color:blue;" ng-click="toSalaryExplain()" >{{salary.total}}</td></tr>
+       	<tr><td>合计</td><td ng-repeat="salary in salaryList" style="color:blue;" ng-click="toSalaryExplain({{salary.id}})" >{{salary.total}}</td></tr>
         </tbody>
  </table>
+ <hr ng-if="isAdmin == 'false'">
+ <div ng-if="isAdmin == 'true'"  ng-repeat="salarys in salaryList" >
+ 	<div class="weui_cell"  >
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>{{salarys.username}}</p>
+        </div>
+     </div>
+     <hr >
+     <table class="weui-table" style="overflow-x: auto;" >
+        <thead >
+        <tr><th></th><th ng-repeat="salary in salarys.salaryList" >{{salary.month}}</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>基本工资</td><td ng-repeat="salary in salarys.salaryList"style="color: gray;" >{{salary.basicSalary}}</td></tr>
+        <tr><td>岗位津贴</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.subsidy}}</td></tr>
+        <tr><td>销售奖金</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.bonus}}</td></tr>
+        <tr><td>话费补贴</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.telcharge}}</td></tr>
+        <tr><td>考勤浮动</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary._float}}</td></tr>
+        <tr><td>社会保险</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.insurance}}</td></tr>
+        <tr><td>述职扣款</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.reportwithhold}}</td></tr>
+        <tr><td>其他扣款</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.otherdeductions}}</td></tr>
+        <tr><td>所得税</td><td ng-repeat="salary in salarys.salaryList" style="color: gray;">{{salary.incometax}}</td></tr>
+       	<tr><td>合计</td><td ng-repeat="salary in salarys.salaryList" style="color:blue;" ng-click="toSalaryExplain({{salary.id}})" >{{salary.total}}</td></tr>
+        </tbody>
+ </table>
+  <hr >
+ </div>
 </body>
 </html>

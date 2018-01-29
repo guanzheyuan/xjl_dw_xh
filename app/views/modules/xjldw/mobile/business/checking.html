@@ -135,7 +135,7 @@ angular.module('app', ['ngTouch'])
     	  $scope.zaotui = 0;
     	  $scope.queqin = 0;
     	  $scope.searchName = false;
-    	  
+    	  $scope.noShow='${noShow}';
     	  
     	  $scope.toCheck = function(month){
     		  var date = new Date();
@@ -241,8 +241,10 @@ angular.module('app', ['ngTouch'])
       <div class="weui-flex">
             <div class="weui-flex-item" style="text-align:center;">
             	<div class="radiu" style="margin-left:35%;">
-            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'X'"   ng-click="save(checkFlag)">上班打卡</p>
-            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'B'"   ng-click="saveDuty(check.checkId)">下班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'X' && noShow=='false'"   ng-click="save(checkFlag)">上班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'B' && noShow=='false'"   ng-click="saveDuty(check.checkId)">下班打卡</p>
+            	    <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'X' && noShow=='true'"    >上班打卡</p>
+            	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'B' && noShow=='true'"    >下班打卡</p>
             	   <p style="font-weight: bold;color:white;padding-top:30%;" ng-if="checkFlag == 'A'" >今日已打卡</p>
             	   <p id="timeClock" style="color:white;font-size:13px;"></p>
             	</div>

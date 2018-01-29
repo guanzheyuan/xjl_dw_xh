@@ -225,21 +225,6 @@ public class MobileFilter extends BaseController{
 				}
 			}
 		}
-		String urls="toBusiness,toNavigation";
-		String url =request.domain + request.url;
-		if(null != wxUser){
-			Logger.info("是否注册："+wxUser.isRegister);
-			if(wxUser.isRegister){
-				String[] urlStr = urls.split(",");
-				for (String str : urlStr) {
-					if(url.indexOf(str)!=-1){
-						render("modules/xjldw/mobile/user/register.html");
-						break;
-					}
-				}
-			}
-		}
-		
 	}
 	
 	/**

@@ -13,11 +13,16 @@
 <link rel="stylesheet" href="/xh/public/weui/css/weui.css">
 <link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
 <link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<link rel="stylesheet" href="/xh/public/mobiscroll/css/mobiscroll.css">
+<link rel="stylesheet" href="/xh/public/mobiscroll/css/mobiscroll_date.css">
+<script src="/xh/public/js/jquery-1.9.1.min.js"></script>
 <script src="/xh/public/widgets/layer.m/layer.m.js"></script>
 <script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
 <script src="/xh/public/widgets/angularjs/angular.min.js"></script>
 <script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
 <script src="/xh/public/js/zepto.min.js"></script>
+<script src="/xh/public/mobiscroll/js/mobiscroll_date.js" charset="gb2312"></script>
+<script src="/xh/public/mobiscroll/js/mobiscroll.js"></script>
 <script type="text/javascript">
 angular.module('app', ['ngTouch'])
 	 .factory('agentRemote', ['$http', function ($http, appValue) {
@@ -97,44 +102,85 @@ angular.module('app', ['ngTouch'])
     	 $scope.sales ={
     			 userinfo:'',
     			 month:'',
-    			 market:'',
-    			 returned:'',
-    			 receivable:'',
-    			 client:'',
-    			 travel:'',
+    			 market:0,
+    			 returned:0,
+    			 receivable:0,
+    			 client:0,
+    			 travel:0,
     			 userinfoId:''
     	 };
     	  $scope.userList = [];
     	  $scope.isModify = false;
     	  $scope.salesId='';
+    	  $scope.loadMobiscroll = function(){
+    			var currYear = (new Date()).getFullYear();	
+    			var opt={};
+    			opt.date = {preset : 'date'};
+    			opt.datetime = {preset : 'datetime'};
+    			opt.time = {preset : 'time'};
+    			opt.default = {
+    				theme: 'android-ics light', //皮肤样式
+    				display: 'modal', //显示方式 
+    				mode: 'scroller', //日期选择模式
+    				dateFormat: 'yy-mm',
+    				lang: 'zh',
+    				/* showNow: true,
+    				nowText: "今天", */
+    				startYear: currYear - 50, //开始年份
+    				endYear: currYear + 10, //结束年份
+    				 onSelect:function(valueText,inst){
+    					 $scope.sales.month = valueText;
+    					 setTimeout(function () {
+    						 $scope.selectOne();
+    					 },500);
+    				 }
+    			};
+    			$("#monthDate").mobiscroll($.extend(opt['date'], opt['default']));
+    	  }
     	  $scope.selectOne = function(){
-    		  $scope.sales.userinfoId =$scope.sales.userinfo.userInfoId;
-    		  agentRemote.querySalesByIdAndWorkDate($scope.sales).then(function(res){
-    			  if(res.data.data.data.length >0){
-    				  $("#market").val(res.data.data.data[0].market);
-    				  $("#returned").val(res.data.data.data[0].returned);
-    				  $("#receivable").val(res.data.data.data[0].receivable);
-    				  $("#client").val(res.data.data.data[0].client);
-    				  $("#travel").val(res.data.data.data[0].travel);
-    				  $scope.sales = res.data.data.data[0];
-    				  $scope.salesId = res.data.data.data[0].salesId;
-        			  console.log($scope.sales);
-        			  $scope.isModify = true;
-    			  }else{
-    				  $scope.isModify = false;
-    			  }
-    		  })
+    			  $scope.sales.userinfoId =$scope.sales.userinfo;
+    			  console.log($scope.sales.userinfo);
+        		  if($scope.sales.userinfoId === "" || $scope.sales.month === ""){
+        			  return;
+        		  }
+        		   $.showLoading();
+        		  agentRemote.querySalesByIdAndWorkDate($scope.sales).then(function(res){
+        			  $.hideLoading();
+        			  if(res.data.data.data.length >0){
+        				  $("#market").val(res.data.data.data[0].market);
+        				  $("#returned").val(res.data.data.data[0].returned);
+        				  $("#receivable").val(res.data.data.data[0].receivable);
+        				  $("#client").val(res.data.data.data[0].client);
+        				  $("#travel").val(res.data.data.data[0].travel);
+        				  $(".select2").find("option[value='number:"+$scope.sales.userinfoId+"'']").attr("selected",true);
+        				  $scope.salesId = res.data.data.data[0].salesId;
+        				  $scope.sales.market=res.data.data.data[0].market;
+        				  $scope.sales.returned=res.data.data.data[0].returned;
+        				  $scope.sales.receivable=res.data.data.data[0].receivable;
+        				  $scope.sales.client=res.data.data.data[0].client;
+        				  $scope.sales.travel=res.data.data.data[0].travel;
+            			  $scope.isModify = true;
+        			  }else{
+        				  $scope.isModify = false;
+        				  $("#market").val(0);
+        				  $("#returned").val(0);
+        				  $("#receivable").val(0);
+        				  $("#client").val(0);
+        				  $("#travel").val(0);
+        				  $scope.sales.market=0;
+        				  $scope.sales.returned=0;
+        				  $scope.sales.receivable=0;
+        				  $scope.sales.client=0;
+        				  $scope.sales.travel=0;
+        			  }
+        		  })
     	  }
     	  $scope.save = function(me){
     		  console.log($scope.sales);
     		  var vaildRes =  agentRemote.valid($scope.sales);
     		  if(vaildRes.flag){
     			  if(!$scope.isModify){
-    				  var userInfoId = $scope.sales.userinfo.userInfoId;
-            		  $scope.sales.userinfoId = userInfoId;
-            		  if(""!=$("#monthDate").val()){
-            			  $scope.sales.month = $("#monthDate").val();
-            		  }
+            		  $scope.sales.userinfoId = $scope.sales.userinfo;
             		  console.log($scope.sales);
         			  agentRemote.save($scope.sales).then(function(res){
         				  if (res.data.ret == '-1') {
@@ -145,6 +191,7 @@ angular.module('app', ['ngTouch'])
         				  }
         			  });
     			  }else{
+    				  
     				  agentRemote.modifySales($scope.sales,$scope.salesId).then(function(res){
     					  $.toast("操作成功");
     					  window.location.href="/xh/mobile/Skip/toSales";
@@ -161,7 +208,8 @@ angular.module('app', ['ngTouch'])
     		  })
     	  }
     	  $scope.initUser();
-    	  setTimeout(function () {
+    	  $scope.loadMobiscroll();
+    	  /* setTimeout(function () {
     		  var date = new Date();
         	  this.year = date.getFullYear();
         	  this.month = date.getMonth() + 1;
@@ -169,7 +217,7 @@ angular.module('app', ['ngTouch'])
         	  console.log(this.year+"-"+this.month);
         	  $scope.sales.month = this.year+"-"+this.month;
         	  $("#monthDate").val(this.year+"-"+this.month);
-		     }, 1000);
+		     }, 1000); */
      }]);
 </script>
 </head>
@@ -180,7 +228,7 @@ angular.module('app', ['ngTouch'])
                 <label for="" class="weui_label">员工</label>
             </div>
             <div class="weui_cell_bd weui_cell_primary">
-                <select class="weui_select" name="select2" ng-change="selectOne()"  ng-model="sales.userinfo" ng-options=" userinfo.userinfoName for userinfo in userList" >
+                <select class="weui_select" id="select_userinfo" name="select2" ng-change="selectOne()"  ng-model="sales.userinfo" ng-options=" userinfo.userInfoId as userinfo.userinfoName for userinfo in userList" >
                 	  <option value="" style="font-size:20px;">--选择员工--</option>
                 </select>
             </div>
@@ -188,37 +236,38 @@ angular.module('app', ['ngTouch'])
         <div class="weui_cell">
               <div class="weui_cell_hd"><label for="" class="weui_label">月份</label></div>
               <div id="monthDiv" class="weui_cell_bd weui_cell_primary">
-                  <input class="weui_input" style="width:100%;"  id="monthDate" type="month"   ng-model="sales.month" />
+                 <!--  <input class="weui_input" style="width:100%;"  id="monthDate" type="month"   ng-model="sales.month" /> -->
+             	 <input type="text" class="weui_input" name="USER_AGE" id="monthDate" readonly placeholder="请填写月份" />
               </div>
          </div>
          <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">销售额</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="market" pattern="[0-9]*"   placeholder="请填写销售额(单位万元)" ng-model="sales.market"/>
+	             <input class="weui_input" type="number" id="market" pattern="[0-9]*"   placeholder="请填写销售额(单位元)" ng-model="sales.market"/>
 	         </div>
 	     </div>
 	     <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">回款额</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="returned" pattern="[0-9]*" placeholder="请填写回款额(单位万元)" ng-model="sales.returned"/>
+	             <input class="weui_input" type="number" id="returned" pattern="[0-9]*" placeholder="请填写回款额(单位元)" ng-model="sales.returned"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">应收款</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="receivable" pattern="[0-9]*" placeholder="请填写应收款(单位万元)" ng-model="sales.receivable"/>
+	             <input class="weui_input" type="number" id="receivable" pattern="[0-9]*" placeholder="请填写应收款(单位元)" ng-model="sales.receivable"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">客户费用</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="client" pattern="[0-9]*"  placeholder="请填写客户费用(单位万元)" ng-model="sales.client"/>
+	             <input class="weui_input" type="number" id="client" pattern="[0-9]*"  placeholder="请填写客户费用(单位元)" ng-model="sales.client"/>
 	         </div>
 	    </div>
 	    <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">差旅费</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="travel" pattern="[0-9]*" placeholder="请填写差旅费(单位万元)" ng-model="sales.travel"/>
+	             <input class="weui_input" type="number" id="travel" pattern="[0-9]*" placeholder="请填写差旅费(单位元)" ng-model="sales.travel"/>
 	         </div>
 	    </div>
 	    <div class="button_sp_area" style="text-align: right;" >
