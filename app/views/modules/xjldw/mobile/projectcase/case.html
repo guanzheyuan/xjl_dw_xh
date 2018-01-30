@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>项目案例</title>
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+</head>
+<body ontouchstart style="background-color: #f8f8f8;">
+<div class="weui-weixin">
+<div class="weui-weixin-ui">
+  <!--页面开始-->
+    <div class="weui-weixin-page">
+   <h2 class="weui-weixin-title">项目案例</h2>
+   <div class="weui-weixin-info"><!--meta-->
+                       <a class="weui-weixin-a weui-weixin-nickname" href="javascript:void(0);" >南京西桓电气有限公司</a>
+                    </div><!--meta结束-->
+                    
+    <div class="weui-weixin-img" style="text-align:center;"><!--图片开始-->
+    <img src="/xh/public/images/mobile/sh.jpeg" width="160" >
+    </div><!--图片结束-->
+                                        
+    <div class="weui-weixin-content"><!--内容-->
+            <p style="font-weight:bolder;">安徽八一化工股份有限公司二期项目</p>
+            <p>2013年3月我公司竞得安徽八一化工股份有限公司离子膜、新氯苯二期项目中火灾报警控制系统的标的。包括火灾报警控制器、智能电源箱、模块箱、手动火灾报警按钮、火灾声光报警器等。2013年5月设备安装调试完毕并一次性验收合格。</p>
+            <p style="font-weight:bolder;">济南钢铁集团公司炼铁厂大修项目</p>
+            <p>2011年7月我公司通过前期技术沟通、后期商务竞标的方式，取得济南钢铁集团公司炼铁厂大修项目中智能信号隔离变送器的供货权，在烧结、球团、喷煤、高炉等位置的控制系统中合计供货450只产品，运行稳定无故障。</p>
+			<p style="font-weight:bolder;">山钢集团新疆喀什结构调整产业升级项目</p>
+			<p>2013年4月，山钢集团高炉系统BPRT机组准备投用，在试车过程发现该机组系统振动信号有较大的冲击干扰，影响主机试车投产及备用风机的正常运行。经现场工程师考虑，选用我司提供的MEX系列隔离栅，该产品为柜内导轨安装。现场按照其说明书进行接线安装，再次运行机组辅机并观测各个振动信号干扰情况，所有充饥干扰全部消除，效果良好，有力的保障机组试车及备用风机的安全运行。</p>
+			<p style="font-weight:bolder;">新疆农六师煤电有限公司机组改造项目</p>
+			<p>2012年5月我公司通过前期技术沟通，后期商务投标的方式，竞得新疆农六师煤电有限责任公司4*360MW机组改造项目中信号隔离变送器的供货权，此项目中合计供货236只产品。产品安装使用后，现场的干扰信号被消除，设备参数的精确性大大提高，确保了发电设备正常运行。</p>
+    				
+    </div><!--内容结束-->
+
+<div class="weui-weixin-tools"><!--工具条-->
+  <a href="javascript:void(0);" >阅读原文</a> 
+  <div class="weui-weixin-read">阅读<span id="readnum">100000+</span>  <span class="weui-weixin-read"><i class="weui-weixin-zan"></i><span class="weui-weixin-num">0</span></span></div>
+  <a href="javascript:void(0);" class="right" id="jubao">举报</a>
+</div><!--工具条结束-->
+ <script>
+ $(function(){
+ $("img").addClass('weixin');
+  $('.weui-weixin-zan').click(function(){
+ if($(this).hasClass('zaned')){
+ $(this).removeClass('zaned');
+ var  val = $(this).next().html();
+ if(parseInt(val)==0){
+ var i=1;
+ }else{
+ var  i  =  parseInt(val)-1;
+ }
+  $(this).next().html(i);
+  
+ }else{
+ $(this).addClass('zaned');
+  var  val = $(this).next().html();
+  $(this).next().html(parseInt(val)+1);
+  //ajax操作
+ }
+ 
+ });
+ 
+ 
+ });
+ </script> 
+
+</div><!--页面结束-->
+  </div>
+</div> 
+</body>
+</html>

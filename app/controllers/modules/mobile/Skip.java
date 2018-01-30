@@ -68,6 +68,7 @@ public class Skip extends MobileFilter {
 	}
 	
 	public static void toProductInfo(){
+		renderArgs.put("type",params.get("type"));
 		render("modules/xjldw/mobile/product/product_info.html");
 	}
 	
@@ -321,5 +322,18 @@ public class Skip extends MobileFilter {
 		render("modules/xjldw/mobile/exhibition/product_activity.html");
 	}
 	
+	/**
+	 * 跳转到项目案例
+	 */
+	public static void toProjectCase(){
+		render("modules/xjldw/mobile/projectcase/case.html");
+	}
+	
+	/**
+	 * 跳转关于
+	 */
+	public static void toWithXh(){
+		render("modules/xjldw/mobile/projectcase/withxh.html");
+	}
 	
 }

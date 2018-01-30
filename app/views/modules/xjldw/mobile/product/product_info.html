@@ -14,23 +14,58 @@
 <link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
 <link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
 <script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+var type='${type}';
+$(function(){
+	if('1' == type){
+		$("#img").attr("src",'/xh/public/images/mobile/dybq.jpg');
+		$("#weiXinTitle").html('信号隔离变送器');
+		$("#content").html(' 本产品为智能化设计，采用先进的电磁耦合技术及厚膜集成工艺研制所成，具备传统产品所不具备的多种功能。可实现输入、输出信号与电源之间的可靠隔离，有效解决工业自动化控制系统现场干扰问题，保证系统的稳定和可靠运行，广泛应用于石油化工、生物制药、冶金、电力、造船、造纸等工业领域的过程控制系统中。');
+		$("#content2").html('液晶型 信号隔离器    双通道： 二入二出 给现场设备提供直流工作电源，同时采集二路现场设备输出的电流或电压信号，经过内部放大、运算、滤波等方式处理，输出二路隔离的电流或电压信号，为系统可靠、稳定的运行提供有力的保障。本产品采用可视化技术，面板带显示窗口，可实时显示现场的输入、输出值。本产品输入、输出、电源之间为三端相互隔离。 <br/>   u  传输准确度：±0.1%F·S（25℃±2℃）u  响应时间：0.5S（0 ～ 90%）（TYP） u  温度漂移：< 30ppm/℃ u  输入阻抗：电流：≤60Ω、电压：≥1MΩ u  输入信号：4 ～ 20mA或1 ～ 5V等，详见选型说明 u  输出信号：4 ～ 20mA或1 ～ 5V等，详见选型说明 u  配电电压：24V±1V u  负载能力：电流输出：≤500Ω；电压输出：≥100kΩ 特殊负载要求可定制 u  电源：20～30V DC u  功耗：2.2W  >>面板说明 u  上排显示：仪表输入测量值，如输入故障则闪烁故障符号； u  下排显示：仪表输出值');
+	}else if('2' == type){
+		$("#img").attr("src",'/xh/public/images/mobile/szznb.png');
+		$("#weiXinTitle").html('智能电力显示仪表');
+	}else if('3' == type){
+		$("#content").html('MST系列智能化--压力/差压/绝压变送器是西桓电气专为国内外高要求客户打造的多功能数字化智能仪表，整体设计框架着眼于可靠性、稳定性、耐久性、精准性，满足日益提高的工业现场应用之要求。我们产品的核心部件采用十六位单片机，其强大的功能和高速的运算能力保证了变送器的优良品质。自带通讯编程键盘强大的界面功能无需外接手操器，保证了良好的交互性，数字液晶显示表头能够实时显示压力、温度、电流三种物理量，及0-100%模拟指示。');
+		$("#img").attr("src",'/xh/public/images/mobile/1.jpg');
+		$("#img1").attr("src",'/xh/public/images/mobile/2.jpg');
+		$("#img2").attr("src",'/xh/public/images/mobile/3.jpg');
+		$("#weiXinTitle").html('绝压变送器');
+	}else if('4'==type){
+		$("#img").attr("src",'/xh/public/images/mobile/fdy.png');
+		$("#content").html('');
+		$("#weiXinTitle").html('防浪涌保护器');
+	}else if('5'==type){
+		$("#content").html('激光测距仪,作为非接触式的测量仪器,已被广泛使用于遥感、精密测量、工程建设、安全监测以及智能控制等领域,涉及多种学科技术。目前应用较广的激光测距仪,主要为脉冲式和相位式。其中,相位式激光测距仪以其精度高、功率小和便携的特点,适用于民用范畴,有较大的市场和应用前景。<br/> 相位式测距仪的基本原理可以表达为 其中,R为待测距离;f为激光的直接调制频率;c为 光速;ψ为检测到的相位差。由上面公式可以看出,相位式测距仪的测距性能主要取决于激光调制的频率和方法,以及相位检测精度;激光调制频率越高相位检测精度越高,对应测距精度便越高, <br/>同时还可 以利用多组间接调制频率来消除相位混迭[1] ,提高 测程测距。调制和检测手段的进步,不断推进着激 光测距仪的发展。 相位式激光测距仪一般采用半导体激光管,测距时利用迭加偏置的调制电流,直接对激光管进行调制驱动,产生激光束;接收端利用光学组件,将由目标反射的激光束回波会聚至光电转换器件(如APD),然后利用一定的检测手段获取相位信息。传 统方法的发射调制函数大多采用正/余弦函数,后端检相采用混频的方法以降低检测到的高信号频率 [2] ,利用检相器得到相位差,从而计算出距离信 息。这样,整个系统基于模拟手段,在速度和自动化程度上受到限制,且不利于与其他系统的配合。为此,针对测距仪的数字化,人们发展了其他的调制和检测方法。');
+		$("#weiXinTitle").html('激光测距侧位仪');
+	}else if('6'==type){
+		$("#weiXinTitle").html('智能流量计');
+		$("#content").html('HQLDE-B全不锈钢电磁流量计由传感器和转换器两部分构成。它是基于法拉第电磁感应定律工作的，用来测量电导率大于5μS/cm导电液体的体积流量，是一种测量导电介质体积流量的感应式仪表。除可测量一般导电液体的体积流量外，还可用于测量强酸强碱等强腐蚀液体和泥浆、矿浆、纸浆等均匀的液固两相悬浮液体的体积流量。<br/>广泛应用于石油、化工、冶金、轻纺、造纸、环保、食品等工业部门及市政管理，水利建设、河流疏浚等领域的流量计量。 二、全不锈钢电磁流量计产品特点  全数字量处理，抗干扰能力强，测量可靠，精度高、流量测量范围可达150：1  超低EMI开关电源，适用电源电压变化范围大，抗EMI性能好 采用16位嵌入式微处理器，运算速度快, 精度高，可编程频率低频矩形波励磁，提高了流量测量的稳定性，功耗低。<br/> 采用SMD器件和表面贴装（SMT）技术，电路可靠性高 管道内无可动部件，无阻流部件，测量中几乎没有附加压力损失。 在现场可根据用户实际需要在线修改量程。 测量结果与流速分布，流体压力，温度、密度、粘度等物理参数无关。 高清晰度背光LCD显示，全中文菜单操作，使用方便，操作简单，易学易懂。 具有RS485、RS232、Hart和Modbus等数字通讯信号输出。（选配）');
+	}
+		
+})
+</script>
 </head>
 <body ontouchstart style="background-color: #f8f8f8;">
 <div class="weui-weixin">
 <div class="weui-weixin-ui">
   <!--页面开始-->
     <div class="weui-weixin-page">
-   <h2 class="weui-weixin-title">信号隔离变送器</h2>
+   <h2 class="weui-weixin-title" id="weiXinTitle"></h2>
    <div class="weui-weixin-info"><!--meta-->
     <span class="weui-weixin-em"></span>
                        <a class="weui-weixin-a weui-weixin-nickname" href="javascript:void(0);" >西桓</a>
                     </div><!--meta结束-->
-    <div class="weui-weixin-img"><!--图片开始-->
-    <img src="/xh/public/images/mobile/datu.jpg">
-    </div><!--图片结束-->
+   <!--  <div class="weui-weixin-img">图片开始
+    <img id="img" src="/xh/public/images/mobile/datu.jpg">
+    </div>图片结束 -->
     <div class="weui-weixin-content"><!--内容-->
-      <p> 本产品为智能化设计，采用先进的电磁耦合技术及厚膜集成工艺研制所成，具备传统产品所不具备的多种功能。可实现输入、输出信号与电源之间的可靠隔离，有效解决工业自动化控制系统现场干扰问题，保证系统的稳定和可靠运行，广泛应用于石油化工、生物制药、冶金、电力、造船、造纸等工业领域的过程控制系统中。</p>
-      </div><!--内容结束-->
+      <p id="content"></p>
+   	  <p><img  id="img" src=""></p>
+   	   <p><img  id="img1" src=""></p>
+   	    <p><img  id="img2" src=""></p>
+   	  <p id="content2"></p>
+    </div><!--内容结束-->
 <div class="weui-weixin-tools"><!--工具条-->
   <a href="javascript:void(0);" >阅读原文</a> 
   <div class="weui-weixin-read">阅读<span id="readnum">100000+</span>  <span class="weui-weixin-read"><i class="weui-weixin-zan"></i><span class="weui-weixin-num">0</span></span></div>
