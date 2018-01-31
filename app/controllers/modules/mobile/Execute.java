@@ -16,6 +16,7 @@ import com.mysql.fabric.xmlrpc.base.Array;
 
 import controllers.modules.mobile.bo.WxUserInfoBo;
 import controllers.modules.mobile.bo.XjlDwCheckingBo;
+import controllers.modules.mobile.bo.XjlDwQuizBo;
 import controllers.modules.mobile.bo.XjlDwReportBo;
 import controllers.modules.mobile.bo.XjlDwSalaryBo;
 import controllers.modules.mobile.bo.XjlDwSalesBo;
@@ -25,6 +26,8 @@ import models.modules.mobile.WxUserInfo;
 import models.modules.mobile.XjlDwChecking;
 import models.modules.mobile.XjlDwCities;
 import models.modules.mobile.XjlDwProvinces;
+import models.modules.mobile.XjlDwQuiz;
+import models.modules.mobile.XjlDwReply;
 import models.modules.mobile.XjlDwReport;
 import models.modules.mobile.XjlDwSalary;
 import models.modules.mobile.XjlDwSales;
@@ -903,6 +906,77 @@ public class Execute  extends MobileFilter {
 		String month = params.get("month");
 		XjlDwSalary xjlDwSalary = XjlDwSalary.querySalaryByUserInfoIdAndtime(userInfoId,month);
 		ok(xjlDwSalary);
+	}
+	
+	/**
+	 * 产品咨询提问
+	 */
+	public static void doConsulAdd(){
+		WxUser wxuser = getWXUser();
+		String title =  params.get("title");
+		XjlDwQuiz  xjlDwQuiz = new XjlDwQuiz();
+		xjlDwQuiz.title = title;
+		xjlDwQuiz.wxOpenId = wxuser.wxOpenId;
+		xjlDwQuiz = XjlDwQuizBo.save(xjlDwQuiz);
+		ok(xjlDwQuiz);
+	}
+	
+	/**
+	 * 产品问题咨询列表
+	 * @throws Exception 
+	 */
+	public static void doQueryQuizList() throws Exception{
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		Map ret = XjlDwQuiz.doQueryQuiz(condition, pageIndex, pageSize);
+		List<Map<String,Object>> listMap = new ArrayList<>();
+		if(null != ret){
+			List<XjlDwQuiz> data  = (List<XjlDwQuiz>) ret.get("data");
+			Map<String,Object> _temp = null;
+			boolean flag = true;
+			for (XjlDwQuiz xjlDwQuiz : data) {
+				_temp = new HashMap<>();
+				_temp.put("id",xjlDwQuiz.quizId);
+				WxUser wx = WxUser.getUserByOpenId(xjlDwQuiz.wxOpenId);
+				if(null !=wx){
+					_temp.put("headImage",wx.headImgUrl);
+					_temp.put("username",wx.nickName);
+				}else{
+					_temp.put("headImage","");
+					_temp.put("username","");
+				}
+				_temp.put("reply",XjlDwReply.doQueryCountByQuizid(String.valueOf(xjlDwQuiz.quizId)));
+				_temp.put("title",xjlDwQuiz.title);
+				_temp.put("time",DateUtil.showDate(xjlDwQuiz.createTime,"yyyy-MM-dd HH:mm:ss"));
+				listMap.add(_temp);
+			}
+		}
+		ok(listMap);
+	}
+	
+	/**
+	 * 通过主键查询
+	 */
+	public static void doQueryReply(){
+		String id = params.get("id");
+		XjlDwQuiz xjlDwQuiz = XjlDwQuiz.doQueryByPrimaryKey(id);
+		Map<String,Object> map = new HashMap<>();
+		if(null != xjlDwQuiz){
+			map.put("id", xjlDwQuiz.quizId);
+			WxUser wx = WxUser.getUserByOpenId(xjlDwQuiz.wxOpenId);
+			if(null !=wx){
+				map.put("headImage",wx.headImgUrl);
+				map.put("username",wx.nickName);
+			}else{
+				map.put("headImage","");
+				map.put("username","");
+			}
+			map.put("title",xjlDwQuiz.title);
+			map.put("reply",XjlDwReply.doQueryCountByQuizid(String.valueOf(xjlDwQuiz.quizId)));
+			map.put("time",DateUtil.showDate(xjlDwQuiz.createTime,"yyyy-MM-dd HH:mm:ss"));
+		}
+		ok(map);
 	}
 	
 	

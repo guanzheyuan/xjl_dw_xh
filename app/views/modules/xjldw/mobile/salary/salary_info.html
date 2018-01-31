@@ -81,19 +81,19 @@ angular.module('app', ['ngTouch'])
 </div>
 <table class="weui-table" style="overflow-x: auto;"  ng-if="salaryList.length != 0 ">
         <thead >
-        <tr><th style="font-weight:bolder;">{{userName}}</th><th ng-repeat="salary in salaryList" ><p style="width:70%;text-align:right;">{{salary.month}}</p></th></tr>
+        <tr><th style="font-weight:bolder;">{{userName}}</th><th style="width:95px;" ><p style="width:70%;text-align:right;">{{salaryList[0].month}}</p></th><th style="width:95px;"><p style="width:70%;text-align:right;">{{salaryList[1].month}}</p></th><th style="width:95px;"><p style="width:70%;text-align:right;">{{salaryList[2].month}}</p></th></tr>
         </thead>
         <tbody>
-        <tr><td>基本工资</td><td ng-repeat="salary in salaryList"style="color: gray;" ><p style="width:70%;text-align:right;">{{salary.basicSalary}}</p></td></tr>
-        <tr><td>岗位津贴</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.subsidy}}</p></td></tr>
-        <tr><td>销售奖金</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.bonus}}</p></td></tr>
-        <tr><td>话费补贴</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.telcharge}}</p></td></tr>
-        <tr><td>考勤浮动</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary._float}}</p></td></tr>
-        <tr><td>社会保险</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.insurance}}</p></td></tr>
-        <tr><td>述职扣款</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.reportwithhold}}</p></td></tr>
-        <tr><td>其他扣款</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.otherdeductions}}</p></td></tr>
-        <tr><td>所得税</td><td ng-repeat="salary in salaryList" style="color: gray;"><p style="width:70%;text-align:right;">{{salary.incometax}}</p></td></tr>
-       	<tr><td>合计</td><td ng-repeat="salary in salaryList" style="color:blue;" ng-click="toSalaryExplain({{salary.id}})" ><p style="width:70%;text-align:right;">{{salary.total}}</p></td></tr>
+        <tr><td>基本工资</td><td style="color: gray;" ><p style="width:70%;text-align:right;">{{salaryList[0].basicSalary}}</p></td><td style="color: gray;" ><p style="width:70%;text-align:right;">{{salaryList[1].basicSalary}}</p></td><td style="color: gray;" ><p style="width:70%;text-align:right;">{{salaryList[2].basicSalary}}</p></td></tr>
+        <tr><td>岗位津贴</td><td style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].subsidy}}</p></td><td style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].subsidy}}</p></td><td style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].subsidy}}</p></td></tr>
+        <tr><td>销售奖金</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].bonus}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].bonus}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].bonus}}</p></td></tr>
+        <tr><td>话费补贴</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].telcharge}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].telcharge}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].telcharge}}</p></td></tr>
+        <tr><td>考勤浮动</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0]._float}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1]._float}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2]._float}}</p></td></tr>
+        <tr><td>社会保险</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].insurance}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].insurance}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].insurance}}</p></td></tr>
+        <tr><td>述职扣款</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].reportwithhold}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].reportwithhold}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].reportwithhold}}</p></td></tr>
+        <tr><td>其他扣款</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].otherdeductions}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].otherdeductions}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].otherdeductions}}</p></td></tr>
+        <tr><td>所得税</td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[0].incometax}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[1].incometax}}</p></td><td  style="color: gray;"><p style="width:70%;text-align:right;">{{salaryList[2].incometax}}</p></td></tr>
+       	<tr><td>合计</td><td  style="color:blue;" ng-click="toSalaryExplain({{salaryList[0].id}})" ><p style="width:70%;text-align:right;">{{salaryList[0].total}}</p></td><td  style="color:blue;" ng-click="toSalaryExplain({{salaryList[1].id}})" ><p style="width:70%;text-align:right;">{{salaryList[1].total}}</p></td><td  style="color:blue;" ng-click="toSalaryExplain({{salaryList[2].id}})" ><p style="width:70%;text-align:right;">{{salaryList[2].total}}</p></td></tr>
         </tbody>
  </table>
 <!--  <hr ng-if="isAdmin == 'false'">

@@ -84,22 +84,23 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toNavigation(){
 		WxUser wxuser = getWXUser();
-		//判断是否注册
-	   boolean flag = WxUserInfo.queryUserInfoByWxOpenId(wxuser.wxOpenId);
-		Logger.info("该用户是否注册："+flag);
-		if(flag){
-			 flag = WxUserInfo.isRegist(wxuser.wxOpenId);
-			  Logger.info("该用户是否提交注册："+flag);
-			  if(flag){
-				  render("modules/xjldw/mobile/user/register.html");
-			  }else{
-				  renderArgs.put("wxOpenId",wxuser.wxOpenId);
-				  render("modules/xjldw/mobile/error/errorhtml.html");
-			  }
-		}else{
-			renderArgs.put("wxUser",wxuser);
-			render("modules/xjldw/mobile/map/navigation.html");
-		}
+		renderArgs.put("wxUser",wxuser);
+		render("modules/xjldw/mobile/map/navigation.html");
+//		//判断是否注册
+//	   boolean flag = WxUserInfo.queryUserInfoByWxOpenId(wxuser.wxOpenId);
+//		Logger.info("该用户是否注册："+flag);
+//		if(flag){
+//			 flag = WxUserInfo.isRegist(wxuser.wxOpenId);
+//			  Logger.info("该用户是否提交注册："+flag);
+//			  if(flag){
+//				  render("modules/xjldw/mobile/user/register.html");
+//			  }else{
+//				  renderArgs.put("wxOpenId",wxuser.wxOpenId);
+//				  render("modules/xjldw/mobile/error/errorhtml.html");
+//			  }
+//		}else{
+//			
+//		}
 	}
 	
 	/**
@@ -149,6 +150,7 @@ public class Skip extends MobileFilter {
 				  render("modules/xjldw/mobile/error/errorhtml.html");
 			  }
 		}else{
+			 render("modules/xjldw/mobile/consult/consulting.html");
 		}
 	}
 	
@@ -334,6 +336,23 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toWithXh(){
 		render("modules/xjldw/mobile/projectcase/withxh.html");
+	}
+	
+	/**
+	 * 跳转产品咨询提问页面
+	 */
+	public static void toConsultingAdd(){
+		WxUser wxuser = getWXUser();
+		renderArgs.put("imageUrl", wxuser.headImgUrl);
+		render("modules/xjldw/mobile/consult/consulting_add.html");
+	}
+	
+	/**
+	 * 跳转到项目案例回复页面
+	 */
+	public static void toConsultingInfo(){
+		renderArgs.put("id", params.get("id"));
+		render("modules/xjldw/mobile/consult/consulting_info.html");
 	}
 	
 }

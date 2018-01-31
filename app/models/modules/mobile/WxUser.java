@@ -105,6 +105,27 @@ public class WxUser extends GenericModel {
         	return wxUser;
         }
 	}
+	
+	public static WxUser getUserByOpenId(String openid){
+		log.debug("getFindByOpenId方法openId:" + openid);
+		int pageIndex = 1;
+        int pageSize = 100;
+        Map condition = new HashMap<String, String>();
+        if(StringUtil.isNotEmpty(openid)){
+            condition.put("wxOpenId", openid);
+        }
+        Map returnMap = queryWxUserListByPage(condition,pageIndex,pageSize);
+        List<WxUser> retData = (List<WxUser>)returnMap.get("data");
+        if(retData.isEmpty()){
+        	return null;
+        }else{
+        	log.debug("一共查询符合条件的数据有:" + retData.size());
+        	WxUser wxUser = retData.get(0);
+        	wxUser.isRegister = WxUserInfo.queryUserInfoByWxOpenId(openid);
+        	wxUser.wxUserInfo =WxUserInfo.getFindByOpenId(openid);
+        	return wxUser;
+        }
+	}
 	/**
 	 * 查询用户
 	 * @param condition
