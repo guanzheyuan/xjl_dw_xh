@@ -276,7 +276,7 @@ public class Execute  extends MobileFilter {
 	public static void doQueryCheckingByMonth() throws Exception{
 		WxUser wxuser = getWXUser();
 		String _month = params.get("month");
-		String wxOpenId = "";
+		String wxOpenId = params.get("wxopenid");
 		String year = "";
 		String month="";
 		if(StringUtil.isNotEmpty(_month)){
@@ -374,15 +374,21 @@ public class Execute  extends MobileFilter {
 	 */
 	public static void doQueryCheckingAStatistics() throws ParseException{
 		String day = params.get("month");
+		String wxOpenId = params.get("wxopenid");
 		WxUser wxuser = getWXUser();
 		String[] monthArr =  day.split("-");
 		String year = monthArr[0];
 		String month = monthArr[1];
+		if(StringUtil.isNotEmpty(wxOpenId)){
+			 wxOpenId = params.get("wxopenid");
+		}else{
+			wxOpenId = wxuser.wxOpenId;
+		}
 		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
 		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
 		Map<String, String> condition = params.allSimple();
 		condition.put("workMonth",String.valueOf(Integer.parseInt(month)));
-		condition.put("wxOpenId",wxuser.wxOpenId);
+		condition.put("wxOpenId",wxOpenId);
 		Map ret = XjlDwChecking.queryWxCheckingByPage(condition, pageIndex, pageSize);
 		int quanqin = 0;
 		int chidao = 0;
@@ -403,7 +409,7 @@ public class Execute  extends MobileFilter {
 					Logger.info("迟到"+chidao);
 				}
 				//早退
-				if(StringUtil.isNotEmpty(xjlDwChecking.pm)&&xjlDwChecking.pm.compareTo(GOBACK)>=1){
+				if(StringUtil.isNotEmpty(xjlDwChecking.pm)&&xjlDwChecking.pm.compareTo(GOBACK)<1){
 					zaotui++;
 					Logger.info("早退"+zaotui);
 				}

@@ -38,13 +38,13 @@ ajaxReturn.done(function (data) {
 });
 
 function getLocation(){
-	var longitude =118.78085027109267;
-	var latitud = 31.95215062249571;
+	var longitude =118.7231769326107;//118.78085027109267;
+	var latitud = 32.031741701745986;//31.95215062249571;
 	 wx.openLocation({  
          latitude :latitud,  //res.latitude, 纬度，浮点数，范围为90 ~ -90  
          longitude :longitude, //res.longitude,  经度，浮点数，范围为180 ~ -180。  
          name : '南京西桓电气有限公司', // 位置名  
-         address : '江苏省南京市江宁区将军大道6号', // 地址详情说明  
+         address : '中国•南京集庆门大街苏宁慧谷E08-2-2110', // 地址详情说明  
          scale : 28, // 地图缩放级别,整形值,范围从1~28。默认为最大  
          infoUrl : 'http://www.gongjuji.net' // 在查看位置界面底部显示的超链接,可点击跳转（测试好像不可用）  
      });  

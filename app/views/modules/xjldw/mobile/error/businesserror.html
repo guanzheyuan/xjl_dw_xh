@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>异常提示</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/css/weui.css">
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+			.factory('agentRemote', ['$http', function ($http, appValue) {
+				return{
+					pushMsg:function(wxOpenId){
+						return $http({
+							method: 'GET',
+                            url: '/xh/mobile/Execute/pushMsgForRegist',
+                            params:{
+                            	wxOpenId:wxOpenId
+                            }
+						});
+					}
+				}
+			}])
+			.controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+				$scope.init = function(){
+					agentRemote.pushMsg('${wxOpenId}').then(function(res){
+						
+					})
+				}
+			}])
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" >
+<div class="page">
+    <div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">操作失败</h2>
+            <p class="weui-msg__desc">抱歉，该功能仅对员工开放!</p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+            </p>
+        </div>
+        <div class="weui-msg__extra-area">
+            <div class="weui-footer">
+                <p class="weui-footer__links">
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

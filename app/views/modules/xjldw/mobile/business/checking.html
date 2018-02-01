@@ -105,12 +105,13 @@ angular.module('app', ['ngTouch'])
 						 }
 					  })  
 			  },
-			  statisChecking:function(month){
+			  statisChecking:function(month,wxOpenId){
 				  return $http({
 						 method: 'GET',
 						 url:'/xh/mobile/Execute/doQueryCheckingAStatistics',
 						 params:{
-							 month:month
+							 month:month,
+							 wxopenid:wxOpenId
 						 }
 					  })  
 			  },
@@ -142,7 +143,7 @@ angular.module('app', ['ngTouch'])
     		  if(""!=month){
     			  var year = date.getFullYear(); //获取当前日期的年份 
     			  console.log(parseInt(month));
-    			  window.location.href="/xh/mobile/Skip/toCheckingLog?month="+parseInt(month);
+    			  window.location.href="/xh/mobile/Skip/toCheckingLog?month="+parseInt(month)+'&wxopenid=${wxOpenId}';
     		  }
     	  }
     	  $scope.query = function(me){
@@ -157,7 +158,7 @@ angular.module('app', ['ngTouch'])
     			  //增加验证 选择时间不能大于当前时间
     			  var montArr = nowDate.split("-");
     			  $.showLoading();
-    			  agentRemote.statisChecking(nowDate).then(function(res){
+    			  agentRemote.statisChecking(nowDate,'${wxOpenId}').then(function(res){
         			  console.log(res);
         			  $.hideLoading();
         			  $scope.quanqin = res.data.data.quanqin;

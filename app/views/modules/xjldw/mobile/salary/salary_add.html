@@ -265,8 +265,6 @@ angular.module('app', ['ngTouch'])
     			     $scope.salary._float=0;
     			     $scope.salary.otherdeductions=0;
     			     $scope.salary.reportwithhold=0;
-    			     $scope.salary.reportwidthholdContent=0;
-    			     $scope.salary.otherwithholdcontent=0;
     			     $scope.salary.incometax=0;
     			     $scope.salary.insurance=0;
      			     $scope.allCount = 0 ;
@@ -345,6 +343,15 @@ angular.module('app', ['ngTouch'])
               </div>
      </div>
      <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">考勤浮动</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="_float"   ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
+	         </div>
+	          <div class="weui_cell_ft">
+                    <a href="javascript:;" class="weui-vcode-btn" ng-click="salaryChecking()">考勤查看</a>
+                </div>
+    </div>
+     <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">基本工资</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
 	             <input class="weui_input" type="number"  id="basicSalary"  pattern="[0-9]*"  ng-change="calculate()"   placeholder="请填写基本工资" ng-model="salary.basicSalary"/>
@@ -367,15 +374,6 @@ angular.module('app', ['ngTouch'])
 	         <div class="weui_cell_bd weui_cell_primary">
 	             <input class="weui_input" type="number" id="telcharge" pattern="[0-9]*"  ng-change="calculate()"  placeholder="请填写话费补贴" ng-model="salary.telcharge"/>
 	         </div>
-    </div>
-     <div class="weui_cell">
-	         <div class="weui_cell_hd"><label class="weui_label">考勤浮动</label></div>
-	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="_float"   ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
-	         </div>
-	          <div class="weui_cell_ft">
-                    <a href="javascript:;" class="weui-vcode-btn" ng-click="salaryChecking()">考勤查看</a>
-                </div>
     </div>
     <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">社会保险</label></div>

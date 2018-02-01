@@ -22,12 +22,13 @@
 angular.module('app', ['ngTouch'])
 	 .factory('agentRemote', ['$http', function ($http, appValue) {
 		 return {
-			 queryList:function(month){
+			 queryList:function(month,wxopenid){
 				 return $http({
 					 method: 'GET',
 					 url:'/xh/mobile/Execute/doQueryCheckingByMonth',
 					 params:{
-						 month:month
+						 month:month,
+						 wxopenid:wxopenid
 					 }
 				  })
 			 }
@@ -36,8 +37,9 @@ angular.module('app', ['ngTouch'])
      .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
     	 $scope.checkList = [];
     	 $scope.workDate = '${month}';
+    	 $scope.wxopenid='${wxopenid}';
     	 $scope.query = function(me){
-   		  agentRemote.queryList($scope.workDate).then(function(res){
+   		  agentRemote.queryList($scope.workDate,$scope.wxopenid).then(function(res){
    			  $scope.checkList = res.data.data;
    		  });
    	  }

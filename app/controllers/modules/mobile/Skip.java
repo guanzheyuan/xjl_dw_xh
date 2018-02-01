@@ -49,7 +49,7 @@ public class Skip extends MobileFilter {
 		 mapDataSon.put("value","申请已经提交，请等待审核！");
 		 mapDataSon.put("color","#808080");
 		 mapData.put("remark", mapDataSon);
-		 WxPushMsg.wxMsgPusheTmplate("bMXSVB4eAjPlJwjRBheRQ_opJTwgxNFIuGWVGf1FDlc","", mapData,wxOpenId);
+		 WxPushMsg.wxMsgPusheTmplate("QqyomHL4zsDauk24h9s2Uk62O8Nimfddw7ji6AaqRoQ","", mapData,wxOpenId);
 	}
 	
 	
@@ -127,6 +127,8 @@ public class Skip extends MobileFilter {
 			renderArgs.put("userInfo",userInfo);
 			if(StringUtil.isNotEmpty(userInfo.userinfoType)){
 				render("modules/xjldw/mobile/business/business_manage.html");
+			}else{
+				render("modules/xjldw/mobile/error/businesserror.html");
 			}
 		}
 	}
@@ -159,10 +161,12 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toChecking(){
 		String flag = params.get("flag");
+		Logger.info("跳转到考勤flag："+flag);
 		if(StringUtil.isNotEmpty(flag)){
 			renderArgs.put("noShow", false);
 		}else{
 			WxUserInfo userInfo = WxUserInfo.getFindByUserInfoId(params.get("userinfoId"));
+			Logger.info("跳转到考勤flag："+userInfo.userinfoName);
 			renderArgs.put("wxOpenId",null!= userInfo?userInfo.wxOpenId:"");
 			renderArgs.put("noShow", true);
 		}
@@ -174,6 +178,7 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toCheckingLog(){
 		renderArgs.put("month",params.get("month"));
+		renderArgs.put("wxopenid",params.get("wxopenid"));
 		render("modules/xjldw/mobile/business/check_log.html");
 	}
 	/**
@@ -303,7 +308,11 @@ public class Skip extends MobileFilter {
 	 */
 	public static void toSalaryExplain(){
 		XjlDwSalary xjlDwSalary = XjlDwSalary.querySararyByPrimaryId(params.get("id"));
-		renderArgs.put("otherdeductions",null != xjlDwSalary?StringUtil.isNotEmpty(xjlDwSalary.otherwithholdcontent)?xjlDwSalary.otherwithholdcontent:"无":"");
+		renderArgs.put("otherdeductions",xjlDwSalary.otherdeductions);
+		renderArgs.put("_float", xjlDwSalary._float);
+		renderArgs.put("otherdeductionsContent",xjlDwSalary.otherwithholdcontent);
+		renderArgs.put("reportwithhold",xjlDwSalary.reportwithhold);
+		renderArgs.put("reportwidthholdcontent",xjlDwSalary.reportwidthholdContent);
 		render("modules/xjldw/mobile/salary/salary_explain.html");
 	}
 	
