@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>西桓论坛</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<style type="text/css">
+  .wenwen-footer{width:100%;position:fixed;bottom:0px; background:#fff;padding:3%;box-sizing:border-box;}
+</style>
+<script type="text/javascript">
+function toAdd(){
+	window.location.href='/xh/mobile/Skip/toForumAdd';
+}
+angular.module('app', ['ngTouch'])
+.factory('agentRemote', ['$http', function ($http, appValue) {
+	return{
+		valid:function(content){
+			if(content === ""){
+				 return {flag:false, msg: '评论不能为空'};
+			}
+			 return {flag: true, msg: '验证通过'};
+		},
+		query:function(id){
+			 return $http({
+				 method: 'GET',
+                 url: '/xh/mobile/Execute/doQueryReview',
+                 params:{
+                	 id:id
+                 }
+			 });
+		},
+		queryReply:function(id){
+			return $http({
+				 method: 'GET',
+                url: '/xh/mobile/Execute/doQueryReviewList',
+                params:{
+               	 id:id
+                }
+			 });
+		},
+		save:function(obj){
+			return $http({
+				 method: 'POST',
+                url: '/xh/mobile/Execute/doReviewAdd',
+                data:obj,
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+                transformRequest:function(obj){
+               	 var str = [];    
+                    for (var p in obj) {    
+                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));    
+                    }    
+                    return str.join("&"); 
+               }
+			 });
+		}
+	}
+}])
+.controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+	$scope.forumId='${id}';
+	$scope.forum = [];
+	$scope.review = {
+			forumId:'${id}',
+			content:''
+	}
+	$scope.reviewList = [];
+	$scope.initCss = function(){
+		//定义文本
+		const paragraph = $('#paragraph');
+		const paragraphText = paragraph.text();
+		const paragraphLength = paragraph.text().length;
+		//定义文章长度
+		const maxParagraphLength = 80;
+		//定义全文按钮
+		const paragraphExtender = $('#paragraphExtender');
+		var toggleFullParagraph = false;
+
+		//定义全文按钮
+		if (paragraphLength < maxParagraphLength) {
+		  paragraphExtender.hide();
+		} else {
+		  paragraph.html(paragraphText.substring(0, maxParagraphLength) + '...');
+		  paragraphExtender.click(function(){
+		    if (toggleFullParagraph) {
+		      toggleFullParagraph = false;
+		      paragraphExtender.html('显示全文');
+		      paragraph.html(paragraphText.substring(0, maxParagraphLength) + '...');
+		    } else {
+		      toggleFullParagraph = true;
+		      paragraphExtender.html('收起');
+		      paragraph.html(paragraphText);
+		    }
+		  });
+		};
+		const menu = $('#actionMenu');
+		const menuBtn = $('#actionToggle');
+		menuBtn.click(function(){menu.toggleClass('active')});
+	}
+	$scope.save = function(){
+		var vaildRes = agentRemote.valid($scope.review.content);
+		if(vaildRes.flag){
+			agentRemote.save($scope.review).then(function(res){
+				  $.toast("操作成功");
+				  window.location.href='/xh/mobile/Skip/toForumInfo?id=${id}';
+			})
+		}else{
+			 $.toast(vaildRes.msg, "forbidden");
+		}
+	}
+	$scope.initReply = function(){
+		agentRemote.queryReply($scope.forumId).then(function(res){
+			console.log(res.data.data);
+			$scope.reviewList  = res.data.data;
+		})
+	}
+	$scope.init = function(){
+		agentRemote.query($scope.forumId).then(function(res){
+			$scope.forum= res.data.data;
+			console.log(res);
+			setTimeout(function () {
+				$scope.initCss();
+			 },200);
+		});
+	}
+	$scope.init();
+	$scope.initReply();
+}])
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<div class="weui-flex">
+            <div class="weui-flex-item" ><div class="placeholder" style="color:black;float:right;background-color: #f8f8f8" onclick="toAdd()"><i class="icon icon-116">发帖</i></div></div>
+  </div>
+      <div class="weui_cells moments">
+        <!-- 普通的post -->
+        <div class="weui_cell moments__post">
+          <div class="weui_cell_hd">
+            <img src="{{forum.headImage}}" />
+          </div>
+          <div class="weui_cell_bd">
+            <!-- 人名链接 -->
+            <a class="title" href="javascript:;">
+              <xhan>{{forum.username}}</xhan>
+            </a>
+             <!-- 资料条 -->
+            <div class="toolbar">
+              <p class="timestamp">{{forum.time}}</p>
+             <!--  <xhan id="actionToggle" class="actionToggle">..</xhan> -->
+            </div>
+            <!-- post内容 -->
+            <p id="paragraph" class="paragraph" style="font-weight:bolder;">
+             {{forum.title}}
+            </p>
+            <p id="paragraph" class="paragraph">
+             {{forum.content}}
+            </p>
+            <!-- 伸张链接 -->
+            <a id="paragraphExtender" class="paragraphExtender">显示全文</a>
+            <!-- 相册 -->
+           <!--  <div class="thumbnails">
+              <div class="thumbnail">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrxhiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClxhdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+              </div>
+              <div class="thumbnail">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrxhiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClxhdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+              </div>
+            </div> -->
+          </div>
+          <!-- 结束 post -->
+        </div>
+      </div>
+       <div class="weui-flex">
+            <div class="weui-flex-item" ><div class="placeholder" style="color:black;float:left;background-color: #f8f8f8"><i class="icon icon-79">评论({{forum.review}})</i></div></div>
+  		</div>
+  		
+  		
+<div class="weui_cells" >   
+<div class="weui_cell"  ng-repeat="review in reviewList">
+        <div class="weui_cell_hd"><img src="{{review.headImage}}" alt="" style="width:50px;margin-right:5px;dixhlay:block"></div>
+        <div class="weui_cell_bd weui_cell_primary">
+         	<a class=" " href="javascript:;" style="color: gray;font-size:15px;">
+              <xhan>{{review.username}}</xhan>
+            </a>
+           <div class="toolbar">
+              <p class="timestamp" style="font-size:11px;color:gray;">{{review.time}}</p>
+            </div>
+             <!-- post内容 -->
+            <p id="paragraph" class="paragraph"  style="font-size:15px;">
+             {{review.content}}
+            </p> 
+        </div>
+</div>
+</div>
+<div class="wenwen-footer"> 
+  <div class=" weui_cells">
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <input class="weui_input" placeholder="写评论" ng-model="review.content" type="text">
+        </div>
+         <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="save()">发送</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -16,9 +16,11 @@ import com.mysql.fabric.xmlrpc.base.Array;
 
 import controllers.modules.mobile.bo.WxUserInfoBo;
 import controllers.modules.mobile.bo.XjlDwCheckingBo;
+import controllers.modules.mobile.bo.XjlDwForumBo;
 import controllers.modules.mobile.bo.XjlDwQuizBo;
 import controllers.modules.mobile.bo.XjlDwReplyBo;
 import controllers.modules.mobile.bo.XjlDwReportBo;
+import controllers.modules.mobile.bo.XjlDwReviewBo;
 import controllers.modules.mobile.bo.XjlDwSalaryBo;
 import controllers.modules.mobile.bo.XjlDwSalesBo;
 import controllers.modules.mobile.filter.MobileFilter;
@@ -26,10 +28,12 @@ import models.modules.mobile.WxUser;
 import models.modules.mobile.WxUserInfo;
 import models.modules.mobile.XjlDwChecking;
 import models.modules.mobile.XjlDwCities;
+import models.modules.mobile.XjlDwForum;
 import models.modules.mobile.XjlDwProvinces;
 import models.modules.mobile.XjlDwQuiz;
 import models.modules.mobile.XjlDwReply;
 import models.modules.mobile.XjlDwReport;
+import models.modules.mobile.XjlDwReview;
 import models.modules.mobile.XjlDwSalary;
 import models.modules.mobile.XjlDwSales;
 import play.Logger;
@@ -1038,6 +1042,119 @@ public class Execute  extends MobileFilter {
 		xjlDwReply = XjlDwReplyBo.save(xjlDwReply);
 		ok(xjlDwReply);
 	}
+	/**
+	 * 论坛列表
+	 */
+	public static void doQueryForum(){
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		Map ret = XjlDwForum.doQuery(condition, pageIndex, pageSize);
+		List<Map<String,Object>> listMap = new ArrayList<>();
+		if(null != ret){
+			List<XjlDwForum> data  = (List<XjlDwForum>) ret.get("data");
+			Map<String,Object> _temp = null;
+			boolean flag = true;
+			for (XjlDwForum xjlDwForum : data) {
+				_temp = new HashMap<>();
+				_temp.put("id",xjlDwForum.forumId);
+				WxUser wx = WxUser.getUserByOpenId(xjlDwForum.wxOpenId);
+				WxUserInfo userinfo = WxUserInfo.getFindByOpenId(xjlDwForum.wxOpenId);
+				if(null !=wx){
+					_temp.put("headImage",wx.headImgUrl);
+				}else{
+					_temp.put("headImage","");
+				}
+				_temp.put("username",userinfo ==null?"":userinfo.userinfoName);
+				_temp.put("review",XjlDwReview.doQueryCountByForumId(String.valueOf(xjlDwForum.forumId)));
+				_temp.put("title",xjlDwForum.title);
+				_temp.put("content",xjlDwForum.content);
+				_temp.put("time",DateUtil.showDate(xjlDwForum.createTime,"yyyy-MM-dd HH:mm:ss"));
+				listMap.add(_temp);
+			}
+		}
+		ok(listMap);
+	}
+	/**
+	 * 发帖
+	 */
+	public static void doSaveForum(){
+		WxUser wxuser = getWXUser();
+		String title =  params.get("title");
+		String content = params.get("content");
+		XjlDwForum xjlDwForum = new XjlDwForum();
+		xjlDwForum.title = title;
+		xjlDwForum.content = content;
+		xjlDwForum.wxOpenId = wxuser.wxOpenId;
+		xjlDwForum = XjlDwForumBo.save(xjlDwForum);
+		ok(xjlDwForum);
+	}
+	/**
+	 * 获取发帖详情
+	 */
+	public static void doQueryReview(){
+		String id = params.get("id");
+		XjlDwForum xjlDwForum = XjlDwForum.doQueryByPrimaryKey(id);
+		Map<String,Object> map = new HashMap<>();
+		if(null != xjlDwForum){
+			map.put("id", xjlDwForum.forumId);
+			WxUser wx = WxUser.getUserByOpenId(xjlDwForum.wxOpenId);
+			if(null !=wx){
+				map.put("headImage",wx.headImgUrl);
+			}else{
+				map.put("headImage","");
+			}
+			WxUserInfo userinfo = WxUserInfo.getFindByOpenId(xjlDwForum.wxOpenId);
+			map.put("username",userinfo==null?"":userinfo.userinfoName);
+			map.put("title",xjlDwForum.title);
+			map.put("content", xjlDwForum.content);
+			map.put("review",XjlDwReview.doQueryCountByForumId(String.valueOf(xjlDwForum.forumId)));
+			map.put("time",DateUtil.showDate(xjlDwForum.createTime,"yyyy-MM-dd HH:mm:ss"));
+		}
+		ok(map);
+	}
+	/**
+	 * 得到评论集合
+	 */
+	public static void doQueryReviewList(){
+		String id = params.get("id");
+		Map map = XjlDwReview.doQueryList(id);
+		Map<String,Object> _map =null;
+		List<Map<String,Object>> listmap = new ArrayList<>();
+		if(null !=map){
+			List<XjlDwReview> data = (List<XjlDwReview>) map.get("data");
+			for (XjlDwReview xjlDwReview : data) {
+				_map =  new HashMap<>();
+				_map.put("id",xjlDwReview.reviewId);
+				_map.put("content",xjlDwReview.content);
+				WxUser wx = WxUser.getUserByOpenId(xjlDwReview.wxOpenId);
+				if(null !=wx){
+					_map.put("headImage",wx.headImgUrl);
+				}else{
+					_map.put("headImage","");
+				}
+				WxUserInfo userinfo = WxUserInfo.getFindByOpenId(xjlDwReview.wxOpenId);
+				_map.put("username",userinfo==null?"":userinfo.userinfoName);
+				_map.put("time", DateUtil.showDate(xjlDwReview.createTime,"yyyy-MM-dd HH:mm:ss"));
+				listmap.add(_map);
+			}
+		}
+		ok(listmap);
+	}
+	/**
+	   * 发帖回复
+	   */
+		public static void doReviewAdd(){
+			WxUser wxuser = getWXUser();
+			String content =  params.get("content");
+			String forumId =  params.get("forumId");
+			XjlDwReview xjlDwReview  = new XjlDwReview();
+			xjlDwReview.content = content;
+			xjlDwReview.forumId =Long.parseLong(forumId);
+			xjlDwReview.wxOpenId = wxuser.wxOpenId;
+			xjlDwReview = XjlDwReviewBo.save(xjlDwReview);
+			ok(xjlDwReview);
+		}
 	public static void pushMsgForRegist(){
 		 String wxOpenId = params.get("wxOpenId");
 		 Map<String, Object> mapData = new HashMap<String, Object>();

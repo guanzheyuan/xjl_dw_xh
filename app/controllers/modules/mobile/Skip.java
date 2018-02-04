@@ -363,5 +363,27 @@ public class Skip extends MobileFilter {
 		renderArgs.put("id", params.get("id"));
 		render("modules/xjldw/mobile/consult/consulting_info.html");
 	}
+	/**
+	 * 跳转到论坛列表
+	 */
+	public static void toForumList(){
+		render("modules/xjldw/mobile/forum/forum_list.html");
+	}
+	/**
+	 * 跳转到发帖页面
+	 */
+	public static void toForumAdd(){
+		WxUser wxuser = getWXUser();
+		renderArgs.put("imageUrl", wxuser.headImgUrl);
+		render("modules/xjldw/mobile/forum/forum_add.html");
+	}
+	
+	/**
+	 * 跳转到发帖评论页面
+	 */
+	public static void toForumInfo(){
+		renderArgs.put("id", params.get("id"));
+		render("modules/xjldw/mobile/forum/forum_info.html");
+	}
 	
 }

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>西桓论坛</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script type="text/javascript">
+angular.module('app', ['ngTouch'])
+			.factory('agentRemote', ['$http', function ($http, appValue) {
+				return{
+					valid:function(obj){
+						if(obj.title === ""){
+							 return {flag:false, msg: '发帖标题不能为空'};
+						}
+						if(obj.content === ""){
+							 return {flag:false, msg: '发帖内容不能为空'};
+						}
+						 return {flag: true, msg: '验证通过'};
+					},
+					save:function(obj){
+						 return $http({
+							 method: 'POST',
+		                     url: '/xh/mobile/Execute/doSaveForum',
+		                     data:obj,
+		                     headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+		                     transformRequest:function(obj){
+		                    	 var str = [];    
+		                         for (var p in obj) {    
+		                             str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));    
+		                         }    
+		                         return str.join("&"); 
+		                    }
+						 });
+					}
+				}
+			}])
+			.controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+				$scope.image = '${imageUrl}';
+				$scope.forum = {
+						title:'',
+						content:''
+				}
+				$scope.save = function(){
+					var vaildRes = agentRemote.valid($scope.forum);
+					if(vaildRes.flag){
+						agentRemote.save($scope.forum).then(function(res){
+							$.toast("操作成功");
+							window.location.href='/xh/mobile/Skip/toForumList';
+						})
+					}else{
+						 $.toast(vaildRes.msg, "forbidden");
+					}
+				}
+			}])
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+ <div class="weui-flex">
+ 	<div class="weui-flex-item" style="background-color: #f8f8f8;text-align:center;"><img alt="" src="{{image}}"></div>
+  </div>
+ <div class="weui_cells_title">标题</div>
+ <div class="weui_cells">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" placeholder="请输入标题" ng-model="forum.title" type="text">
+                </div>
+            </div>
+        </div>  
+  <div class="weui_cells_title">发帖内容</div>     
+  <div class="weui_cells weui_cells_form">
+         <div class="weui_cell">
+             <div class="weui_cell_bd weui_cell_primary">
+                 <textarea id="textarea" class="weui_textarea" ng-model="forum.content" placeholder="请输入发帖内容" rows="3"></textarea>
+             </div>
+         </div>
+  </div>
+        <div class="weui_btn_area">
+            <a class="weui_btn weui_btn_primary" href="javascript:" ng-click="save()" id="btn">确定</a>
+        </div>  
+</body>
+</html>
