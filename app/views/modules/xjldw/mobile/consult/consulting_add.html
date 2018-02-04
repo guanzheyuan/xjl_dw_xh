@@ -22,7 +22,7 @@
 angular.module('app', ['ngTouch'])
 			.factory('agentRemote', ['$http', function ($http, appValue) {
 				return{
-					valid:function(title){
+					valid:function(obj){
 						if(obj.title ===""){
 							 return {flag:false, msg: '标题不能为空'};
 						}
