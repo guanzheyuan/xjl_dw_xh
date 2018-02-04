@@ -927,8 +927,10 @@ public class Execute  extends MobileFilter {
 	public static void doConsulAdd(){
 		WxUser wxuser = getWXUser();
 		String title =  params.get("title");
+		String content =  params.get("content");
 		XjlDwQuiz  xjlDwQuiz = new XjlDwQuiz();
 		xjlDwQuiz.title = title;
+		xjlDwQuiz.content = content;
 		xjlDwQuiz.wxOpenId = wxuser.wxOpenId;
 		xjlDwQuiz = XjlDwQuizBo.save(xjlDwQuiz);
 		ok(xjlDwQuiz);
@@ -986,6 +988,7 @@ public class Execute  extends MobileFilter {
 				map.put("username","");
 			}
 			map.put("title",xjlDwQuiz.title);
+			map.put("content",xjlDwQuiz.content);
 			map.put("reply",XjlDwReply.doQueryCountByQuizid(String.valueOf(xjlDwQuiz.quizId)));
 			map.put("time",DateUtil.showDate(xjlDwQuiz.createTime,"yyyy-MM-dd HH:mm:ss"));
 		}

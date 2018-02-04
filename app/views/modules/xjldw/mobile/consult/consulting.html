@@ -92,7 +92,7 @@ angular.module('app', ['ngTouch'])
 </script>
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
- <div class="weui-flex">
+ <div class="weui-flex" style="padding-top:5%;">
  			<div class="weui-flex-item" ><div class="placeholder" style="color:black;float:left;background-color: #f8f8f8">问题({{consuList.length}})</div></div>
             <div class="weui-flex-item" ><div class="placeholder" style="color:black;float:right;background-color: #f8f8f8" onclick="toAdd()"><i class="icon icon-116">提问</i></div></div>
   </div>
@@ -108,6 +108,9 @@ angular.module('app', ['ngTouch'])
             <a class="title" href="javascript:;">
               <span>{{consu.username}}</span>
             </a>
+            <div class="toolbar">
+             <p  class="timestamp">{{consu.time}}</p>
+             </div>
             <!-- post内容 -->
             <p id="paragraph" class="paragraph">
              {{consu.title}}
@@ -124,15 +127,14 @@ angular.module('app', ['ngTouch'])
               </div>
             </div> -->
             <!-- 资料条 -->
-            <div class="toolbar">
-              <p class="timestamp" style="width:150px;">{{consu.time}}</p>
+            <div class="weui-flex" style="height:20px;">
+            <div class="weui-flex-item" ><span id="actionToggle" class="actionToggle" style="background-color:white;padding-right:10%;"><i class="icon icon-80">({{consu.reply}})</i></span></div>
              <!--  <div>
                 <div id="actionMenu" class="actionMenu slideIn">
                   <p class="actionBtn" id="btnLike"><i class="icon icon-79"></i></p>
                   <p class="actionBtn" id="btnComment"><i class="icon icon-3"></i></p>
                 </div>
               </div> -->
-              <span id="actionToggle" class="actionToggle" style="background-color:white;"><i class="icon icon-80">({{consu.reply}})</i></span>
             </div>
            <!--  <!-- 赞／评论区 -->
             <!-- <p class="liketext"><i class="icon icon-96"></i><span class="nickname">Yoby</span>,<span class="nickname">奥巴马</span></p> -->

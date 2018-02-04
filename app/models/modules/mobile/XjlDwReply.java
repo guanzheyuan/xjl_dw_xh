@@ -28,15 +28,15 @@ public class XjlDwReply extends GenericModel  {
 	public Long quizId;
 	@Column(name = "content")
 	public String content;
-	@Column(name = "WX_OPEN_ID")
+	@Column(name = "wx_open_id")
 	public String wxOpenId;
-	@Column(name = "STATUS")
+	@Column(name = "status")
 	public String status;
-	@Column(name = "CREATE_TIME")
+	@Column(name = "create_time")
 	public Date createTime;
 	
 	public static int doQueryCountByQuizid(String quizId){
-		String sql = "select * from xjl_dw_reply where status='0AA' and quiz_id='"+quizId+"'";
+		String sql = "select count(1) from xjl_dw_reply where status='0AA' and quiz_id='"+quizId+"'";
 		Map<String,String> condition = new HashMap<>();
     	SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwReply> data = ModelUtils.queryData(1,10, ret);
@@ -51,7 +51,7 @@ public class XjlDwReply extends GenericModel  {
 		String sql = "select * from xjl_dw_reply where status='0AA' and quiz_id='"+quizId+"' order by create_time desc ";
 		Map<String,String> condition = new HashMap<>();
     	SQLResult ret = ModelUtils.createSQLResult(condition, sql);
-		List<XjlDwReply> data = ModelUtils.queryData(1,999999, ret);
+		List<XjlDwReply> data = ModelUtils.queryData(1,999999, ret,XjlDwReply.class);
 		return ModelUtils.createResultMap(ret, data);
 	}
 }

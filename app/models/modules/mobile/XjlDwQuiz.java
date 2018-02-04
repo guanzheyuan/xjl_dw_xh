@@ -40,7 +40,7 @@ public class XjlDwQuiz extends GenericModel  {
 	public List<XjlDwReply> listMap = null;
 	
 	public static Map doQueryQuiz(Map<String, String> condition,int pageIndex, int pageSize){
-		String sql="select * from xjl_dw_quiz where status='0AA'";
+		String sql="select * from xjl_dw_quiz where status='0AA' order by CREATE_TIME desc";
 		SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwQuiz> data = ModelUtils.queryData(pageIndex, pageSize, ret, XjlDwQuiz.class);
 		return ModelUtils.createResultMap(ret, data);

@@ -1065,13 +1065,13 @@ public class DateUtil {
           long s=(l/1000-days*24*60*60-hours*60*60-min*60);
           if(days > 0){
                   if(days>0 && days<2){
-                      result ="前天"+hour+"点"+minute+"分";                           
+                      result ="前天"+hour+":"+minute+"";                           
                   } else {
-                      result = yearNum%100+"年"+month+"月 "+day+"日"+hour+"点"+minute+"分";
+                      result = yearNum+"-"+month+"-"+day+" "+hour+":"+minute+"";
                   }
           }else if(hours > 0 ) {
                    if(day!=nowDay){
-                       result = "昨天"+hour+"点"+minute+"分";
+                       result = "昨天"+hour+":"+minute+"";
                    }else{
                        result=hours+"小时 前";    
                    }

@@ -23,7 +23,13 @@ angular.module('app', ['ngTouch'])
 			.factory('agentRemote', ['$http', function ($http, appValue) {
 				return{
 					valid:function(title){
-						if(title === ""){
+						if(obj.title ===""){
+							 return {flag:false, msg: '标题不能为空'};
+						}
+						if(obj.title.length >16){
+							 return {flag:false, msg: '标题长度已超出'};
+						}
+						if(obj.content === ""){
 							 return {flag:false, msg: '提问不能为空'};
 						}
 						 return {flag: true, msg: '验证通过'};
@@ -48,10 +54,11 @@ angular.module('app', ['ngTouch'])
 			.controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
 				$scope.image = '${imageUrl}';
 				$scope.consu = {
-						title:''
+						title:'',
+						content:''
 				}
 				$scope.save = function(){
-					var vaildRes = agentRemote.valid($scope.consu.title);
+					var vaildRes = agentRemote.valid($scope.consu);
 					if(vaildRes.flag){
 						agentRemote.save($scope.consu).then(function(res){
 							$.toast("操作成功");
@@ -68,11 +75,19 @@ angular.module('app', ['ngTouch'])
    <div class="weui-flex">
  	<div class="weui-flex-item" style="background-color: #f8f8f8;text-align:center;"><img alt="" src="{{image}}"></div>
   </div>
+  <div class="weui_cells_title">标题</div>
+ <div class="weui_cells">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" placeholder="请输入标题"  ng-model="consu.title" type="text">
+                </div>
+            </div>
+  </div> 
   <div class="weui_cells_title">提问内容</div>     
   <div class="weui_cells weui_cells_form">
          <div class="weui_cell">
              <div class="weui_cell_bd weui_cell_primary">
-                 <textarea id="textarea" class="weui_textarea" ng-model="consu.title" placeholder="请输入咨询问题" rows="3"></textarea>
+                 <textarea id="textarea" class="weui_textarea" ng-model="consu.content" placeholder="请输入咨询问题" rows="3"></textarea>
              </div>
          </div>
   </div>

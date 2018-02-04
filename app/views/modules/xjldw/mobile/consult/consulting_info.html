@@ -154,6 +154,9 @@ angular.module('app', ['ngTouch'])
             <a class="title" href="javascript:;">
               <span>{{consu.username}}</span>
             </a>
+             <div class="toolbar">
+              <p class="timestamp">{{consu.time}}</p>
+            </div>
             <!-- post内容 -->
             <p id="paragraph" class="paragraph">
              {{consu.title}}
@@ -170,10 +173,10 @@ angular.module('app', ['ngTouch'])
               </div>
             </div> -->
             <!-- 资料条 -->
-            <div class="toolbar">
+            <!-- <div class="toolbar">
               <p class="timestamp">{{consu.time}}</p>
-             <!--  <span id="actionToggle" class="actionToggle">..</span> -->
-            </div>
+              <span id="actionToggle" class="actionToggle">..</span>
+            </div> -->
           </div>
           <!-- 结束 post -->
         </div>
@@ -187,16 +190,16 @@ angular.module('app', ['ngTouch'])
 <div class="weui_cell"  ng-repeat="reply in replyList">
         <div class="weui_cell_hd"><img src="{{reply.headImage}}" alt="" style="width:50px;margin-right:5px;display:block"></div>
         <div class="weui_cell_bd weui_cell_primary">
-         	<a class="title" href="javascript:;">
+         	<a class=" " href="javascript:;" style="color: gray;font-size:15px;">
               <span>{{reply.username}}</span>
             </a>
-             <!-- post内容 -->
-            <p id="paragraph" class="paragraph">
-             {{reply.content}}
-            </p>
-             <div class="toolbar">
+            <div class="toolbar">
               <p class="timestamp" style="font-size:11px;color:gray;">{{reply.time}}</p>
             </div>
+             <!-- post内容 -->
+            <p id="paragraph" class="paragraph" style="font-size:15px;">
+             {{reply.content}}
+            </p>
         </div>
 </div>
 </div>
