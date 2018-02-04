@@ -48,7 +48,7 @@ public class XjlDwReply extends GenericModel  {
 	}
 	
 	public static Map doQueryByPrimaryKey(String quizId){
-		String sql = "select * from xjl_dw_reply where status='0AA' and quiz_id='"+quizId+"'";
+		String sql = "select * from xjl_dw_reply where status='0AA' and quiz_id='"+quizId+"' order by create_time desc ";
 		Map<String,String> condition = new HashMap<>();
     	SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwReply> data = ModelUtils.queryData(1,999999, ret);

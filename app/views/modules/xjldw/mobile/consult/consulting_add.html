@@ -51,10 +51,15 @@ angular.module('app', ['ngTouch'])
 						title:''
 				}
 				$scope.save = function(){
-					agentRemote.save($scope.consu).then(function(res){
-						$.toast("操作成功");
-						window.location.href='/xh/mobile/Skip/toProductConsult';
-					})
+					var vaildRes = agentRemote.valid($scope.consu.title);
+					if(vaildRes.flag){
+						agentRemote.save($scope.consu).then(function(res){
+							$.toast("操作成功");
+							window.location.href='/xh/mobile/Skip/toProductConsult';
+						})
+					}else{
+						 $.toast(vaildRes.msg, "forbidden");
+					}
 				}
 			}])
 </script>

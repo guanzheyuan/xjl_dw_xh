@@ -137,7 +137,7 @@ angular.module('app', ['ngTouch'])
     	 $scope.userName = '${userinfoName}';
     	 $scope.userOpenid='${openid}';
     	 $scope.isChecking = false;
-    	 $scope.ismodify = false;
+    	 $scope.ismodify = 'false';
     	 $scope.salaryId="";
     	 $scope.allCount = 0;
     	 $scope.allDay = "";
@@ -186,11 +186,72 @@ angular.module('app', ['ngTouch'])
  			};
  			$("#monthDate").mobiscroll($.extend(opt['date'], opt['default']));
  	  }
+    	 $scope.isback = function(){
+   	    	var isback = sessionStorage.getItem('isback');
+   	    	if(isback=='true'){
+   	    		 $scope.salary.basicSalary = sessionStorage.getItem('basicSalary');
+  			     $scope.salary.subsidy = sessionStorage.getItem('subsidy');
+  			     $scope.salary.bonus=sessionStorage.getItem('bonus');
+  			     $scope.salary.telcharge=sessionStorage.getItem('telcharge');
+  			     $scope.salary._float=sessionStorage.getItem('_float');
+  			     $scope.salary.otherdeductions=sessionStorage.getItem('otherdeductions');
+  			     $scope.salary.reportwithhold=sessionStorage.getItem('reportwithhold');
+  			     $scope.salary.reportwidthholdContent=sessionStorage.getItem('reportwidthholdContent');
+  			     $scope.salary.otherwithholdcontent=sessionStorage.getItem('otherwithholdcontent');
+  			     $scope.salary.incometax=sessionStorage.getItem('incometax');
+  			     $scope.salary.insurance=sessionStorage.getItem('insurance');
+  			     $scope.ismodify = sessionStorage.getItem('ismodify');
+  			     $scope.salaryId =  sessionStorage.getItem('salaryId');
+  			     $scope.allCount =  sessionStorage.getItem('allCount');
+  			     $("#basicSalary").val($scope.salary.basicSalary);
+ 	   			 $("#subsidy").val( $scope.salary.subsidy);
+ 	   			 $("#bonus").val($scope.salary.bonus);
+ 	   			 $("#telcharge").val( $scope.salary.telcharge);
+ 	   			 $("#_float").val($scope.salary._float);
+ 	   			 $("#insurance").val( $scope.salary.insurance);
+ 	   			 $("#reportwithhold").val($scope.salary.reportwithhold);
+ 	   			 $("#otherdeductions").val( $scope.salary.otherdeductions);
+ 			     $("#incometax").val($scope.salary.incometax);
+ 			     $("#reportwidthholdContent").val($scope.salary.reportwidthholdContent==='null'?"":$scope.salary.reportwidthholdConten);
+ 			     $("#otherwithholdcontent").val($scope.salary.otherwithholdcontent==='null'?"":$scope.salary.otherwithholdcontent);
+ 			     sessionStorage.removeItem('isback');
+ 			     sessionStorage.removeItem('basicSalary');
+   	    		 sessionStorage.removeItem('subsidy');
+   	    		 sessionStorage.removeItem('bonus');
+   	    		 sessionStorage.removeItem('telcharge');
+   	    		 sessionStorage.removeItem('_float');
+   	    		 sessionStorage.removeItem('insurance');
+   	    		 sessionStorage.removeItem('reportwithhold');
+   	    		 sessionStorage.removeItem('otherdeductions');
+   	    		 sessionStorage.removeItem('incometax');
+   	    		 sessionStorage.removeItem('reportwidthholdContent');
+   	    		 sessionStorage.removeItem('otherwithholdcontent');
+   	    		 sessionStorage.removeItem('ismodify');
+   	    		 sessionStorage.removeItem('salaryId');
+   	    		 sessionStorage.removeItem('allCount');
+   	    	}
+   	     }
+     	
     	 $scope.salaryChecking = function(){
     		 if("" != $("#monthDate").val()){
     			 $scope.salary.month = $("#monthDate").val()
     		 }
     		 window.location.href="/xh/mobile/Skip/toChecking?userinfoId="+$scope.salary.userInfoId;
+    		 sessionStorage.setItem('isback',true);
+    		 sessionStorage.setItem('basicSalary',$scope.salary.basicSalary);
+    		 sessionStorage.setItem('subsidy',$scope.salary.subsidy);
+    		 sessionStorage.setItem('bonus',$scope.salary.bonus);
+    		 sessionStorage.setItem('telcharge',$scope.salary.telcharge);
+    		 sessionStorage.setItem('_float',$scope.salary._float);
+    		 sessionStorage.setItem('insurance',$scope.salary.insurance);
+    		 sessionStorage.setItem('reportwithhold',$scope.salary.reportwithhold);
+    		 sessionStorage.setItem('otherdeductions',$scope.salary.otherdeductions);
+    		 sessionStorage.setItem('incometax',$scope.salary.incometax);
+    		 sessionStorage.setItem('reportwidthholdContent', $scope.salary.reportwidthholdContent);
+    		 sessionStorage.setItem('otherwithholdcontent',$scope.salary.otherwithholdcontent);
+    		 sessionStorage.setItem('ismodify',$scope.ismodify);
+    		 sessionStorage.setItem('salaryId',$scope.salaryId);
+    		 sessionStorage.setItem('allCount', $scope.allCount);
     	 }
     	 $scope.calculate = function(){
     		 console.log('进入');
@@ -248,7 +309,7 @@ angular.module('app', ['ngTouch'])
      			     $scope.salary.insurance=res.data.data.insurance;
      			     $scope.allCount = res.data.data.total;
         			 $scope.salaryId = res.data.data.salaryId;
-     			     $scope.ismodify = true;
+     			     $scope.ismodify ='true';
     			 }else{
     				 $("#basicSalary").val(0);
         			 $("#subsidy").val(0);
@@ -268,7 +329,7 @@ angular.module('app', ['ngTouch'])
     			     $scope.salary.incometax=0;
     			     $scope.salary.insurance=0;
      			     $scope.allCount = 0 ;
-     			    $scope.ismodify =false;
+     			    $scope.ismodify ='false';
     			 }
     		 })
     	 }
@@ -284,13 +345,12 @@ angular.module('app', ['ngTouch'])
     		 });
     	 }
     	 $scope.save = function(){
-    		 console.log($scope.salary);
     		 if("" != $("#monthDate").val()){
     			 $scope.salary.month = $("#monthDate").val()
     		 }
     		var vaildRes  = agentRemote.valid($scope.salary);
     		  if(vaildRes.flag){
-    			  if(!$scope.ismodify){
+    			  if($scope.ismodify == 'false'){
     				  agentRemote.save($scope.salary,$scope.allCount).then(function(res){
         				  if (res.data.ret == '-1') {
     		    			  $.toast(res.data.desc, "forbidden");
@@ -316,9 +376,12 @@ angular.module('app', ['ngTouch'])
    			  console.log($scope.userList);
    		  })
    	  }
-   	    $scope.initUser();
-    	 $scope.loadMobiscroll();
+    	 console.log();
+  		 $scope.initUser();
+  	     $scope.loadMobiscroll();
+  	     $scope.isback();
      }]);
+     
 </script>
 </head>
 </head>
@@ -342,15 +405,6 @@ angular.module('app', ['ngTouch'])
                   <input type="text" class="weui_input" name="USER_AGE" id="monthDate" readonly placeholder="请填写月份" />
               </div>
      </div>
-     <div class="weui_cell">
-	         <div class="weui_cell_hd"><label class="weui_label">考勤浮动</label></div>
-	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="number" id="_float"   ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
-	         </div>
-	          <div class="weui_cell_ft">
-                    <a href="javascript:;" class="weui-vcode-btn" ng-click="salaryChecking()">考勤查看</a>
-                </div>
-    </div>
      <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">基本工资</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
@@ -381,6 +435,15 @@ angular.module('app', ['ngTouch'])
 	             <input class="weui_input" type="number" id="insurance"  pattern="[0-9]*"  ng-change="calculate()" placeholder="请填写社会保险" ng-model="salary.insurance"/>
 	         </div>
     </div>
+      <div class="weui_cell">
+	         <div class="weui_cell_hd"><label class="weui_label">考勤浮动</label></div>
+	         <div class="weui_cell_bd weui_cell_primary">
+	             <input class="weui_input" type="number" id="_float"   ng-change="calculate()"  placeholder="请填写考勤浮动" ng-model="salary._float"/>
+	         </div>
+	          <div class="weui_cell_ft">
+                    <a href="javascript:;" class="weui-vcode-btn" ng-click="salaryChecking()">考勤查看</a>
+                </div>
+    </div>
     <div class="weui_cell">
 	         <div class="weui_cell_hd"><label class="weui_label">述职扣款</label></div>
 	         <div class="weui_cell_bd weui_cell_primary">
@@ -400,7 +463,7 @@ angular.module('app', ['ngTouch'])
     </div>
     <div class="weui_cell">
 	         <div class="weui_cell_bd weui_cell_primary">
-	             <input class="weui_input" type="text"    placeholder="请填写扣款说明" ng-model="salary.otherwithholdcontent"/>
+	             <input class="weui_input" type="text" id="otherwithholdcontent""   placeholder="请填写扣款说明" ng-model="salary.otherwithholdcontent"/>
 	         </div>
     </div>
      <div class="weui_cell">

@@ -97,8 +97,11 @@ angular.module('app', ['ngTouch'])
             <a href="javascript:;" class="weui_btn weui_btn_mini bg-blue" id="audit"    ng-click="changeAudit(0)">待审核</a>
        </div>
        <div class="weui_panel_bd" >
-          <div class="weui_media_box weui_media_text" ng-show="auditList.length==0">
+          <div class="weui_media_box weui_media_text" ng-show="auditList.length==0 && audit.userinfoType == ''">
           	 <h6 class="weui_media_title">暂无待审核数据....</h6>
+          </div>
+          <div class="weui_media_box weui_media_text" ng-show="auditList.length==0 && audit.userinfoType != ''">
+          	 <h6 class="weui_media_title">暂无已审核数据....</h6>
           </div>
            <div class="weui_media_box weui_media_text" ng-repeat="audit in auditList" >
 	           <div  ng-if="audit.userinfoType == ''">

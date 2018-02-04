@@ -42,7 +42,7 @@ angular.module('app', ['ngTouch'])
 	$scope.onclick = function(id){
 		window.location.href='/xh/mobile/Skip/toConsultingInfo?id='+id;
 	}
-	$scope.initCss = function(){
+	$scope.initCss = function(id){
 		//定义文本
 		const paragraph = $('#paragraph');
 		const paragraphText = paragraph.text();
@@ -50,7 +50,7 @@ angular.module('app', ['ngTouch'])
 		//定义文章长度
 		const maxParagraphLength = 80;
 		//定义全文按钮
-		const paragraphExtender = $('#paragraphExtender');
+		const paragraphExtender = $('#'+id);
 		var toggleFullParagraph = false;
 
 		//定义全文按钮
@@ -78,12 +78,16 @@ angular.module('app', ['ngTouch'])
 		agentRemote.queryList().then(function(res){
 			console.log(res);
 			$scope.consuList = res.data.data;
+			setTimeout(function () {
+				if($scope.consuList.length >0){
+					for(var i = 0; i<$scope.consuList.length;i++){
+						$scope.initCss($scope.consuList[i].id); 
+					}
+				}
+			 },500);
 		});
 	}
 	$scope.init();
-	setTimeout(function () {
-		$scope.initCss();
-	 },500);
 }])
 </script>
 </head>
@@ -109,14 +113,14 @@ angular.module('app', ['ngTouch'])
              {{consu.title}}
             </p>
             <!-- 伸张链接 -->
-            <a id="paragraphExtender" class="paragraphExtender">显示全文</a>
+            <a id="{{consu.id}}" class="paragraphExtender">显示全文</a>
             <!-- 相册 -->
            <!--  <div class="thumbnails">
               <div class="thumbnail">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrxhiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
               </div>
               <div class="thumbnail">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrxhiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
               </div>
             </div> -->
             <!-- 资料条 -->

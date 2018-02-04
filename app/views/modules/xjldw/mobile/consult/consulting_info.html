@@ -18,6 +18,9 @@
 <script src="/xh/public/widgets/angularjs/angular.min.js"></script>
 <script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
 <script src="/xh/public/js/zepto.min.js"></script>
+<style type="text/css">
+  .wenwen-footer{width:100%;position:fixed;bottom:0px; background:#fff;padding:3%;box-sizing:border-box;}
+</style>
 <script type="text/javascript">
 function toAdd(){
 	window.location.href='/xh/mobile/Skip/toConsultingAdd';
@@ -25,6 +28,12 @@ function toAdd(){
 angular.module('app', ['ngTouch'])
 .factory('agentRemote', ['$http', function ($http, appValue) {
 	return{
+		valid:function(content){
+			if(content === ""){
+				 return {flag:false, msg: '回复不能为空'};
+			}
+			 return {flag: true, msg: '验证通过'};
+		},
 		query:function(id){
 			 return $http({
 				 method: 'GET',
@@ -33,12 +42,41 @@ angular.module('app', ['ngTouch'])
                 	 id:id
                  }
 			 });
+		},
+		queryReply:function(id){
+			return $http({
+				 method: 'GET',
+                url: '/xh/mobile/Execute/doQueryReplayList',
+                params:{
+               	 id:id
+                }
+			 });
+		},
+		save:function(obj){
+			return $http({
+				 method: 'POST',
+                url: '/xh/mobile/Execute/doReplyAdd',
+                data:obj,
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+                transformRequest:function(obj){
+               	 var str = [];    
+                    for (var p in obj) {    
+                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));    
+                    }    
+                    return str.join("&"); 
+               }
+			 });
 		}
 	}
 }])
 .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
 	$scope.quizId='${id}';
 	$scope.consu = [];
+	$scope.reply = {
+			quizId:'${id}',
+			content:''
+	}
+	$scope.replyList = [];
 	$scope.initCss = function(){
 		//定义文本
 		const paragraph = $('#paragraph');
@@ -71,9 +109,25 @@ angular.module('app', ['ngTouch'])
 		const menuBtn = $('#actionToggle');
 		menuBtn.click(function(){menu.toggleClass('active')});
 	}
+	$scope.save = function(){
+		var vaildRes = agentRemote.valid($scope.reply.content);
+		if(vaildRes.flag){
+			agentRemote.save($scope.reply).then(function(res){
+				  $.toast("操作成功");
+				  window.location.href='/xh/mobile/Skip/toConsultingInfo?id=${id}';
+			})
+		}else{
+			 $.toast(vaildRes.msg, "forbidden");
+		}
+	}
+	$scope.initReply = function(){
+		agentRemote.queryReply($scope.quizId).then(function(res){
+			console.log(res.data.data);
+			$scope.replyList  = res.data.data;
+		})
+	}
 	$scope.init = function(){
 		agentRemote.query($scope.quizId).then(function(res){
-			console.log(res);
 			$scope.consu= res.data.data;
 			setTimeout(function () {
 				$scope.initCss();
@@ -81,14 +135,14 @@ angular.module('app', ['ngTouch'])
 		});
 	}
 	$scope.init();
+	$scope.initReply();
 }])
 </script>
 </head>
 <body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
- <div class="weui-flex">
+<div class="weui-flex">
             <div class="weui-flex-item" ><div class="placeholder" style="color:black;float:right;background-color: #f8f8f8" onclick="toAdd()"><i class="icon icon-116">提问</i></div></div>
   </div>
- <!-- 开始 朋友圈 -->
       <div class="weui_cells moments">
         <!-- 普通的post -->
         <div class="weui_cell moments__post">
@@ -109,33 +163,53 @@ angular.module('app', ['ngTouch'])
             <!-- 相册 -->
            <!--  <div class="thumbnails">
               <div class="thumbnail">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrxhiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
               </div>
               <div class="thumbnail">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrxhiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
               </div>
             </div> -->
             <!-- 资料条 -->
             <div class="toolbar">
               <p class="timestamp">{{consu.time}}</p>
-              <span id="actionToggle" class="actionToggle">..</span>
+             <!--  <span id="actionToggle" class="actionToggle">..</span> -->
             </div>
           </div>
           <!-- 结束 post -->
         </div>
       </div>
-      <!-- 结束 朋友圈 -->       
        <div class="weui-flex">
             <div class="weui-flex-item" ><div class="placeholder" style="color:black;float:left;background-color: #f8f8f8"><i class="icon icon-79">回复({{consu.reply}})</i></div></div>
   		</div>
   		
   		
-<div class="weui_cells">
+<div class="weui_cells" >   
+<div class="weui_cell"  ng-repeat="reply in replyList">
+        <div class="weui_cell_hd"><img src="{{reply.headImage}}" alt="" style="width:50px;margin-right:5px;display:block"></div>
+        <div class="weui_cell_bd weui_cell_primary">
+         	<a class="title" href="javascript:;">
+              <span>{{reply.username}}</span>
+            </a>
+             <!-- post内容 -->
+            <p id="paragraph" class="paragraph">
+             {{reply.content}}
+            </p>
+             <div class="toolbar">
+              <p class="timestamp" style="font-size:11px;color:gray;">{{reply.time}}</p>
+            </div>
+        </div>
+</div>
+</div>
+<div class="wenwen-footer"> 
+  <div class=" weui_cells">
     <div class="weui_cell">
         <div class="weui_cell_bd weui_cell_primary">
-            <input class="weui_input" placeholder="写回复" type="text">
+            <input class="weui_input" placeholder="写回复" ng-model="reply.content" type="text">
         </div>
+         <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="save()">发送</a>
     </div>
-</div>  
+  </div>
+</div>
 </body>
-</html>
+</html> 
+

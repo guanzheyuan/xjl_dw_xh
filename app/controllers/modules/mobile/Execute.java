@@ -17,6 +17,7 @@ import com.mysql.fabric.xmlrpc.base.Array;
 import controllers.modules.mobile.bo.WxUserInfoBo;
 import controllers.modules.mobile.bo.XjlDwCheckingBo;
 import controllers.modules.mobile.bo.XjlDwQuizBo;
+import controllers.modules.mobile.bo.XjlDwReplyBo;
 import controllers.modules.mobile.bo.XjlDwReportBo;
 import controllers.modules.mobile.bo.XjlDwSalaryBo;
 import controllers.modules.mobile.bo.XjlDwSalesBo;
@@ -117,7 +118,8 @@ public class Execute  extends MobileFilter {
 	public static void doModifyUserInfoIsPass(){
 		String status = params.get("status");
 		String id = params.get("id");
-		int ret = WxUserInfo.modifyUserInfoIsPass(id, status);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
+		int ret = WxUserInfo.modifyUserInfoIsPass(id, status,sdf.format(new Date()));
 		ok(ret);
 	}
 	
@@ -295,6 +297,7 @@ public class Execute  extends MobileFilter {
 		}else{
 			wxOpenId = wxuser.wxOpenId;
 		}
+		WxUserInfo userInfo = WxUserInfo.getFindByOpenId(wxOpenId);
 		Logger.info("参数年："+year);
 		Logger.info("参数月："+month);
 		Map ret = XjlDwChecking.queryCheckingByMonth(wxOpenId, String.valueOf(Integer.parseInt(month)),year);
@@ -319,6 +322,10 @@ public class Execute  extends MobileFilter {
 				_map.put("isNow",sf.format(now).equals(xjlDwChecking.workDate));
 				listMap.add(_map);
 			}
+			String time = "";
+			if(null !=userInfo){
+				time = userInfo.auditTime;
+			}
 			//统计是否有漏打卡日期
 			if(!listMap.isEmpty()){
 				int count = 0;
@@ -335,7 +342,7 @@ public class Execute  extends MobileFilter {
 						calendar.setTime(gcLast.getTime());  
 					    calendar.add(Calendar.DAY_OF_MONTH, -1);  
 						for (int i = 0; i < 30; i++) {
-							if(calendar.getTime().getTime() <now.getTime()){
+							if(calendar.getTime().getTime() <now.getTime() && calendar.getTime().getTime()>sf.parse(time).getTime()){
 								Logger.info("小于今天日期"+sf.format(calendar.getTime()));
 								calendar.setTime(gcLast.getTime());  
 							    calendar.add(Calendar.DAY_OF_MONTH, +i);  
@@ -984,8 +991,50 @@ public class Execute  extends MobileFilter {
 		}
 		ok(map);
 	}
-	
-	
+	/**
+	 * 得到回复内容集合
+	 */
+	public static void doQueryReplayList(){
+		String id = params.get("id");
+		Map map = XjlDwReply.doQueryByPrimaryKey(id);
+		Map<String,Object> _map =null;
+		List<Map<String,Object>> listmap = new ArrayList<>();
+		if(null !=map){
+			List<XjlDwReply> data = (List<XjlDwReply>) map.get("data");
+			Logger.info("回复列表统计数量："+data.size());
+			for (XjlDwReply xjlDwReply : data) {
+				_map =  new HashMap<>();
+				Logger.info(""+xjlDwReply.replyId);
+				_map.put("id",xjlDwReply.replyId);
+				_map.put("content",xjlDwReply.content);
+				WxUser wx = WxUser.getUserByOpenId(xjlDwReply.wxOpenId);
+				if(null !=wx){
+					_map.put("headImage",wx.headImgUrl);
+					_map.put("username",wx.nickName);
+				}else{
+					_map.put("headImage","");
+					_map.put("username","");
+				}
+				_map.put("time", DateUtil.showDate(xjlDwReply.createTime,"yyyy-MM-dd HH:mm:ss"));
+				listmap.add(_map);
+			}
+		}
+		ok(listmap);
+	}
+	/**
+	 * 回复提问
+	 */
+	public static void doReplyAdd(){
+		WxUser wxuser = getWXUser();
+		String content =  params.get("content");
+		String quizId =  params.get("quizId");
+		XjlDwReply xjlDwReply = new XjlDwReply();
+		xjlDwReply.quizId = Long.parseLong(quizId);
+		xjlDwReply.content = content;
+		xjlDwReply.wxOpenId = wxuser.wxOpenId;
+		xjlDwReply = XjlDwReplyBo.save(xjlDwReply);
+		ok(xjlDwReply);
+	}
 	public static void pushMsgForRegist(){
 		 String wxOpenId = params.get("wxOpenId");
 		 Map<String, Object> mapData = new HashMap<String, Object>();

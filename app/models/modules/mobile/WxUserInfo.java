@@ -64,6 +64,9 @@ public class WxUserInfo  extends GenericModel{
 	@Column(name = "ISADMIN")
 	public String isadmin;
 	
+	@Column(name = "audit_time")
+	public String auditTime;
+	
 	@Transient
 	public String address;
 	
@@ -136,7 +139,7 @@ public class WxUserInfo  extends GenericModel{
 	    }
 		if(StringUtil.isNotEmpty(condition.get("userinfoType"))){
 			String searchKeyWord = condition.get("userinfoType");
-			sql += "and a.USERINFO_TYPE !='' ";
+			sql += "and a.USERINFO_TYPE !='' and isadmin is null ";
 	    }
 		if(StringUtil.isNotEmpty(condition.get("userInfoId"))){
 			String searchKeyWord = condition.get("userInfoId");
@@ -150,9 +153,8 @@ public class WxUserInfo  extends GenericModel{
 				wxUserInfo.userinfoTypeName = "0".equals(wxUserInfo.userinfoType)?"销售":"商务";
 			}
 			XjlDwReport report = XjlDwReport.queryReportByMonth(condition.get("year"), condition.get("month"), wxUserInfo.wxOpenId);
-			Logger.info("得到每个人对应月份的报告："+report.reportId);
-			wxUserInfo.report = null ==report?"false":sf.format(report.createTime);
-			wxUserInfo.reportId = null == report?"false":String.valueOf(report.reportId);
+				wxUserInfo.report = null ==report?"false":sf.format(report.createTime);
+				wxUserInfo.reportId = null == report?"false":String.valueOf(report.reportId);
 		}
 		return ModelUtils.createResultMap(ret, data);
 	}
@@ -288,8 +290,8 @@ public class WxUserInfo  extends GenericModel{
 	 * @param status
 	 * @return
 	 */
-	public static int modifyUserInfoIsPass(String id,String status){
-		String sql="update xjl_dw_userinfo set status='"+status+"' where USERINFO_ID='"+id+"'";
+	public static int modifyUserInfoIsPass(String id,String status,String time){
+		String sql="update xjl_dw_userinfo set status='"+status+"',audit_time='"+time+"' where USERINFO_ID='"+id+"'";
 		Map<String, String> condition = new HashMap<String, String>();
 		return ModelUtils.executeDelete(condition, sql);
 	}
