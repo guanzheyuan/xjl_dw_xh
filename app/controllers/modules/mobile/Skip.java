@@ -32,7 +32,7 @@ public class Skip extends MobileFilter {
 		}
 		  
     }
-	
+	 
 	public static void pushMsgForRegist(String wxOpenId){
 		 Map<String, Object> mapData = new HashMap<String, Object>();
 		 Map<String, Object> mapDataSon = new HashMap<String, Object>();
