@@ -385,5 +385,10 @@ public class Skip extends MobileFilter {
 		renderArgs.put("id", params.get("id"));
 		render("modules/xjldw/mobile/forum/forum_info.html");
 	}
-	
+	/**
+	 * 跳转到资料存储列表
+	 */
+	public static void toStoreList(){
+		render("modules/xjldw/mobile/store/store_list.html");
+	}
 }

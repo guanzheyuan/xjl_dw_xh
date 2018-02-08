@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta charset="UTF-8">
+<title>资料存储</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"/>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="yes" name="apple-touch-fullscreen" />
+<meta content="telephone=no" name="format-detection" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<link rel="stylesheet" href="/xh/public/weui/css/weui.css">
+<link rel="stylesheet" href="/xh/public/weui/css/weui2.css"/>
+<link rel="stylesheet" href="/xh/public/weui/css/weui3.css"/>
+<script src="/xh/public/widgets/layer.m/layer.m.js"></script>
+<script src="/xh/public/widgets/zeptojs/zepto.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular.min.js"></script>
+<script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
+<script src="/xh/public/js/zepto.min.js"></script>
+<script>
+angular.module('app', ['ngTouch'])
+.factory('agentRemote', ['$http', function ($http, appValue) {
+	return{
+		queryList:function(obj){
+			 return $http({
+				 method: 'GET',
+                 url: '/xh/mobile/Execute/doQueryStoreList'
+			 });
+		},
+		queryByTitle:function(title){
+			 return $http({
+				 method: 'GET',
+                 url: '/xh/mobile/Execute/doQueryStoreByTitle',
+                 params:{
+                	 title:title
+                 }
+			 });
+		}
+	}
+}])
+.controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
+	$scope.storeList = [];
+	$scope.initSearch = function(){
+		$('.searchbar_wrap').searchBar({
+		    cancelText:"取消",
+		    searchText:'关键字',
+		    onfocus: function (value) {
+		        console.log(value);
+		        $scope.queryTitle(value);
+		    },
+		    onblur:function(value) {
+		    	  console.log(value);
+		    	  $scope.queryTitle(value);
+		    },
+		    oninput: function(value) {
+		    	  console.log(value);
+		    	  $scope.queryTitle(value);
+		    },
+		    onsubmit:function(value){
+		    	  console.log(value);
+		    	  $scope.queryTitle(value);
+		    },
+		    oncancel:function(){
+		    	  console.log(value);
+		    	  $scope.queryTitle(value);
+		    },
+		    onclear:function(){
+		    	  console.log(value);
+		    	  $scope.queryTitle(value);
+		    }
+		});
+	}
+	$scope.queryTitle = function(title){
+		agentRemote.queryByTitle(title).then(function(res){
+			 $scope.storeList  = res.data.data.data;
+		 })
+	}
+	$scope.init = function(){
+		agentRemote.queryList().then(function(res){
+			console.log(res);
+			$scope.storeList  = res.data.data.data;
+		});
+	}
+	$scope.init();
+	setTimeout(function () {
+		$scope.initSearch();
+    }, 500);
+	
+}])
+</script>
+</head>
+<body ng-cloak ng-controller="MainController" ontouchstart style="background-color: #f8f8f8;">
+<p class="page-hd-desc"></p>
+<div class="searchbar_wrap">
+</div>
+<div class="weui-flex">
+	<div class="weui-flex-item" ><div class="placeholder" style="color:black;float:left;background-color: #f8f8f8">文件({{storeList.length}})</div></div>
+</div>
+ <div class="weui_cells">
+        <div class="weui_cell" ng-repeat="store in storeList">
+          <div class="weui_cell_bd weui_cell_primary">
+              <p>{{store.title}}</p>
+          </div>
+          <div class="weui_cell_ft">{{store.time}}</div>
+      </div>
+ </div>
+</body>
+</html>

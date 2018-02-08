@@ -66,6 +66,16 @@ angular.module('app', ['ngTouch'])
                     return str.join("&"); 
                }
 			 });
+		},
+		doLike:function(replyId,like){
+			return $http({
+				 method: 'GET',
+	             url: '/xh/mobile/Execute/doConLikeAdd',
+	             params:{
+	            	 replyId:replyId,
+	            	 like:like
+	             }
+			 });
 		}
 	}
 }])
@@ -77,6 +87,11 @@ angular.module('app', ['ngTouch'])
 			content:''
 	}
 	$scope.replyList = [];
+	$scope.doLike = function(id,like){
+		agentRemote.doLike(id,like).then(function(res){
+			$scope.initReply();
+		});
+	}
 	$scope.initCss = function(){
 		//定义文本
 		const paragraph = $('#paragraph');
@@ -146,6 +161,10 @@ angular.module('app', ['ngTouch'])
       <div class="weui_cells moments">
         <!-- 普通的post -->
         <div class="weui_cell moments__post">
+         <!-- post内容 -->
+            <p id="paragraph" class="paragraph" style="font-weight:bolder;">
+             {{consu.title}}
+            </p>
           <div class="weui_cell_hd">
             <img src="{{consu.headImage}}" />
           </div>
@@ -157,10 +176,6 @@ angular.module('app', ['ngTouch'])
              <div class="toolbar">
               <p class="timestamp">{{consu.time}}</p>
             </div>
-            <!-- post内容 -->
-            <p id="paragraph" class="paragraph">
-             {{consu.title}}
-            </p>
             <!-- 伸张链接 -->
             <a id="paragraphExtender" class="paragraphExtender">显示全文</a>
             <!-- 相册 -->
@@ -186,7 +201,7 @@ angular.module('app', ['ngTouch'])
   		</div>
   		
   		
-<div class="weui_cells" >   
+<!-- <div class="weui_cells" >   
 <div class="weui_cell"  ng-repeat="reply in replyList">
         <div class="weui_cell_hd"><img src="{{reply.headImage}}" alt="" style="width:50px;margin-right:5px;display:block"></div>
         <div class="weui_cell_bd weui_cell_primary">
@@ -196,13 +211,49 @@ angular.module('app', ['ngTouch'])
             <div class="toolbar">
               <p class="timestamp" style="font-size:11px;color:gray;">{{reply.time}}</p>
             </div>
-             <!-- post内容 -->
+             post内容
             <p id="paragraph" class="paragraph" style="font-size:15px;">
              {{reply.content}}
             </p>
         </div>
 </div>
-</div>
+</div> -->
+<div class="weui_cells moments" ng-repeat="reply in replyList">
+        <!-- 普通的post -->
+        <div class="weui_cell moments__post">
+          <div class="weui_cell_hd">
+            <img src="{{reply.headImage}}" />
+          </div>
+          <div class="weui_cell_bd">
+            <!-- 人名链接 -->
+            <a class="title" href="javascript:;" style="width:270px;">
+              <span style="width:100px;">{{reply.username}}</span>
+              <span  style="width:100%;text-align:right;"ng-if="reply.like == true" ng-click="doLike('{{reply.id}}','{{reply.like}}')"><i class="icon icon-65" >({{reply.likecount}})</i></span>
+                <span  style="width:100%;text-align:right;" ng-if="reply.like == false"><i class="icon icon-65"  style="color:blue;">({{reply.likecount}})</i></span>
+            </a>
+            <div class="toolbar">
+              <p class="timestamp">{{reply.time}}</p>
+            </div>
+            <p id="paragraph" class="paragraph">
+             {{reply.content}}
+            </p>
+            <!-- 相册 -->
+           <!--  <div class="thumbnails">
+              <div class="thumbnail">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrspiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+              </div>
+              <div class="thumbnail">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrspiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" />
+              </div>
+            </div> -->
+            <!-- 资料条 -->
+          </div>
+          <!-- 结束 post -->
+        </div>
+      </div>
+      <div class="weui_cells moments" style="height:91px;" ng-if="replyList.length >=4">
+      </div>
+
 <div class="wenwen-footer"> 
   <div class=" weui_cells">
     <div class="weui_cell">

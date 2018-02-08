@@ -19,8 +19,10 @@ import controllers.modules.mobile.bo.XjlDwCheckingBo;
 import controllers.modules.mobile.bo.XjlDwForumBo;
 import controllers.modules.mobile.bo.XjlDwQuizBo;
 import controllers.modules.mobile.bo.XjlDwReplyBo;
+import controllers.modules.mobile.bo.XjlDwReplyLikeBo;
 import controllers.modules.mobile.bo.XjlDwReportBo;
 import controllers.modules.mobile.bo.XjlDwReviewBo;
+import controllers.modules.mobile.bo.XjlDwReviewLikeBo;
 import controllers.modules.mobile.bo.XjlDwSalaryBo;
 import controllers.modules.mobile.bo.XjlDwSalesBo;
 import controllers.modules.mobile.filter.MobileFilter;
@@ -32,10 +34,13 @@ import models.modules.mobile.XjlDwForum;
 import models.modules.mobile.XjlDwProvinces;
 import models.modules.mobile.XjlDwQuiz;
 import models.modules.mobile.XjlDwReply;
+import models.modules.mobile.XjlDwReplyLike;
 import models.modules.mobile.XjlDwReport;
 import models.modules.mobile.XjlDwReview;
 import models.modules.mobile.XjlDwSalary;
 import models.modules.mobile.XjlDwSales;
+import models.modules.mobile.XjlDwStore;
+import models.modules.mobile.xjlDwReviewLike;
 import play.Logger;
 import utils.DateUtil;
 import utils.StringUtil;
@@ -1002,6 +1007,7 @@ public class Execute  extends MobileFilter {
 	 * 得到回复内容集合
 	 */
 	public static void doQueryReplayList(){
+		WxUser wxuser = getWXUser();
 		String id = params.get("id");
 		Map map = XjlDwReply.doQueryByPrimaryKey(id);
 		Map<String,Object> _map =null;
@@ -1022,6 +1028,8 @@ public class Execute  extends MobileFilter {
 					_map.put("headImage","");
 					_map.put("username","");
 				}
+				_map.put("like", XjlDwReplyLike.doQueryReplyLike(wxuser.wxOpenId,String.valueOf(xjlDwReply.replyId)) == null);
+				_map.put("likecount", XjlDwReplyLike.doCountReplyByReplyId(String.valueOf(xjlDwReply.replyId)));
 				_map.put("time", DateUtil.showDate(xjlDwReply.createTime,"yyyy-MM-dd HH:mm:ss"));
 				listmap.add(_map);
 			}
@@ -1117,6 +1125,7 @@ public class Execute  extends MobileFilter {
 	 * 得到评论集合
 	 */
 	public static void doQueryReviewList(){
+		WxUser wxuser = getWXUser();
 		String id = params.get("id");
 		Map map = XjlDwReview.doQueryList(id);
 		Map<String,Object> _map =null;
@@ -1135,6 +1144,8 @@ public class Execute  extends MobileFilter {
 				}
 				WxUserInfo userinfo = WxUserInfo.getFindByOpenId(xjlDwReview.wxOpenId);
 				_map.put("username",userinfo==null?"":userinfo.userinfoName);
+				_map.put("like",xjlDwReviewLike.doQueryReviewLike(wxuser.wxOpenId,String.valueOf(xjlDwReview.reviewId)) == null);
+				_map.put("likecount",xjlDwReviewLike.doCountReviewByReviewId(String.valueOf(xjlDwReview.reviewId)));
 				_map.put("time", DateUtil.showDate(xjlDwReview.createTime,"yyyy-MM-dd HH:mm:ss"));
 				listmap.add(_map);
 			}
@@ -1142,9 +1153,9 @@ public class Execute  extends MobileFilter {
 		ok(listmap);
 	}
 	/**
-	   * 发帖回复
-	   */
-		public static void doReviewAdd(){
+	  * 发帖回复
+	  */
+	public static void doReviewAdd(){
 			WxUser wxuser = getWXUser();
 			String content =  params.get("content");
 			String forumId =  params.get("forumId");
@@ -1154,7 +1165,50 @@ public class Execute  extends MobileFilter {
 			xjlDwReview.wxOpenId = wxuser.wxOpenId;
 			xjlDwReview = XjlDwReviewBo.save(xjlDwReview);
 			ok(xjlDwReview);
-		}
+	}
+	/**
+	 * 资料存储列表
+	 */
+	public static void doQueryStoreList(){
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		Map ret = XjlDwStore.doQueryStoreList(condition, pageIndex, pageSize);
+		ok(ret);
+	}
+	/**
+	 * 点赞操作
+	 */
+	public static void doConLikeAdd(){
+		String replyId = params.get("replyId");
+		WxUser wxuser = getWXUser();
+		XjlDwReplyLike xjl = new XjlDwReplyLike();
+		xjl.replyId = Long.parseLong(replyId);
+		xjl.wxOpenId = wxuser.wxOpenId;
+		XjlDwReplyLikeBo.save(xjl);
+	}
+	/**
+	 * 根据标题检索存储列表
+	 */
+	public static void doQueryStoreByTitle(){
+		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
+		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
+		Map condition = params.allSimple();
+		condition.put("title", params.get("title"));
+		Map ret =XjlDwStore.doQueryStoreList(condition, pageIndex, pageSize);
+		ok(ret);
+	}
+	/**
+	 * 点赞操作
+	 */
+	public static void doLikeAdd(){
+		WxUser wxuser = getWXUser();
+		String reviewId = params.get("reviewId");
+		xjlDwReviewLike xjl = new xjlDwReviewLike();
+		xjl.wxOpenId = wxuser.wxOpenId;
+		xjl.reviewId = Long.parseLong(reviewId);
+		XjlDwReviewLikeBo.save(xjl);
+	}
 	public static void pushMsgForRegist(){
 		 String wxOpenId = params.get("wxOpenId");
 		 Map<String, Object> mapData = new HashMap<String, Object>();
