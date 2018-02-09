@@ -169,6 +169,7 @@ public class Execute  extends MobileFilter {
 	/**
 	 * 新增考勤记录(上班)
 	 */
+	@SuppressWarnings("deprecation")
 	public static void doChecking(){
 		WxUser wxuser = getWXUser();
 	    Date d = new Date();
@@ -179,7 +180,6 @@ public class Execute  extends MobileFilter {
 		Calendar cal = Calendar.getInstance();
 		check.workMonth = String.valueOf(cal.get(Calendar.MONTH)+1);
 		check.workYear =String.valueOf(cal.get(Calendar.YEAR));
-		DateFormat df3 = DateFormat.getTimeInstance();
 		String am = "";
 		if(d.getHours() < 10){
 			am ="0"+d.getHours()+":"; 
@@ -206,11 +206,12 @@ public class Execute  extends MobileFilter {
 	/**
 	 * 下班打卡记录
 	 */
+	@SuppressWarnings("deprecation")
 	public static void doCheckingOver(){
 	    Date d = new Date();
 	    WxUser wxuser = getWXUser();
 	    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-	    DateFormat df3 = DateFormat.getTimeInstance();
+	    //DateFormat df3 = DateFormat.getTimeInstance();
 	    String pm = "";
 		if(d.getHours() < 10){
 			pm ="0"+d.getHours()+":"; 
@@ -344,7 +345,7 @@ public class Execute  extends MobileFilter {
 						gcLast.setTime(theDate);
 						//设置为第一天
 						gcLast.set(Calendar.DAY_OF_MONTH, 1);
-						String day_first=sf.format(gcLast.getTime());
+						//String day_first=sf.format(gcLast.getTime());
 						boolean flag = false;
 						boolean isHoliday = false;
 						Logger.info("这个月第一天"+sf.format(gcLast.getTime()));
@@ -958,7 +959,7 @@ public class Execute  extends MobileFilter {
 		if(null != ret){
 			List<XjlDwQuiz> data  = (List<XjlDwQuiz>) ret.get("data");
 			Map<String,Object> _temp = null;
-			boolean flag = true;
+			//boolean flag = true;
 			for (XjlDwQuiz xjlDwQuiz : data) {
 				_temp = new HashMap<>();
 				_temp.put("id",xjlDwQuiz.quizId);
@@ -1062,7 +1063,6 @@ public class Execute  extends MobileFilter {
 		if(null != ret){
 			List<XjlDwForum> data  = (List<XjlDwForum>) ret.get("data");
 			Map<String,Object> _temp = null;
-			boolean flag = true;
 			for (XjlDwForum xjlDwForum : data) {
 				_temp = new HashMap<>();
 				_temp.put("id",xjlDwForum.forumId);
