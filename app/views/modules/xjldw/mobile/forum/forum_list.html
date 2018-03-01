@@ -18,6 +18,9 @@
 <script src="/xh/public/widgets/angularjs/angular.min.js"></script>
 <script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
 <script src="/xh/public/js/zepto.min.js"></script>
+<style type="text/css">
+  .wenwen-footer{width:100%;position:fixed;bottom:0px; background:#fff;padding:3%;box-sizing:border-box;}
+</style>
 <script>
 function toAdd(){
 	window.location.href='/xh/mobile/Skip/toForumAdd';
@@ -25,18 +28,75 @@ function toAdd(){
 angular.module('app', ['ngTouch'])
 .factory('agentRemote', ['$http', function ($http, appValue) {
 	return{
+		valid:function(content){
+			if(content === ""){
+				 return {flag:false, msg: '评论不能为空'};
+			}
+			 return {flag: true, msg: '验证通过'};
+		},
 		queryList:function(obj){
 			 return $http({
 				 method: 'GET',
                  url: '/xh/mobile/Execute/doQueryForum'
+			 });
+		},
+		doLike:function(reviewId,like){
+			return $http({
+				 method: 'GET',
+	             url: '/xh/mobile/Execute/doLikeAdd',
+	             params:{
+	            	 reviewId:reviewId
+	             }
+			 });
+		},
+		save:function(obj){
+			return $http({
+				 method: 'POST',
+               url: '/xh/mobile/Execute/doReviewAdd',
+               data:obj,
+               headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+               transformRequest:function(obj){
+              	 var str = [];    
+                   for (var p in obj) {    
+                       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));    
+                   }    
+                   return str.join("&"); 
+              }
 			 });
 		}
 	}
 }])
 .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
 	$scope.forumList = [];
+	$scope.reviewList = [];
+	$(".wenwen-footer").hide();
 	$scope.forum = {
 			title:''
+	}
+	$scope.review = {
+			forumId:'',
+			content:''
+	}
+	$scope.save = function(){
+		var vaildRes = agentRemote.valid($scope.review.content);
+		if(vaildRes.flag){
+			agentRemote.save($scope.review).then(function(res){
+				  $.toast("操作成功");
+				  $scope.init();
+				  $(".wenwen-footer").hide();
+			})
+		}else{
+			 $.toast(vaildRes.msg, "forbidden");
+		}
+	}
+	$scope.showInput = function(id){
+		$scope.review.forumId = id;
+		$(".wenwen-footer").show();
+	}
+	$scope.doLike = function(id){
+		agentRemote.doLike(id).then(function(res){
+			$scope.init();
+		});
 	}
 	$scope.onclick = function(id){
 		window.location.href='/xh/mobile/Skip/toForumInfo?id='+id;
@@ -102,7 +162,7 @@ angular.module('app', ['ngTouch'])
           <div class="weui_cell_hd">
             <img src="{{forum.headImage}}" />
           </div>
-          <div class="weui_cell_bd" ng-click="onclick({{forum.id}})">
+          <div class="weui_cell_bd" >
             <!-- 人名链接 -->
             <a class="title" href="javascript:;">
               <xhan>{{forum.username}}</xhan>
@@ -127,20 +187,39 @@ angular.module('app', ['ngTouch'])
             </div> -->
             <!-- 资料条 -->
             <div class="weui-flex" style="height:20px;">
-             <div class="weui-flex-item" ><xhan id="actionToggle" class="actionToggle" style="background-color:white;padding-right:10%;"><i class="icon icon-80">({{forum.review}})</i></xhan></div>
-             <!--  <div>
-                <div id="actionMenu" class="actionMenu slideIn">
-                  <p class="actionBtn" id="btnLike"><i class="icon icon-79"></i></p>
-                  <p class="actionBtn" id="btnComment"><i class="icon icon-3"></i></p>
-                </div>
-              </div> -->
+             <div class="weui-flex-item" ><xhan id="actionToggle" class="actionToggle" style="background-color:white;padding-right:10%;"><i class="icon icon-80" ng-click="showInput('{{forum.id}}')">({{forum.review}})</i></xhan></div>
             </div>
-           <!--  <!-- 赞／评论区 -->
-            <!-- <p class="liketext"><i class="icon icon-96"></i><xhan class="nickname">Yoby</xhan>,<xhan class="nickname">奥巴马</xhan></p> -->
           </div>
+          <!-- 答复 -->
+			<div class="weui_cell"   ng-repeat="review in forum.reviewList">
+			      <div class="weui_cell_hd" style="width:50px;"><img src="{{review.headImage}}" style="width:30px;height:40px;margin-right:5px;display:block;"></div>
+				  <div class="weui_cell_bd weui_cell_primary">
+				  	<a class=" " href="javascript:;" style="color: gray;font-size:15px;">
+		             <span>{{review.username}}</span>
+		             <span id="actionToggle" class="actionToggle" style="background-color:white;width:30%;margin-top:-5%;"  ng-if="review.like == true" ng-click="doLike('{{review.id}}')"><i class="icon icon-65" style="padding-left:50%;">({{review.likecount}})</i></span>
+		              <span id="actionToggle" class="actionToggle" style="background-color:white;width:30%;margin-top:-5%;"  ng-if="review.like == false"><i class="icon icon-65" style="padding-left:50%;color:blue">({{review.likecount}})</i></span>
+		            </a>
+		            <div class="toolbar">
+		             <p class="timestamp" style="font-size:11px;color:gray;">{{review.time}}</p>
+		           </div>
+		           <p id="paragraph" class="paragraph"  style="font-size:15px;">
+			          {{review.content}}
+			       </p> 
+				  </div>
+			</div>
           <!-- 结束 post -->
         </div>
       </div>
       <!-- 结束 朋友圈 -->
+       <div class="wenwen-footer"> 
+  <div class=" weui_cells">
+    <div class="weui_cell">
+        <div class="weui_cell_bd weui_cell_primary">
+            <input class="weui_input" placeholder="写评论" ng-model="review.content" type="text">
+        </div>
+         <a href="javascript:;" class="weui_btn weui_btn_mini weui_btn_primary" ng-click="save()">发送</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>

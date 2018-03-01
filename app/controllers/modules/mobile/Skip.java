@@ -389,6 +389,8 @@ public class Skip extends MobileFilter {
 	 * 跳转到资料存储列表
 	 */
 	public static void toStoreList(){
+		WxUser wxuser = getWXUser();
+		renderArgs.put("wxUser", wxuser); 
 		render("modules/xjldw/mobile/store/store_list.html");
 	}
 }

@@ -1058,11 +1058,16 @@ public class Execute  extends MobileFilter {
 		int pageIndex = StringUtil.getInteger(params.get("PAGE_INDEX"), 1);
 		int pageSize = StringUtil.getInteger(params.get("PAGE_SIZE"), 100);
 		Map condition = params.allSimple();
+		WxUser wxuser = getWXUser();
 		Map ret = XjlDwForum.doQuery(condition, pageIndex, pageSize);
 		List<Map<String,Object>> listMap = new ArrayList<>();
+		List<Map<String,Object>> listmap1 = null;
+		List<XjlDwReview> reviewList = null;
+		Map map = null;
 		if(null != ret){
 			List<XjlDwForum> data  = (List<XjlDwForum>) ret.get("data");
 			Map<String,Object> _temp = null;
+			Map<String,Object> _temp1 = null;
 			for (XjlDwForum xjlDwForum : data) {
 				_temp = new HashMap<>();
 				_temp.put("id",xjlDwForum.forumId);
@@ -1078,6 +1083,29 @@ public class Execute  extends MobileFilter {
 				_temp.put("title",xjlDwForum.title);
 				_temp.put("content",xjlDwForum.content);
 				_temp.put("time",DateUtil.showDate(xjlDwForum.createTime,"yyyy-MM-dd HH:mm:ss"));
+				map =  XjlDwReview.doQueryList(String.valueOf(xjlDwForum.forumId));
+				listmap1 = new ArrayList<>();
+				if(null != map){
+					reviewList = (List<XjlDwReview>) map.get("data");
+					for (XjlDwReview xjlDwReview : reviewList) {
+						_temp1 = new HashMap<>();
+						_temp1.put("id",xjlDwReview.reviewId);
+						_temp1.put("content",xjlDwReview.content);
+						 wx = WxUser.getUserByOpenId(xjlDwReview.wxOpenId);
+						if(null !=wx){
+							_temp1.put("headImage",wx.headImgUrl);
+						}else{
+							_temp1.put("headImage","");
+						}
+						 userinfo = WxUserInfo.getFindByOpenId(xjlDwReview.wxOpenId);
+						 _temp1.put("username",userinfo==null?"":userinfo.userinfoName);
+						 _temp1.put("like",xjlDwReviewLike.doQueryReviewLike(wxuser.wxOpenId,String.valueOf(xjlDwReview.reviewId)) == null);
+						 _temp1.put("likecount",xjlDwReviewLike.doCountReviewByReviewId(String.valueOf(xjlDwReview.reviewId)));
+						 _temp1.put("time", DateUtil.showDate(xjlDwReview.createTime,"yyyy-MM-dd HH:mm:ss"));
+						 listmap1.add(_temp1);
+					}
+				}
+				_temp.put("reviewList",listmap1);
 				listMap.add(_temp);
 			}
 		}

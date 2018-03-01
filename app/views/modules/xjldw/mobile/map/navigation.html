@@ -34,7 +34,7 @@ ajaxReturn.done(function (data) {
          signature: signature,// 必填，签名，见附录1
          jsApiList: ['openLocation', 'getLocation', 'closeWindow', 'previewImage'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
      });
-	 setTimeout("getLocation()",1000)
+	 setTimeout("getLocation()",500)
 });
 
 function getLocation(){
@@ -44,9 +44,9 @@ function getLocation(){
          latitude :latitud,  //res.latitude, 纬度，浮点数，范围为90 ~ -90  
          longitude :longitude, //res.longitude,  经度，浮点数，范围为180 ~ -180。  
          name : '南京西桓电气有限公司', // 位置名  
-         address : '中国•南京集庆门大街苏宁慧谷E08-2-2110', // 地址详情说明  
+         address : 'NANJING SIIHANN ELECTRIC CO,LTD.                                                                                                                                                                                                                                                                                                                      中国•南京集庆门大街苏宁慧谷E08-2-2110', // 地址详情说明  
          scale : 28, // 地图缩放级别,整形值,范围从1~28。默认为最大  
-         infoUrl : 'http://www.gongjuji.net' // 在查看位置界面底部显示的超链接,可点击跳转（测试好像不可用）  
+         infoUrl : 'http://www.siihann.cn' // 在查看位置界面底部显示的超链接,可点击跳转（测试好像不可用）  
      });  
 } 
 </script>

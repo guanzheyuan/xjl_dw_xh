@@ -46,7 +46,7 @@ public class XjlDwReview extends GenericModel   {
 	}
 	
 	public static Map doQueryList(String forumId){
-		String sql="select * from xjl_dw_review where status='0AA' and forum_id='"+forumId+"'";
+		String sql="select * from xjl_dw_review where status='0AA' and forum_id='"+forumId+"' order by create_time desc";
 		Map<String,String> condition = new HashMap<>();
     	SQLResult ret = ModelUtils.createSQLResult(condition, sql);
 		List<XjlDwReview> data = ModelUtils.queryData(1,10, ret,XjlDwReview.class);

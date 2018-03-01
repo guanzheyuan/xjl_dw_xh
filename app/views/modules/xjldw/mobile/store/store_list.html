@@ -18,6 +18,7 @@
 <script src="/xh/public/widgets/angularjs/angular.min.js"></script>
 <script src="/xh/public/widgets/angularjs/angular-touch.min.js"></script>
 <script src="/xh/public/js/zepto.min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 <script>
 angular.module('app', ['ngTouch'])
 .factory('agentRemote', ['$http', function ($http, appValue) {
@@ -41,6 +42,46 @@ angular.module('app', ['ngTouch'])
 }])
 .controller('MainController',['$scope','agentRemote','$timeout',function($scope,agentRemote,$timeout){
 	$scope.storeList = [];
+	$scope.storeShare = function(){
+		$('.weui-share').show().addClass('fadeIn');
+		wx.onMenuShareTimeline({
+		    title: '个人资料', // 分享标题
+		    link: 'http://dw201709.com/xh/public/txt/share.docx', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+		    imgUrl: 'http://dw201709.com/xh/public/images/mobile/excel_alt_1.png', // 分享图标
+		    success: function () {
+		    	alert(123);
+		    // 用户确认分享后执行的回调函数
+		},
+		cancel: function () {
+		    // 用户取消分享后执行的回调函数
+		    }
+		});
+		wx.onMenuShareAppMessage({
+			title: '个人资料', // 分享标题
+			desc: '分享文件', // 分享描述
+			link: 'http://dw201709.com/xh/public/txt/share.docx', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+			imgUrl: 'http://dw201709.com/xh/public/images/mobile/excel_alt_1.png', // 分享图标
+			success: function () {
+			// 用户确认分享后执行的回调函数
+			},
+			cancel: function () {
+			// 用户取消分享后执行的回调函数
+			}
+			});
+		wx.onMenuShareQQ({
+			title: '个人资料', // 分享标题
+			desc: '分享文件', // 分享描述
+			link: 'http://dw201709.com/xh/public/txt/share.docx', // 分享链接
+			imgUrl: 'http://dw201709.com/xh/public/images/mobile/excel_alt_1.png', // 分享图标
+			success: function () {
+			// 用户确认分享后执行的回调函数
+			},
+			cancel: function () {
+			// 用户取消分享后执行的回调函数
+			}
+			});
+	}
+	
 	$scope.initSearch = function(){
 		$('.searchbar_wrap').searchBar({
 		    cancelText:"取消",
@@ -76,6 +117,33 @@ angular.module('app', ['ngTouch'])
 			 $scope.storeList  = res.data.data.data;
 		 })
 	}
+	$scope.initWX = function(){
+		var openId = '${wxUser.wxOpenId}';
+		var vnoId = '1';
+		var url = window.location.href.split('#')[0];
+		var ajaxReturn = $.ajax({url:"/xh/Weixin/getWxSdkInfo", data: {url: url,openId:openId,vnoId:vnoId}});
+		ajaxReturn.done(function (data) {
+			var appId = data.appId,
+		    signature = data.signature,
+		    timestamp = data.timestamp,
+		    nonce = data.nonce;
+			 wx.config({
+		         debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+		         appId: appId, // 必填，公众号的唯一标识
+		         timestamp: timestamp, // 必填，生成签名的时间戳
+		         nonceStr: nonce, // 必填，生成签名的随机串
+		         signature: signature,// 必填，签名，见附录1
+		         jsApiList: ['checkJsApi',  
+				             'onMenuShareTimeline',  
+				             'onMenuShareAppMessage',  
+				             'onMenuShareQQ',  
+				             'onMenuShareWeibo',  
+				             'chooseWXPay',
+				             'closeWindow'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+		     });
+		});
+		
+	}
 	$scope.init = function(){
 		agentRemote.queryList().then(function(res){
 			console.log(res);
@@ -83,6 +151,7 @@ angular.module('app', ['ngTouch'])
 		});
 	}
 	$scope.init();
+	$scope.initWX();
 	setTimeout(function () {
 		$scope.initSearch();
     }, 500);
@@ -102,8 +171,13 @@ angular.module('app', ['ngTouch'])
           <div class="weui_cell_bd weui_cell_primary">
               <p>{{store.title}}</p>
           </div>
-          <div class="weui_cell_ft">{{store.time}}</div>
+          <div class="weui_cell_ft">{{store.time}}<i class="icon icon-41" style="padding-left:10px;" ng-click="storeShare()" ></i></div>
       </div>
  </div>
+ <div class="weui-share" onclick="$(this).fadeOut();$(this).removeClass('fadeOut')">
+<div class="weui-share-box">
+点击需要分享的资料后,再点击右上角送给指定朋友或者分享到朋友圈<i></i>
+</div>
+</div> 
 </body>
 </html>
